@@ -1,0 +1,35 @@
+<?xml version="1.0" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+    <services>
+        <service id="symfony.application"
+            class="Symfony\Component\Console\Application">
+            <argument key="name">Creode Dev</argument>
+            <argument key="version">1.0.0</argument>
+            <call method="add">
+                 <argument type="service" id="cdev.docker_command" />
+            </call>
+        </service>
+
+        <service id="cdev.docker_command" class="Creode\Cdev\Command\DockerCommand">
+            <argument type="service" id="cdev.docker" />
+        </service>
+
+        <service id="cdev.docker" class="Creode\Tools\Docker">
+            <argument type="service" id="cdev.docker_compose" />
+            <argument type="service" id="cdev.docker_sync" />
+        </service>
+
+        <service id="cdev.docker_compose" class="Creode\Tools\Docker\Compose">
+        </service>
+
+        <service id="cdev.docker_sync" class="Creode\Tools\Docker\Sync">
+        </service>
+
+        <service id="symfony.console_output"
+            class="Symfony\Component\Console\Output\ConsoleOutput">
+        </service>
+    </services>
+</container>
