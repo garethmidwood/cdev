@@ -1,43 +1,35 @@
 <?php
 namespace Creode\Tools\Docker;
 
-use Symfony\Component\Process\Process;
-use Symfony\Component\Process\Exception\ProcessFailedException;
+use Creode\Tools\Command;
 
-class Sync
+class Sync extends Command
 {
     public function start()
     {
-        /**
-         * 
-         * DO THIS TO ALL FUNCTIONS
-         * 
-         */
-        $process = new Process('docker-sync start');
-        $process->run();
-
-        // executes after the command finishes
-        if (!$process->isSuccessful()) {
-            throw new ProcessFailedException($process);
-        }
-
-        echo $process->getOutput();
+        $this->run('docker-sync start');
 
         return 'docker-sync start completed';
     }
 
     public function stop()
     {
-        return 'docker-sync stop';
+        $this->run('docker-sync stop');
+
+        return 'docker-sync stop completed';
     }
 
     public function clean()
     {
-        return 'docker-sync clean';
+        $this->run('docker-sync clean');
+
+        return 'docker-sync clean completed';
     }
 
     public function sync()
     {
-        return 'docker-sync sync';
+        $this->run('docker-sync sync');
+
+        return 'docker-sync sync completed';
     }
 }

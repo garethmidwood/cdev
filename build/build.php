@@ -1,7 +1,7 @@
 #!/usr/bin/env php
 <?php
-$pharfile = 'cdock.phar';
-$startfile = 'src/cdock.php';
+$pharfile = 'cdev.phar';
+$startfile = 'src/cdev.php';
 
 $basedir = dirname(dirname( __FILE__ ));
 
