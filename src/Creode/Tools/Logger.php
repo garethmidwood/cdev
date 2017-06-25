@@ -11,8 +11,16 @@ abstract class Logger
 
     protected function logTitle($title)
     {
-        echo '================================' . PHP_EOL;
-        echo strtoupper($title) . PHP_EOL;
-        echo '================================' . PHP_EOL;
+        echo PHP_EOL . '>>>>>>>>>> ' . strtoupper($title) . PHP_EOL;
+    }
+
+    protected function logError($message)
+    {
+        echo ' ! ' . $message . PHP_EOL;
+    }
+
+    protected function logNotice($message)
+    {
+        echo ' * ' . $message . PHP_EOL;
     }
 }

@@ -1,9 +1,9 @@
 <?php
 namespace Creode\Tools\Docker;
 
-use Creode\Tools\Command;
+use Creode\Tools\SystemCommand;
 
-class Sync extends Command
+class Sync extends SystemCommand
 {
     public function start()
     {

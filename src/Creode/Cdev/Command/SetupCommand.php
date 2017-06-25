@@ -6,6 +6,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\Question;
 
 use Creode\Tools\ToolInterface as ToolInterface;
 
@@ -60,8 +61,19 @@ class SetupCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $helper = $this->getHelper('question');
+
+        $question = new Question('Package name (<vendor>/<name>) ', 'creode/toolazytotype');
+        $answers['packageName'] = $helper->ask($input, $output, $question);
+
+        $question = new Question('Docker port suffix (3 digits - e.g. 014) ', 'XXX');
+        $answers['portNo'] = $helper->ask($input, $output, $question);
+
+        $question = new Question('Project name (xxxx).docker ', 'toolazytotype');
+        $answers['projectName'] = $helper->ask($input, $output, $question);
+
         $output->writeln(
-            $this->_tool->setup($input)
+            $this->_tool->setup($input, $answers)
         );
     }
 }

@@ -10,6 +10,7 @@ use Creode\Tools\Composer\Composer;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Yaml\Yaml;
 
 class Docker extends Logger implements ToolInterface
 {
@@ -74,9 +75,13 @@ class Docker extends Logger implements ToolInterface
      * @param InputInterface $input 
      * @return null
      */
-    public function setup(InputInterface $input)
+    public function setup(InputInterface $input, array $answers = array())
     {
         $this->_input = $input;
+
+        $this->validateAnswers($answers);
+
+        $this->_answers = $answers;
 
         $oldSrc = $this->_input->getOption('oldsrc');
 
@@ -90,12 +95,9 @@ class Docker extends Logger implements ToolInterface
 
         $this->composerInit();
 
-        // - move code into /src directory
-        //   - will need to ask if it's already in a sub dir
-        // - run composer init (let it ask for its own inputs)
-        // - run require creode/docker
-        // - copy docker templates
-        //   - ask for input on what the project name is (no spaces) and port number
+        $this->composerInstall();
+
+        $this->configureDocker();
     }
 
     public function start()
@@ -122,6 +124,33 @@ class Docker extends Logger implements ToolInterface
         $this->_sync->clean();
     }
 
+    private function validateAnswers(array $answers = array())
+    {
+        $messages = array();
+
+        if (!isset($answers['packageName'])) {
+            $messages[] = 'Composer package name must be filled in';
+        }
+
+        if (!isset($answers['projectName'])) {
+            $messages[] = 'Docker project name must be filled in';
+        } elseif (!filter_var('http://'.$answers['projectName'].'.com', FILTER_VALIDATE_URL)) {
+            $messages[] = 'Docker project name must be suitable for use in domain name (no spaces, underscores etc.)';
+        }
+
+        if (!isset($answers['portNo'])) {
+            $messages[] = 'Docker port number must be filled in';
+        } elseif (!preg_match('/^[0-9]{3}$/',$answers['portNo'])) {
+            $messages[] = 'Docker port number must be a 3 digit number';
+        }
+
+        if (count($messages) > 0) {
+            foreach ($messages as $message) {
+                $this->logError($message);
+            }
+            throw new \Exception('Validation issues with input data. See log for details');
+        }
+    }
 
     private function renameSrcDir()
     {
@@ -136,7 +165,7 @@ class Docker extends Logger implements ToolInterface
 
         if (!$this->_fs->exists($oldSrcPath))
         {
-            $this->logMessage("$oldSrc directory doesn't exist. Aborting");
+            $this->logError("$oldSrc directory doesn't exist. Aborting");
             throw new \Exception("$oldSrc directory doesn't exist");
         }
             
@@ -159,7 +188,7 @@ class Docker extends Logger implements ToolInterface
 
         if ($this->_fs->exists($srcPath))
         {
-            $this->logMessage("$src directory already exists. Continuing with existing dir");
+            $this->logNotice("$src directory already exists. Continuing with existing dir");
             return;
         }
             
@@ -180,8 +209,19 @@ class Docker extends Logger implements ToolInterface
         $this->_finder
             ->in($path)
             ->depth('== 0')
-            ->exclude($src)
-            ->exclude('composer.*');
+            ->exclude($src);
+
+        foreach (Repo::TEMPLATES as $dockerTemplate) {
+            if ($this->_fs->exists($path . '/' . $dockerTemplate)) {
+                $this->logError("$dockerTemplate exists. Project is already set up?");
+                throw new \Exception("$dockerTemplate exists. Project is already set up?");
+            }
+        }
+
+        if (count($this->_finder) == 0) {
+            $this->logNotice("No files to move");
+            return;
+        }
 
         foreach ($this->_finder as $file) {
             $this->logMessage("Moving {$file->getFileName()} into $src directory");
@@ -199,9 +239,95 @@ class Docker extends Logger implements ToolInterface
 
         $path = $this->_input->getOption('path');
 
+        if ($this->_fs->exists($path . '/composer.json')) {
+            $this->logNotice('composer.json already exists, skipping');
+            return;
+        }
+
         $this->logMessage(
-            $this->_composer->init($path)
+            $this->_composer->init($path, $this->_answers['packageName'])
         );
     }
 
+    private function composerInstall()
+    {
+        $this->logTitle('Running composer install');
+
+        $path = $this->_input->getOption('path');
+
+        $this->logMessage(
+            $this->_composer->install($path)
+        );
+    }
+
+    private function configureDocker()
+    {
+        $this->logTitle('Copying Docker templates');
+
+        foreach (Repo::TEMPLATES as $dockerTemplate) {
+            $this->tailorDockerTemplate(
+                $this->copyDockerTemplate($dockerTemplate)
+            );
+        }
+    }
+
+    private function copyDockerTemplate($dockerTemplate)
+    {
+        $this->logMessage("Copying $dockerTemplate to project directory");
+
+        $path = $this->_input->getOption('path');
+
+        $templatePath = $path . Repo::TEMPLATE_PATH . $dockerTemplate;
+
+        if (!$this->_fs->exists($templatePath)) {
+            $this->logError("$templatePath doesn't exist. Aborting");
+            throw new \Exception("$templatePath doesn't exist");
+        }
+
+        $newTemplatePath = $path . '/' . $dockerTemplate;
+
+        $this->_fs->copy(
+            $templatePath,
+            $newTemplatePath,
+            true
+        );
+
+        return $newTemplatePath;
+    }
+
+    private function tailorDockerTemplate($template)
+    {
+        $config = Yaml::parse(file_get_contents($template));
+
+        if (!isset($config['services'])) {
+            return;
+        }
+
+        foreach ($config['services'] as $key => &$service) {
+            if (isset($service['ports'])) {
+                foreach($service['ports'] as &$ports) {
+                    $this->logMessage("Replacing ports for $key [$ports]");
+                    $ports = str_replace('001:', $this->_answers['portNo'] . ':', $ports);
+                    $this->logMessage(" New value $ports");
+                }
+            }
+
+            if (isset($service['container_name'])) {
+                $this->logMessage("Replacing container name for $key");
+                $service['container_name'] = str_replace('yourproject', $this->_answers['projectName'], $service['container_name']);
+                $this->logMessage(" New value {$service['container_name']}");
+            }
+
+            if ($key == 'php' && isset($service['environment'])) {
+                $this->logMessage("Replacing domain name for $key");
+                $service['environment'] = str_replace('yourproject', $this->_answers['projectName'], $service['environment']);
+                $domainName = str_replace('VIRTUAL_HOST=', '*', $service['environment']);
+                $this->logMessage(" New value {$domainName[0]}");
+            }
+        }  
+
+        $updatedConfig = Yaml::dump($config);
+
+        file_put_contents($template, $updatedConfig);
+    }
 }
