@@ -1,9 +1,9 @@
 <?php
-namespace Creode\Tools\Composer;
+namespace Creode\System\Command\Composer;
 
-use Creode\Tools\SystemCommand;
+use Creode\System\Command\Command;
 
-class Composer extends SystemCommand
+class Composer extends Command
 {
     const COMPOSER = '/usr/local/bin/composer.phar'; // TODO: Make this universal
 

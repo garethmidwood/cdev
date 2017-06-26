@@ -1,9 +1,9 @@
 <?php
-namespace Creode\Tools\Docker;
+namespace Creode\System\Command\Docker;
 
-use Creode\Tools\SystemCommand;
+use Creode\System\Command\Command;
 
-class Compose extends SystemCommand
+class Compose extends Command
 {
     public function up()
     {

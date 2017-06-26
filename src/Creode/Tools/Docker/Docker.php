@@ -4,9 +4,9 @@ namespace Creode\Tools\Docker;
 
 use Creode\Tools\ToolInterface;
 use Creode\Tools\Logger;
-use Creode\Tools\Docker\Compose;
-use Creode\Tools\Docker\Sync;
-use Creode\Tools\Composer\Composer;
+use Creode\System\Command\Docker\Compose;
+use Creode\System\Command\Docker\Sync;
+use Creode\System\Command\Composer\Composer;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Console\Input\InputInterface;
@@ -299,6 +299,24 @@ class Docker extends Logger implements ToolInterface
     {
         $config = Yaml::parse(file_get_contents($template));
 
+        // replace docker sync volume names
+        if (isset($config['volumes'])) {
+            foreach ($config['volumes'] as $key => $service) {
+                $this->logMessage("Replacing $key sync volume name");
+                $config['volumes'][$this->_answers['projectName'] . '-' . $key] = $service;
+                unset($config['volumes'][$key]);
+            }
+        }
+
+        if (isset($config['syncs'])) {
+            foreach ($config['syncs'] as $key => $service) {
+                $this->logMessage("Replacing $key sync volume name");
+                $config['syncs'][$this->_answers['projectName'] . '-' . $key] = $service;
+                unset($config['syncs'][$key]);
+            }
+        }
+
+        // replace files for services in docker-compose.yml
         if (!isset($config['services'])) {
             return;
         }
@@ -323,6 +341,12 @@ class Docker extends Logger implements ToolInterface
                 $service['environment'] = str_replace('yourproject', $this->_answers['projectName'], $service['environment']);
                 $domainName = str_replace('VIRTUAL_HOST=', '*', $service['environment']);
                 $this->logMessage(" New value {$domainName[0]}");
+            }
+
+            if (isset($service['volumes'])) {
+                $this->logMessage("Replacing sync volume names for $key");
+                $service['volumes'] = str_replace('website-code-sync:', $this->_answers['projectName'] . '-website-code-sync:', $service['volumes']);
+                $this->logMessage(" New value {$this->_answers['projectName']}-website-code-sync");
             }
         }  
 

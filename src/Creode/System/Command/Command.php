@@ -1,13 +1,13 @@
 <?php
 
-namespace Creode\Tools;
+namespace Creode\System\Command;
 
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
 use Symfony\Component\Process\InputStream;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 
-abstract class SystemCommand
+abstract class Command
 {
     protected function run($command, array $options, $workingDir)
     {

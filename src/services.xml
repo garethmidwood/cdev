@@ -47,15 +47,15 @@
         </service>
 
         <service id="cdev.docker_compose"
-            class="Creode\Tools\Docker\Compose">
+            class="Creode\System\Command\Docker\Compose">
         </service>
 
         <service id="cdev.docker_sync"
-            class="Creode\Tools\Docker\Sync">
+            class="Creode\System\Command\Docker\Sync">
         </service>
 
         <service id="cdev.composer"
-            class="Creode\Tools\Composer\Composer">
+            class="Creode\System\Command\Composer\Composer">
         </service>
 
         <service id="symfony.console_output"
