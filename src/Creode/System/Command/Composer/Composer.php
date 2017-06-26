@@ -5,12 +5,17 @@ use Creode\System\Command\Command;
 
 class Composer extends Command
 {
-    const COMPOSER = '/usr/local/bin/composer.phar'; // TODO: Make this universal
+    private $_composer;
+
+    public function setPath($path)
+    {
+        $this->_composer = $path;
+    }
 
     public function init($path, $packageName)
     {
         $this->run(
-            self::COMPOSER,
+            $this->_composer,
             [
                 'init',
                 '-n',
@@ -28,7 +33,7 @@ class Composer extends Command
     public function install($path)
     {
         $this->run(
-            self::COMPOSER,
+            $this->_composer,
             [
                 'install'
             ],

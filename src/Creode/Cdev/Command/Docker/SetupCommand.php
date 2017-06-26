@@ -1,37 +1,18 @@
 <?php
-namespace Creode\Cdev\Command;
+namespace Creode\Cdev\Command\Docker;
 
-use Symfony\Component\Console\Command\Command;
+use Creode\Cdev\Command\ToolCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 
-use Creode\Tools\ToolInterface as ToolInterface;
-
-class SetupCommand extends Command
+class SetupCommand extends ToolCommand
 {
-    /**
-     * @var ToolInterface
-     */
-    private $_tool;
-
-    /**
-     * Constructor
-     * @param ToolInterface $tool 
-     * @return null
-     */
-    public function __construct(ToolInterface $tool)
-    {
-        $this->_tool = $tool;
-
-        parent::__construct();
-    }
-
     protected function configure()
     {
-        $this->setName('setup');
+        $this->setName('docker:setup');
         $this->setDescription('Sets up the project to run on a virtual environment');
 
         $this->addOption(
@@ -57,9 +38,28 @@ class SetupCommand extends Command
             'If entered, the named directory will be renamed to the value of src',
             null
         );
+
+        $this->addOption(
+            'composer',
+            'c',
+            InputOption::VALUE_OPTIONAL,
+            'Path to composer executable',
+            '/usr/local/bin/composer.phar'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
+    {
+        $answers = $this->askQuestions($input, $output);
+
+        $this->_tool->input($input);
+
+        $output->writeln(
+            $this->_tool->setup($answers)
+        );
+    }
+
+    private function askQuestions(InputInterface $input, OutputInterface $output)
     {
         $helper = $this->getHelper('question');
 
@@ -72,8 +72,6 @@ class SetupCommand extends Command
         $question = new Question('Project name (xxxx).docker ', 'toolazytotype');
         $answers['projectName'] = $helper->ask($input, $output, $question);
 
-        $output->writeln(
-            $this->_tool->setup($input, $answers)
-        );
+        return $answers;
     }
 }

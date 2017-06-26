@@ -5,23 +5,23 @@ use Creode\System\Command\Command;
 
 class Compose extends Command
 {
-    public function up()
+    public function up($path)
     {
-        $this->run('docker-compose up');
+        $this->run('docker-compose', ['up'], $path);
 
         return 'docker-compose up completed';
     }
 
-    public function stop()
+    public function stop($path)
     {
-        $this->run('docker-compose stop');
+        $this->run('docker-compose', ['stop'], $path);
 
         return 'docker-compose stop completed';
     }
 
-    public function rm()
+    public function rm($path)
     {
-        $this->run('docker-compose rm');
+        $this->run('docker-compose', ['rm'], $path);
 
         return 'docker-compose rm completed';
     }

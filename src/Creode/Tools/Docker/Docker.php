@@ -71,14 +71,22 @@ class Docker extends Logger implements ToolInterface
     }
 
     /**
+     * Sets the inputs
+     * @param InputInterface $input 
+     * @return type
+     */
+    public function input(InputInterface $input)
+    {
+        $this->_input = $input;
+    }
+
+    /**
      * Sets up the directory with docker 
      * @param InputInterface $input 
      * @return null
      */
-    public function setup(InputInterface $input, array $answers = array())
+    public function setup(array $answers = array())
     {
-        $this->_input = $input;
-
         $this->validateAnswers($answers);
 
         $this->_answers = $answers;
@@ -93,6 +101,10 @@ class Docker extends Logger implements ToolInterface
             $this->moveFilesToSrc();
         }
 
+        $this->composerSetPath(
+            $this->_input->getOption('composer')
+        );
+
         $this->composerInit();
 
         $this->composerInstall();
@@ -104,24 +116,30 @@ class Docker extends Logger implements ToolInterface
     {
         $this->logTitle('Starting dev environment...');
 
-        $this->_sync->start();
-        $this->_compose->up();
+        $path = $this->_input->getOption('path');
+
+        $this->_sync->start($path);
+        $this->_compose->up($path);
     }
 
     public function stop()
     {
         $this->logTitle('Stopping dev environment...');
 
-        $this->_compose->stop();
-        $this->_sync->stop();
+        $path = $this->_input->getOption('path');
+
+        $this->_compose->stop($path);
+        $this->_sync->stop($path);
     }
 
     public function nuke()
     {
         $this->logTitle('Nuking dev environment...');
 
-        $this->_compose->rm();
-        $this->_sync->clean();
+        $path = $this->_input->getOption('path');
+
+        $this->_compose->rm($path);
+        $this->_sync->clean($path);
     }
 
     private function validateAnswers(array $answers = array())
@@ -231,6 +249,16 @@ class Docker extends Logger implements ToolInterface
                 $file->getPath() . '/' . $src . '/' . $file->getFileName() 
             );
         }
+    }
+
+    /**
+     * Sets composer executable path
+     * @param string $composerPath Path to composer executable
+     * @return null
+     */
+    private function composerSetPath($composerPath)
+    {
+        $this->_composer->setPath($composerPath);
     }
 
     private function composerInit()

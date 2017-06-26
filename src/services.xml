@@ -9,33 +9,48 @@
             <argument key="name">Creode Dev</argument>
             <argument key="version">1.0.0</argument>
             <call method="add">
-                <argument type="service" id="cdev.nuke_command" />
+                <argument type="service" id="cdev.cdev_configure_command" />
             </call>
             <call method="add">
-                <argument type="service" id="cdev.setup_command" />
+                <argument type="service" id="cdev.db_pull_command" />
             </call>
             <call method="add">
-                <argument type="service" id="cdev.start_command" />
+                <argument type="service" id="cdev.docker_nuke_command" />
             </call>
             <call method="add">
-                <argument type="service" id="cdev.stop_command" />
+                <argument type="service" id="cdev.docker_setup_command" />
+            </call>
+            <call method="add">
+                <argument type="service" id="cdev.docker_start_command" />
+            </call>
+            <call method="add">
+                <argument type="service" id="cdev.docker_stop_command" />
             </call>
         </service>
 
-        <service id="cdev.nuke_command" class="Creode\Cdev\Command\NukeCommand">
+        <service id="cdev.docker_nuke_command" class="Creode\Cdev\Command\Docker\NukeCommand">
             <argument type="service" id="cdev.docker" />
         </service>
 
-        <service id="cdev.setup_command" class="Creode\Cdev\Command\SetupCommand">
+        <service id="cdev.docker_setup_command" class="Creode\Cdev\Command\Docker\SetupCommand">
             <argument type="service" id="cdev.docker" />
         </service>
 
-        <service id="cdev.start_command" class="Creode\Cdev\Command\StartCommand">
+        <service id="cdev.docker_start_command" class="Creode\Cdev\Command\Docker\StartCommand">
             <argument type="service" id="cdev.docker" />
         </service>
 
-        <service id="cdev.stop_command" class="Creode\Cdev\Command\StopCommand">
+        <service id="cdev.docker_stop_command" class="Creode\Cdev\Command\Docker\StopCommand">
             <argument type="service" id="cdev.docker" />
+        </service>
+
+        <service id="cdev.db_pull_command" class="Creode\Cdev\Command\Db\PullCommand">
+            <argument type="service" id="cdev.config" />
+            <argument type="service" id="cdev.ssh" />
+        </service>
+
+        <service id="cdev.cdev_configure_command"
+            class="Creode\Cdev\Command\Cdev\ConfigureCommand">
         </service>
 
         <service id="cdev.docker" class="Creode\Tools\Docker\Docker">
@@ -44,6 +59,11 @@
             <argument type="service" id="cdev.composer" />
             <argument type="service" id="symfony.filesystem" />
             <argument type="service" id="symfony.finder" />
+        </service>
+
+        <service id="cdev.config"
+            class="Creode\Cdev\Config">
+            <argument type="service" id="symfony.console_output" />
         </service>
 
         <service id="cdev.docker_compose"
@@ -56,6 +76,19 @@
 
         <service id="cdev.composer"
             class="Creode\System\Command\Composer\Composer">
+        </service>
+
+        <service id="cdev.logger" class="Symfony\Component\Console\Logger\ConsoleLogger">
+            <argument type="service" id="symfony.console_output" />
+        </service>
+
+        <service id="cdev.ssh" class="Creode\System\Command\Ssh\Ssh">
+            <argument type="service" id="ssh.factory" />
+            <argument type="service" id="cdev.config" />
+        </service>
+
+        <service id="ssh.factory"
+            class="Creode\System\Command\Ssh\Factory">
         </service>
 
         <service id="symfony.console_output"

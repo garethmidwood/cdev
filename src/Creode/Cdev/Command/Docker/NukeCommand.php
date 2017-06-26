@@ -1,37 +1,18 @@
 <?php
-namespace Creode\Cdev\Command;
+namespace Creode\Cdev\Command\Docker;
 
-use Symfony\Component\Console\Command\Command;
+use Creode\Cdev\Command\ToolCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Creode\Tools\ToolInterface as ToolInterface;
-
-class StopCommand extends Command
+class NukeCommand extends ToolCommand
 {
-    /**
-     * @var ToolInterface
-     */
-    private $_tool;
-
-    /**
-     * Constructor
-     * @param ToolInterface $tool 
-     * @return null
-     */
-    public function __construct(ToolInterface $tool)
-    {
-        $this->_tool = $tool;
-
-        parent::__construct();
-    }
-
     protected function configure()
     {
-        $this->setName('stop');
-        $this->setDescription('Stops the project virtual environment');
+        $this->setName('docker:nuke');
+        $this->setDescription('Destroys the project virtual environment');
 
         $this->addOption(
             'path',
@@ -44,8 +25,10 @@ class StopCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $this->_tool->input($input);
+        
         $output->writeln(
-            $this->_tool->stop()
+            $this->_tool->nuke()
         );
     }
 }
