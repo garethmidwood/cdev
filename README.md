@@ -1,19 +1,19 @@
-## CDEV
+# CDEV
 A tool to manage dev environments
 
-## Installation instructions
+# Installation instructions
 - Clone/Download the repository
 - cp cdev.phar /usr/local/bin/cdev
 
 
-## Dependancies
+# Dependencies
 
-# Install libssh2
+## Install libssh2
 ```
 brew install libssh2
 ```
 
-# Install PHP7 SSH
+## Install PHP7 SSH
 ```
 wget https://github.com/Sean-Der/pecl-networking-ssh2/archive/php7.zip
 unzip php7.zip
@@ -24,13 +24,13 @@ make
 sudo make install
 ```
 
-# Activate module. In php.ini file add:
+## Activate module. In php.ini file add:
 ```
 # file: php.ini
 extension=ssh2.so
 ```
 
-# Test it has activated
+## Test it has activated
 ```
 php -i | grep ssh
 
@@ -40,20 +40,42 @@ ssh2
 libssh2 version => 1.8.0
 ```
 
-### Usage
-## Setup dev environment for a project
+# Usage
+
+## Docker
+### Setup dev environment for a project
 ```
 cd project/dir
 cdev docker:setup
 ```
 
-## Configure to pull DB backups
+### Switch dev environment on
+```
+cd project/dir
+cdev docker:start
+```
+
+### Switch dev environment off
+```
+cd project/dir
+cdev docker:stop
+```
+
+### Destroy dev environment
+```
+cd project/dir
+cdev docker:nuke
+```
+
+
+## Backups
+### Configure to pull backups
 ```
 cd project/dir
 cdev cdev:configure
 ```
 
-## Pull latest DB backup
+### Pull latest DB backup
 ```
 cd project/dir
 cdev db:pull
