@@ -40,7 +40,22 @@ ssh2
 libssh2 version => 1.8.0
 ```
 
-## Usage
-# Setup dev environment for a project
-- cd project/dir
-- cdev setup
+### Usage
+## Setup dev environment for a project
+```
+cd project/dir
+cdev docker:setup
+```
+
+## Configure to pull DB backups
+```
+cd project/dir
+cdev cdev:configure
+```
+
+## Pull latest DB backup
+```
+cd project/dir
+cdev db:pull
+```
+
