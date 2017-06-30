@@ -21,7 +21,7 @@ class Compose extends Command
 
     public function rm($path)
     {
-        $this->run('docker-compose', ['rm'], $path);
+        $this->run('docker-compose', ['rm', '-f'], $path);
 
         return 'docker-compose rm completed';
     }

@@ -14,6 +14,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class Docker extends Logger implements ToolInterface
 {
+    const CONFIG_FILE = 'cdev.yml';
+    
     /**
      * @var Compose
      */
@@ -227,7 +229,8 @@ class Docker extends Logger implements ToolInterface
         $this->_finder
             ->in($path)
             ->depth('== 0')
-            ->exclude($src);
+            ->exclude($src)
+            ->exclude(self::CONFIG_FILE);
 
         foreach (Repo::TEMPLATES as $dockerTemplate) {
             if ($this->_fs->exists($path . '/' . $dockerTemplate)) {

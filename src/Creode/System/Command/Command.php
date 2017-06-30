@@ -29,9 +29,9 @@ abstract class Command
             $process->run(
                 function ($type, $buffer) {
                     if (Process::ERR === $type) {
-                        echo 'ERR > '.$buffer;
+                        echo $buffer;
                     } else {
-                        echo 'OUT > '.$buffer;
+                        echo $buffer;
                     }
                 }
             );
