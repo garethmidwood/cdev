@@ -2,8 +2,12 @@
 A tool to manage dev environments
 
 # Installation instructions
-- Clone/Download the repository
-- cp cdev.phar /usr/local/bin/cdev
+```
+git clone git@github.com:garethmidwood/cdev.git
+cd path/to/repo
+php build/build.php
+cp cdev.phar /usr/local/bin/cdev
+```
 
 
 # Dependencies
