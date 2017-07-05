@@ -368,38 +368,36 @@ class Docker extends Logger implements ToolInterface
         }
 
         // replace files for services in docker-compose.yml
-        if (!isset($config['services'])) {
-            return;
-        }
-
-        foreach ($config['services'] as $key => &$service) {
-            if (isset($service['ports'])) {
-                foreach($service['ports'] as &$ports) {
-                    $this->logMessage("Replacing ports for $key [$ports]");
-                    $ports = str_replace('001:', $this->_answers['portNo'] . ':', $ports);
-                    $this->logMessage(" New value $ports");
+        if (isset($config['services'])) {
+            foreach ($config['services'] as $key => &$service) {
+                if (isset($service['ports'])) {
+                    foreach($service['ports'] as &$ports) {
+                        $this->logMessage("Replacing ports for $key [$ports]");
+                        $ports = str_replace('001:', $this->_answers['portNo'] . ':', $ports);
+                        $this->logMessage(" New value $ports");
+                    }
                 }
-            }
 
-            if (isset($service['container_name'])) {
-                $this->logMessage("Replacing container name for $key");
-                $service['container_name'] = str_replace('yourproject', $this->_answers['projectName'], $service['container_name']);
-                $this->logMessage(" New value {$service['container_name']}");
-            }
+                if (isset($service['container_name'])) {
+                    $this->logMessage("Replacing container name for $key");
+                    $service['container_name'] = str_replace('yourproject', $this->_answers['projectName'], $service['container_name']);
+                    $this->logMessage(" New value {$service['container_name']}");
+                }
 
-            if ($key == 'php' && isset($service['environment'])) {
-                $this->logMessage("Replacing domain name for $key");
-                $service['environment'] = str_replace('yourproject', $this->_answers['projectName'], $service['environment']);
-                $domainName = str_replace('VIRTUAL_HOST=', '*', $service['environment']);
-                $this->logMessage(" New value {$domainName[0]}");
-            }
+                if ($key == 'php' && isset($service['environment'])) {
+                    $this->logMessage("Replacing domain name for $key");
+                    $service['environment'] = str_replace('yourproject', $this->_answers['projectName'], $service['environment']);
+                    $domainName = str_replace('VIRTUAL_HOST=', '*', $service['environment']);
+                    $this->logMessage(" New value {$domainName[0]}");
+                }
 
-            if (isset($service['volumes'])) {
-                $this->logMessage("Replacing sync volume names for $key");
-                $service['volumes'] = str_replace('website-code-sync:', $this->_answers['projectName'] . '-website-code-sync:', $service['volumes']);
-                $this->logMessage(" New value {$this->_answers['projectName']}-website-code-sync");
-            }
-        }  
+                if (isset($service['volumes'])) {
+                    $this->logMessage("Replacing sync volume names for $key");
+                    $service['volumes'] = str_replace('website-code-sync:', $this->_answers['projectName'] . '-website-code-sync:', $service['volumes']);
+                    $this->logMessage(" New value {$this->_answers['projectName']}-website-code-sync");
+                }
+            } 
+        } 
 
         $updatedConfig = Yaml::dump($config);
 
