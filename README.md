@@ -69,6 +69,7 @@ libssh2 version => 1.8.0
 ## Docker
 ### Setup dev environment for a project
 ```
+git clone git@your:repo.git
 cd project/dir
 cdev docker:setup
 ```
