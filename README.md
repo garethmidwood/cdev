@@ -100,10 +100,10 @@ cd project/dir
 cdev cdev:configure
 ```
 
-### Pull latest DB backup
+### Pull latest DB and/or Media backup
 ```
 cd project/dir
-cdev db:pull
+cdev backup:pull
 ```
 
 
