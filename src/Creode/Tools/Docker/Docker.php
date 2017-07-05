@@ -4,9 +4,9 @@ namespace Creode\Tools\Docker;
 
 use Creode\Tools\ToolInterface;
 use Creode\Tools\Logger;
-use Creode\System\Command\Docker\Compose;
-use Creode\System\Command\Docker\Sync;
-use Creode\System\Command\Composer\Composer;
+use Creode\System\Docker\Compose;
+use Creode\System\Docker\Sync;
+use Creode\System\Composer\Composer;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Console\Input\InputInterface;
@@ -142,6 +142,26 @@ class Docker extends Logger implements ToolInterface
 
         $this->_compose->rm($path);
         $this->_sync->clean($path);
+    }
+
+    public function runCommand($cmd, array $options = array(), $elevatePermissions = false)
+    {
+        $path = $this->_input->getOption('path');
+
+        $options = array_merge(
+            [
+                'exec',
+                '--user=' . ($elevatePermissions ? 'root' : 'www-data'),
+                'php'
+            ],
+            $options
+        );
+        
+        $this->_compose->runCmd(
+            $cmd,
+            $options,
+            $path
+        );
     }
 
     private function validateAnswers(array $answers = array())

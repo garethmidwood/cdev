@@ -31,7 +31,7 @@ class ConfigureCommand extends Command
 
     protected function configure()
     {
-        $this->setName('cdev:configure');
+        $this->setName('configure');
         $this->setDescription('Creates this tools configuration file for the repo');
 
         $this->addOption(

@@ -1,5 +1,5 @@
 <?php
-namespace Creode\System\Command\Ssh;
+namespace Creode\System\Ssh;
 
 use Creode\Cdev\Config;
 use hexpang\Client\SSHClient\SSHClient;

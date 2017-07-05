@@ -1,7 +1,7 @@
 <?php
-namespace Creode\System\Command\Composer;
+namespace Creode\System\Composer;
 
-use Creode\System\Command\Command;
+use Creode\System\Command;
 
 class Composer extends Command
 {

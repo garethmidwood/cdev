@@ -1,6 +1,6 @@
 <?php
 
-namespace Creode\System\Command;
+namespace Creode\System;
 
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
@@ -39,7 +39,7 @@ abstract class Command
             $process->run();
         }
 
-        // // executes after the command finishes
+        // executes after the command finishes
         if (!$process->isSuccessful()) {
             throw new ProcessFailedException($process);
         }

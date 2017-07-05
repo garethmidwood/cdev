@@ -1,8 +1,8 @@
 <?php
-namespace Creode\Cdev\Command\Db;
+namespace Creode\Cdev\Command\Backup;
 
 use Creode\Cdev\Config;
-use Creode\System\Command\Ssh\Ssh;
+use Creode\System\Ssh\Ssh;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -40,8 +40,8 @@ class PullCommand extends Command
     
     protected function configure()
     {
-        $this->setName('db:pull');
-        $this->setDescription('Pulls the latest DB from the office NAS');
+        $this->setName('backup:pull');
+        $this->setDescription('Pulls the latest backups from the office NAS');
 
         $this->addOption(
             'config',
@@ -68,38 +68,54 @@ class PullCommand extends Command
 
         $cwd = $input->getOption('path');
         
+        $transfers = [];
+
         switch($answers['backupType']) {
+            case 'all':
+                $transfers[] = [
+                    'target' => $cwd . '/media/backup.tar',
+                    'source' => $backupServer['media-dir'] . $backupServer['media-file']
+                ];
+                $transfers[] = [
+                    'target' => $cwd . '/db/backup.sql',
+                    'source' => $backupServer['db-dir'] . $backupServer['db-file']
+                ];
+                break;
             case 'media':
-                $targetPath = $cwd . '/media/backup.tar';
-                $sourcePath = $backupServer['media-dir'] . $backupServer['media-file'];
+                $transfers[] = [
+                    'target' => $cwd . '/media/backup.tar',
+                    'source' => $backupServer['media-dir'] . $backupServer['media-file']
+                ];
                 break;
             case 'database':
             default:
-                $targetPath = $cwd . '/db/backup.sql';
-                $sourcePath = $backupServer['db-dir'] . $backupServer['db-file'];
+                $transfers[] = [
+                    'target' => $cwd . '/db/backup.sql',
+                    'source' => $backupServer['db-dir'] . $backupServer['db-file']
+                ];
                 break;
         }
 
-        $this->_ssh->download(
-            'backups',
-            $sourcePath,
-            $targetPath,
-            $output
-        );
+        foreach ($transfers as $transfer) {
+            $this->_ssh->download(
+                'backups',
+                $transfer['source'],
+                $transfer['target'],
+                $output
+            );
+        }
     }
 
     private function askQuestions(InputInterface $input, OutputInterface $output)
     {
         $helper = $this->getHelper('question');
 
-        // $question = new Question('Path to ssh key (blank to use config password) ');
-        // $answers['keyPath'] = $helper->ask($input, $output, $question);
-
         $question = new ChoiceQuestion(
-            'Backup to retrieve',
+            'Backup(s) to retrieve',
             array(
                 'database',
-                'media'
+                'media',
+                'all'
             )
         );
         $question->setErrorMessage('Backup %s is invalid.');

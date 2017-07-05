@@ -1,9 +1,9 @@
 <?php
-namespace Creode\System\Command\Ssh;
+namespace Creode\System\Ssh;
 
 use Creode\Cdev\Config;
-use Creode\System\Command\Command;
-use Creode\System\Command\Ssh\Factory;
+use Creode\System\Command;
+use Creode\System\Ssh\Factory;
 use Symfony\Component\Console\Output\OutputInterface;
 use hexpang\Client\SSHClient\SSHClient;
 use Psr\Log\LoggerInterface;
