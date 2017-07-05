@@ -5,8 +5,18 @@ A tool to manage dev environments
 ```
 git clone git@github.com:garethmidwood/cdev.git
 cd path/to/repo
+```
+```
+# install dependencies
+cd src
+composer install
+```
+```
+# build phar file
 # you will need to install the dependencies before you can run this section
+cd ..
 php build/build.php
+# make it available system-wide
 cp cdev.phar /usr/local/bin/cdev
 ```
 
