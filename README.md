@@ -5,6 +5,7 @@ A tool to manage dev environments
 ```
 git clone git@github.com:garethmidwood/cdev.git
 cd path/to/repo
+# you will need to install the dependencies before you can run this section
 php build/build.php
 cp cdev.phar /usr/local/bin/cdev
 ```
@@ -34,6 +35,14 @@ sudo make install
 extension=ssh2.so
 ```
 
+## Allow phar files to be created
+```
+# file: php.ini
+[Phar]
+; http://php.net/phar.readonly
+phar.readonly = Off
+```
+
 ## Test it has activated
 ```
 php -i | grep ssh
@@ -43,6 +52,7 @@ Registered PHP Streams => https, ftps, compress.zlib, compress.bzip2, php, file,
 ssh2
 libssh2 version => 1.8.0
 ```
+
 
 # Usage
 
