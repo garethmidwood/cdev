@@ -95,3 +95,11 @@ cd project/dir
 cdev db:pull
 ```
 
+
+## Magento 2
+### Clear caches
+```
+cd project/dir
+cdev mage2:cache:clear
+```
+
