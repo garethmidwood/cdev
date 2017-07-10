@@ -140,6 +140,7 @@ class Docker extends Logger implements ToolInterface
 
         $path = $this->_input->getOption('path');
 
+        $this->_compose->stop($path);
         $this->_compose->rm($path);
         $this->_sync->clean($path);
     }
