@@ -15,7 +15,8 @@ abstract class Command
         array $options,
         $workingDir,
         $timeout = 3600,
-        $liveUpdates = true
+        $liveUpdates = true,
+        $inputFile = false
     ) {
         array_unshift($options, $command);
 
@@ -23,8 +24,10 @@ abstract class Command
         $process = $builder->getProcess();
         $process->setTimeout($timeout);
         $process->setWorkingDirectory($workingDir);
+        if ($inputFile) {
+            $process->setInput($inputFile);
+        }
         
-
         if ($liveUpdates) {
             $process->run(
                 function ($type, $buffer) {

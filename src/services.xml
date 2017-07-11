@@ -121,8 +121,8 @@
             class="Creode\System\Sed\Sed">
         </service>
 
-        <service id="cdev.iconv"
-            class="Creode\System\Iconv\Iconv">
+        <service id="cdev.iconv" class="Creode\System\Iconv\Iconv">
+            <argument type="service" id="symfony.filesystem" />
         </service>
 
         <service id="symfony.console_output"
