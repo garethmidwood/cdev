@@ -1,12 +1,18 @@
 <?php
 namespace Creode\Cdev\Command\Cdev;
 
+use Creode\Cdev\Framework\Magento1;
+use Creode\Cdev\Framework\Magento2;
+use Creode\Cdev\Framework\Drupal7;
+use Creode\Cdev\Framework\Drupal8;
+use Creode\Cdev\Framework\WordPress;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Yaml\Yaml;
 
 class ConfigureCommand extends Command
@@ -16,15 +22,15 @@ class ConfigureCommand extends Command
     private $_config = array(
         'version' => '2',
         'config' => array(
+            'framework' => null,
             'backups' => array(
-                'user' => null,
-                'pass' => null,
-                'host' => null,
-                'port' => null,
-                'db-dir' => null,
-                'db-file' => null,
-                'media-dir' => null,
-                'media-file' => null,
+                'user' => 'creode',
+                'host' => '192.168.0.97',
+                'port' => '22',
+                'db-dir' => 'e.g. /var/services/homes/creode/clients/{client}/database/',
+                'db-file' => 'weekly-backup.sql',
+                'media-dir' => 'e.g. /var/services/homes/creode/clients/{client}/media/',
+                'media-file' => 'weekly-backup.tar',
             )
         )
     );
@@ -53,6 +59,12 @@ class ConfigureCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $configFile = $input->getOption('path') . '/' . $input->getOption('config');
+
+        if (file_exists($configFile)) {
+            $this->_config = Yaml::parse(file_get_contents($configFile));
+        }
+
         $answers = $this->askQuestions($input, $output);
 
         $output->writeln('Writing config file to ' . $input->getOption('path') . '/' . $input->getOption('config'));
@@ -60,7 +72,7 @@ class ConfigureCommand extends Command
         $configuration = Yaml::dump($this->_config);
 
         file_put_contents(
-            $input->getOption('path') . '/' . $input->getOption('config'),
+            $configFile,
             $configuration
         );
     }
@@ -69,40 +81,80 @@ class ConfigureCommand extends Command
     {
         $helper = $this->getHelper('question');
 
-        $question = new Question('Backups: Host (defaults to NAS setting) ', '192.168.0.97');
-        $this->_config['config']['backups']['host'] = $helper->ask($input, $output, $question);
+        $question = new ChoiceQuestion(
+            'Framework',
+            array(
+                Magento1::NAME,
+                Magento2::NAME,
+                Drupal7::NAME,
+                Drupal8::NAME,
+                WordPress::NAME
+            )
+        );
+        $question->setErrorMessage('Framework %s is invalid.');
+        $this->_config['config']['framework'] = $helper->ask($input, $output, $question);
 
-        $question = new Question('Backups: Port (defaults to NAS setting) ', '22');
-        $this->_config['config']['backups']['port'] = $helper->ask($input, $output, $question);
+        $this->askQuestion(
+            'Backups: Host',
+            $this->_config['config']['backups']['host'],
+            $input, 
+            $output
+        );
 
-        $question = new Question('Backups: User (defaults to NAS setting) ', 'creode');
-        $this->_config['config']['backups']['user'] = $helper->ask($input, $output, $question);
+        $this->askQuestion(
+            'Backups: Port',
+            $this->_config['config']['backups']['port'],
+            $input, 
+            $output
+        );
 
-        $question = new Question('Backups: Password');
-        $question->setHidden(true);
-        $question->setHiddenFallback(false);
-        $question->setValidator(function ($answer) {
-            if (!is_string($answer) || strlen($answer) == 0) {
-                throw new \RuntimeException(
-                    'You must enter a password'
-                );
-            }
+        $this->askQuestion(
+            'Backups: User',
+            $this->_config['config']['backups']['user'],
+            $input, 
+            $output
+        );
 
-            return $answer;
-        });
-        $this->_config['config']['backups']['pass'] = $helper->ask($input, $output, $question);
+        $this->askQuestion(
+            'Backups: DB Directory',
+            $this->_config['config']['backups']['db-dir'],
+            $input, 
+            $output
+        );
 
-        $question = new Question('Backups: DB Directory (e.g. /var/services/homes/creode/clients/{client}/database/) ');
-        $this->_config['config']['backups']['db-dir'] = $helper->ask($input, $output, $question);
+        $this->askQuestion(
+            'Backups: DB file name',
+            $this->_config['config']['backups']['db-file'],
+            $input, 
+            $output
+        );
 
-        $question = new Question('Backups: DB file name (defaults to weekly-backup.sql) ', 'weekly-backup.sql');
-        $this->_config['config']['backups']['db-file'] = $helper->ask($input, $output, $question);
+        $this->askQuestion(
+            'Backups: Media Directory',
+            $this->_config['config']['backups']['media-dir'],
+            $input, 
+            $output
+        );
 
-        $question = new Question('Backups: Media Directory (e.g. /var/services/homes/creode/clients/{client}/media/) ');
-        $this->_config['config']['backups']['media-dir'] = $helper->ask($input, $output, $question);
-
-        $question = new Question('Backups: Media file name (defaults to weekly-backup.tar) ', 'weekly-backup.tar');
-        $this->_config['config']['backups']['media-file'] = $helper->ask($input, $output, $question);
-
+        $this->askQuestion(
+            'Backups: Media file name',
+            $this->_config['config']['backups']['media-file'],
+            $input, 
+            $output
+        );
     }
+
+    private function askQuestion($text, &$config, $input, $output) 
+    {
+        $helper = $this->getHelper('question');
+
+        $question = new Question(
+            $text . ' : [Current=' . $config . ']',
+            $config
+        );
+
+        $config = $helper->ask($input, $output, $question);
+    }
+
+
 }

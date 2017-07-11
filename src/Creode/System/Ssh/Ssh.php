@@ -23,7 +23,8 @@ class Ssh extends Command
     private $_sshClient;
 
     /**
-     * @param Filesystem $fs 
+     * @param Factory $sshFactory 
+     * @param Config $config 
      * @return null
      */
     public function __construct(
@@ -42,7 +43,7 @@ class Ssh extends Command
      * @param OutputInterface $output
      * @return string
      */
-    public function download($configNode, $srcPath, $targetPath, OutputInterface $output)
+    public function download($configNode, $srcPath, $targetPath, $password, OutputInterface $output)
     {
         $downloadDir = dirname($targetPath);
 
@@ -57,7 +58,7 @@ class Ssh extends Command
             $conf['host'],
             $conf['port'],
             $conf['user'],
-            $conf['pass']
+            $password
         );
 
         $output->writeln("Connecting to server");

@@ -15,6 +15,12 @@
                 <argument type="service" id="cdev.backup_pull_command" />
             </call>
             <call method="add">
+                <argument type="service" id="cdev.db_cleanse_command" />
+            </call>
+            <call method="add">
+                <argument type="service" id="cdev.db_utf8_command" />
+            </call>
+            <call method="add">
                 <argument type="service" id="cdev.docker_nuke_command" />
             </call>
             <call method="add">
@@ -50,6 +56,15 @@
         <service id="cdev.backup_pull_command" class="Creode\Cdev\Command\Backup\PullCommand">
             <argument type="service" id="cdev.config" />
             <argument type="service" id="cdev.ssh" />
+        </service>
+
+        <service id="cdev.db_cleanse_command" class="Creode\Cdev\Command\Backup\Db\CleanseCommand">
+            <argument type="service" id="cdev.config" />
+            <argument type="service" id="cdev.awk" />
+        </service>
+
+        <service id="cdev.db_utf8_command" class="Creode\Cdev\Command\Backup\Db\Utf8Command">
+            <argument type="service" id="cdev.iconv" />
         </service>
 
         <service id="cdev.mage2_cache_clear_command" class="Creode\Cdev\Command\Magento2\CacheClearCommand">
@@ -96,6 +111,18 @@
 
         <service id="ssh.factory"
             class="Creode\System\Ssh\Factory">
+        </service>
+
+        <service id="cdev.awk" class="Creode\System\Awk\Awk">
+            <argument type="service" id="symfony.filesystem" />
+        </service>
+
+        <service id="cdev.sed"
+            class="Creode\System\Sed\Sed">
+        </service>
+
+        <service id="cdev.iconv"
+            class="Creode\System\Iconv\Iconv">
         </service>
 
         <service id="symfony.console_output"

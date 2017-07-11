@@ -66,31 +66,31 @@ class PullCommand extends Command
 
         $backupServer = $this->_config->get('backups');
 
-        $cwd = $input->getOption('path');
+        $cwd = $input->getOption('path') . '/';
         
         $transfers = [];
 
         switch($answers['backupType']) {
             case 'all':
                 $transfers[] = [
-                    'target' => $cwd . '/media/backup.tar',
+                    'target' => $cwd . Files::MEDIA_FILE,
                     'source' => $backupServer['media-dir'] . $backupServer['media-file']
                 ];
                 $transfers[] = [
-                    'target' => $cwd . '/db/backup.sql',
+                    'target' => $cwd . Files::DB_FILE,
                     'source' => $backupServer['db-dir'] . $backupServer['db-file']
                 ];
                 break;
             case 'media':
                 $transfers[] = [
-                    'target' => $cwd . '/media/backup.tar',
+                    'target' => $cwd . Files::MEDIA_FILE,
                     'source' => $backupServer['media-dir'] . $backupServer['media-file']
                 ];
                 break;
             case 'database':
             default:
                 $transfers[] = [
-                    'target' => $cwd . '/db/backup.sql',
+                    'target' => $cwd . Files::DB_FILE,
                     'source' => $backupServer['db-dir'] . $backupServer['db-file']
                 ];
                 break;
@@ -101,6 +101,7 @@ class PullCommand extends Command
                 'backups',
                 $transfer['source'],
                 $transfer['target'],
+                $answers['password'],
                 $output
             );
         }
@@ -121,6 +122,20 @@ class PullCommand extends Command
         $question->setErrorMessage('Backup %s is invalid.');
 
         $answers['backupType'] = $helper->ask($input, $output, $question);
+
+        $question = new Question('SSH Password');
+        $question->setHidden(true);
+        $question->setHiddenFallback(false);
+        $question->setValidator(function ($answer) {
+            if (!is_string($answer) || strlen($answer) == 0) {
+                throw new \RuntimeException(
+                    'You must enter a password'
+                );
+            }
+
+            return $answer;
+        });
+        $answers['password'] = $helper->ask($input, $output, $question);
 
         return $answers;
     }
