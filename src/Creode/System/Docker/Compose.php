@@ -18,13 +18,19 @@ class Compose extends Command
         $this->_configExists = file_exists(self::FILE);
     }
 
-    public function up($path)
+    public function up($path, $build = false)
     {
         if (!$this->_configExists) {
             return self::FILE . ' not found.';
         }
 
-        $this->run(self::COMMAND, ['up'], $path);
+        $params = ['up'];
+
+        if ($build) {
+            array_push($params, '--build');
+        }
+
+        $this->run(self::COMMAND, $params, $path);
 
         return self::COMMAND . ' up completed';
     }

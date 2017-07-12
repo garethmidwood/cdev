@@ -14,5 +14,7 @@ interface ToolInterface
     
     public function nuke();
 
+    public function cleanup();
+
     public function runCommand($cmd, array $options = array(), $elevatePermissions = false);
 }

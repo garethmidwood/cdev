@@ -5,6 +5,7 @@ namespace Creode\Tools\Docker;
 use Creode\Tools\ToolInterface;
 use Creode\Tools\Logger;
 use Creode\System\Docker\Compose;
+use Creode\System\Docker\Docker as SystemDocker;
 use Creode\System\Docker\Sync;
 use Creode\System\Composer\Composer;
 use Symfony\Component\Filesystem\Filesystem;
@@ -16,6 +17,11 @@ class Docker extends Logger implements ToolInterface
 {
     const CONFIG_FILE = 'cdev.yml';
     
+    /**
+     * @var SystemDocker
+     */
+    private $_docker;
+
     /**
      * @var Compose
      */
@@ -59,12 +65,14 @@ class Docker extends Logger implements ToolInterface
      * @return null
      */
     public function __construct(
+        SystemDocker $docker,
         Compose $compose,
         Sync $sync,
         Composer $composer,
         Filesystem $fs,
         Finder $finder
     ) {
+        $this->_docker = $docker;
         $this->_compose = $compose;
         $this->_sync = $sync;
         $this->_composer = $composer;
@@ -119,9 +127,10 @@ class Docker extends Logger implements ToolInterface
         $this->logTitle('Starting dev environment...');
 
         $path = $this->_input->getOption('path');
+        $build = $this->_input->getOption('build');
 
         $this->_sync->start($path);
-        $this->_compose->up($path);
+        $this->_compose->up($path, $build);
     }
 
     public function stop()
@@ -143,6 +152,15 @@ class Docker extends Logger implements ToolInterface
         $this->_compose->stop($path);
         $this->_compose->rm($path);
         $this->_sync->clean($path);
+    }
+
+    public function cleanup()
+    {
+        $this->logTitle('Cleaning up Docker leftovers...');
+
+        $path = $this->_input->getOption('path');
+
+        $this->_docker->cleanup($path);
     }
 
     public function runCommand($cmd, array $options = array(), $elevatePermissions = false)

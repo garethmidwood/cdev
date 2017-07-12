@@ -9,16 +9,19 @@
             <argument key="name">Creode Dev</argument>
             <argument key="version">1.0.0</argument>
             <call method="add">
-                <argument type="service" id="cdev.cdev_configure_command" />
+                <argument type="service" id="cdev.backup_pull_command" />
             </call>
             <call method="add">
-                <argument type="service" id="cdev.backup_pull_command" />
+                <argument type="service" id="cdev.cdev_configure_command" />
             </call>
             <call method="add">
                 <argument type="service" id="cdev.db_cleanse_command" />
             </call>
             <call method="add">
                 <argument type="service" id="cdev.db_utf8_command" />
+            </call>
+            <call method="add">
+                <argument type="service" id="cdev.docker_cleanup_command" />
             </call>
             <call method="add">
                 <argument type="service" id="cdev.docker_nuke_command" />
@@ -38,19 +41,23 @@
         </service>
 
         <service id="cdev.docker_nuke_command" class="Creode\Cdev\Command\Docker\NukeCommand">
-            <argument type="service" id="cdev.docker" />
+            <argument type="service" id="cdev.tool_docker" />
         </service>
 
         <service id="cdev.docker_setup_command" class="Creode\Cdev\Command\Docker\SetupCommand">
-            <argument type="service" id="cdev.docker" />
+            <argument type="service" id="cdev.tool_docker" />
         </service>
 
         <service id="cdev.docker_start_command" class="Creode\Cdev\Command\Docker\StartCommand">
-            <argument type="service" id="cdev.docker" />
+            <argument type="service" id="cdev.tool_docker" />
         </service>
 
         <service id="cdev.docker_stop_command" class="Creode\Cdev\Command\Docker\StopCommand">
-            <argument type="service" id="cdev.docker" />
+            <argument type="service" id="cdev.tool_docker" />
+        </service>
+
+        <service id="cdev.docker_cleanup_command" class="Creode\Cdev\Command\Docker\CleanupCommand">
+            <argument type="service" id="cdev.tool_docker" />
         </service>
 
         <service id="cdev.backup_pull_command" class="Creode\Cdev\Command\Backup\PullCommand">
@@ -68,17 +75,18 @@
         </service>
 
         <service id="cdev.mage2_cache_clear_command" class="Creode\Cdev\Command\Magento2\CacheClearCommand">
-            <argument type="service" id="cdev.docker" />
+            <argument type="service" id="cdev.tool_docker" />
         </service>
 
         <service id="cdev.cdev_configure_command"
             class="Creode\Cdev\Command\Cdev\ConfigureCommand">
         </service>
 
-        <service id="cdev.docker" class="Creode\Tools\Docker\Docker">
-            <argument type="service" id="cdev.docker_compose" />
-            <argument type="service" id="cdev.docker_sync" />
-            <argument type="service" id="cdev.composer" />
+        <service id="cdev.tool_docker" class="Creode\Tools\Docker\Docker">
+            <argument type="service" id="cdev.system_docker" />
+            <argument type="service" id="cdev.system_docker_compose" />
+            <argument type="service" id="cdev.system_docker_sync" />
+            <argument type="service" id="cdev.system_composer" />
             <argument type="service" id="symfony.filesystem" />
             <argument type="service" id="symfony.finder" />
         </service>
@@ -88,15 +96,19 @@
             <argument type="service" id="symfony.console_output" />
         </service>
 
-        <service id="cdev.docker_compose"
+        <service id="cdev.system_docker"
+            class="Creode\System\Docker\Docker">
+        </service>
+
+        <service id="cdev.system_docker_compose"
             class="Creode\System\Docker\Compose">
         </service>
 
-        <service id="cdev.docker_sync"
+        <service id="cdev.system_docker_sync"
             class="Creode\System\Docker\Sync">
         </service>
 
-        <service id="cdev.composer"
+        <service id="cdev.system_composer"
             class="Creode\System\Composer\Composer">
         </service>
 
