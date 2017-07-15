@@ -1,10 +1,8 @@
 <?php
 
-namespace Creode\Tools;
+namespace Creode\Environments;
 
-use Symfony\Component\Console\Input\InputInterface;
-
-interface ToolInterface
+interface Environment
 {
     public function setup(array $answers = array());
     

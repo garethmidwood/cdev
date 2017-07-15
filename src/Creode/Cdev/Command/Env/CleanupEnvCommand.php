@@ -25,10 +25,10 @@ class CleanupEnvCommand extends EnvCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->_tool->input($input);
+        $this->_environment->input($input);
         
         $output->writeln(
-            $this->_tool->cleanup()
+            $this->_environment->cleanup()
         );
     }
 }

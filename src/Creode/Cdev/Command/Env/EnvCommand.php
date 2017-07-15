@@ -2,24 +2,33 @@
 namespace Creode\Cdev\Command\Env;
 
 use Symfony\Component\Console\Command\Command;
-use Creode\Tools\ToolInterface;
+use Creode\Environments\Environment;
+use Creode\Framework\Framework;
 
 abstract class EnvCommand extends Command
 {
     /**
-     * @var ToolInterface
+     * @var Environment
      */
-    protected $_tool;
+    protected $_environment;
+
+    /**
+     * @var Framework
+     */
+    protected $_framework;
 
     /**
      * Constructor
-     * @param ToolInterface $tool 
+     * @param Environment $environment
+     * @param Framework $framework 
      * @return null
      */
     public function __construct(
-        ToolInterface $tool
+        Environment $environment,
+        Framework $framework
     ) {
-        $this->_tool = $tool;
+        $this->_environment = $environment;
+        $this->_framework = $framework;
 
         parent::__construct();
     }

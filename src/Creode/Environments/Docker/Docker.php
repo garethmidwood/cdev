@@ -1,10 +1,10 @@
 <?php
 
-namespace Creode\Tools\Docker;
+namespace Creode\Environments\Docker;
 
 use Creode\Cdev\Config;
+use Creode\Environments\Environment;
 use Creode\Framework\Framework;
-use Creode\Tools\ToolInterface;
 use Creode\Tools\Logger;
 use Creode\System\Docker\Compose;
 use Creode\System\Docker\Docker as SystemDocker;
@@ -17,7 +17,7 @@ use Symfony\Component\Yaml\Yaml;
 
 
 
-class Docker extends Logger implements ToolInterface
+class Docker extends Logger implements Environment
 {
     const NAME = 'docker';
     

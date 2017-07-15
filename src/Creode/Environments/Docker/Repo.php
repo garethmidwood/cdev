@@ -1,6 +1,6 @@
 <?php
 
-namespace Creode\Tools\Docker;
+namespace Creode\Environments\Docker;
 
 class Repo
 {

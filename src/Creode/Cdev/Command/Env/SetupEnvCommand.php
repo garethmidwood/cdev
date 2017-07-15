@@ -52,10 +52,10 @@ class SetupEnvCommand extends EnvCommand
     {
         $answers = $this->askQuestions($input, $output);
 
-        $this->_tool->input($input);
+        $this->_environment->input($input);
 
         $output->writeln(
-            $this->_tool->setup($answers)
+            $this->_environment->setup($answers)
         );
     }
 

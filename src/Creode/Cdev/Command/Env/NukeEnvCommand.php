@@ -25,10 +25,10 @@ class NukeEnvCommand extends EnvCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->_tool->input($input);
+        $this->_environment->input($input);
         
         $output->writeln(
-            $this->_tool->nuke()
+            $this->_environment->nuke()
         );
     }
 }

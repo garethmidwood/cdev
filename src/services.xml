@@ -46,9 +46,6 @@
             <call method="add">
                 <argument type="service" id="cdev.env_stop_command" />
             </call>
-            <call method="add">
-                <argument type="service" id="cdev.mage2_cache_clear_command" />
-            </call>
         </service>
 
 
@@ -75,36 +72,38 @@
 
         <service id="cdev.env_cleanup_command" class="Creode\Cdev\Command\Env\CleanupEnvCommand">
             <argument type="service" id="cdev.environment.type" />
+            <argument type="service" id="cdev.environment.framework" />
         </service>
 
         <service id="cdev.env_nuke_command" class="Creode\Cdev\Command\Env\NukeEnvCommand">
             <argument type="service" id="cdev.environment.type" />
+            <argument type="service" id="cdev.environment.framework" />
         </service>
 
         <service id="cdev.env_setup_command" class="Creode\Cdev\Command\Env\SetupEnvCommand">
             <argument type="service" id="cdev.environment.type" />
+            <argument type="service" id="cdev.environment.framework" />
         </service>
 
         <service id="cdev.env_ssh_command" class="Creode\Cdev\Command\Env\SshEnvCommand">
             <argument type="service" id="cdev.environment.type" />
+            <argument type="service" id="cdev.environment.framework" />
         </service>
 
         <service id="cdev.env_start_command" class="Creode\Cdev\Command\Env\StartEnvCommand">
             <argument type="service" id="cdev.environment.type" />
+            <argument type="service" id="cdev.environment.framework" />
         </service>
 
         <service id="cdev.env_stop_command" class="Creode\Cdev\Command\Env\StopEnvCommand">
             <argument type="service" id="cdev.environment.type" />
-        </service>
-
-        <service id="cdev.mage2_cache_clear_command" class="Creode\Cdev\Command\Magento2\CacheClearCommand">
-            <argument type="service" id="cdev.environment.type" />
+            <argument type="service" id="cdev.environment.framework" />
         </service>
 
 
-        <!-- Tools -->
+        <!-- Environments -->
 
-        <service id="environment.type.docker" class="Creode\Tools\Docker\Docker">
+        <service id="environment.type.docker" class="Creode\Environments\Docker\Docker">
             <argument type="service" id="cdev.system_docker" />
             <argument type="service" id="cdev.system_docker_compose" />
             <argument type="service" id="cdev.system_docker_sync" />

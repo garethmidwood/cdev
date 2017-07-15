@@ -12,7 +12,7 @@ class Magento2 implements Framework
     {   
         echo 'not done it yet..' . PHP_EOL;
         // $output->writeln(
-        //     $this->_tool->runCommand(
+        //     $this->_environment->runCommand(
         //         [
         //             'bin/magento',
         //             'cache:clean'
@@ -21,7 +21,7 @@ class Magento2 implements Framework
         // );
 
         // $output->writeln(
-        //     $this->_tool->runCommand(
+        //     $this->_environment->runCommand(
         //         [
         //             'bin/magento',
         //             'cache:flush'

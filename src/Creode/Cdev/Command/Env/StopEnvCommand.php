@@ -25,10 +25,10 @@ class StopEnvCommand extends EnvCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->_tool->input($input);
+        $this->_environment->input($input);
         
         $output->writeln(
-            $this->_tool->stop()
+            $this->_environment->stop()
         );
     }
 }
