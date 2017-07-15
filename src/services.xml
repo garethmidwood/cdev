@@ -103,7 +103,7 @@
 
         <!-- Environments -->
 
-        <service id="environment.type.docker" class="Creode\Environments\Docker\Docker">
+        <service id="environment.type.docker" class="Creode\Environment\Docker\Docker">
             <argument type="service" id="cdev.system_docker" />
             <argument type="service" id="cdev.system_docker_compose" />
             <argument type="service" id="cdev.system_docker_sync" />

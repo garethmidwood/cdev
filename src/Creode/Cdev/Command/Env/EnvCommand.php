@@ -2,7 +2,7 @@
 namespace Creode\Cdev\Command\Env;
 
 use Symfony\Component\Console\Command\Command;
-use Creode\Environments\Environment;
+use Creode\Environment\Environment;
 use Creode\Framework\Framework;
 
 abstract class EnvCommand extends Command

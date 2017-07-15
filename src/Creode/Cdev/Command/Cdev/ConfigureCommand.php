@@ -2,12 +2,8 @@
 namespace Creode\Cdev\Command\Cdev;
 
 use Creode\Cdev\Config;
-use Creode\Environments\Docker\Docker;
-use Creode\Framework\Magento1\Magento1;
-use Creode\Framework\Magento2\Magento2;
-use Creode\Framework\Drupal7\Drupal7;
-use Creode\Framework\Drupal8\Drupal8;
-use Creode\Framework\WordPress\WordPress;
+use Creode\Environment;
+use Creode\Framework;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -97,7 +93,7 @@ class ConfigureCommand extends Command
             'Environment type',
             array(
                 // TODO: Find a better way to include these, ideally by adding the classes somehow
-                Docker::NAME
+                Environment\Docker\Docker::NAME
             )
         );
         $question->setErrorMessage('Environment type %s is invalid.');
@@ -114,11 +110,11 @@ class ConfigureCommand extends Command
                 'wordpress'
             )
             // array(
-            //     Magento1::NAME,
-            //     Magento2::NAME,
-            //     Drupal7::NAME,
-            //     Drupal8::NAME,
-            //     WordPress::NAME
+            //     Framework\Magento1\Magento1::NAME,
+            //     Framework\Magento2\Magento2::NAME,
+            //     Framework\Drupal7\Drupal7::NAME,
+            //     Framework\Drupal8\Drupal8::NAME,
+            //     Framework\WordPress\WordPress::NAME
             // )
         );
         $question->setErrorMessage('Framework %s is invalid.');

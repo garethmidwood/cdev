@@ -1,9 +1,9 @@
 <?php
 
-namespace Creode\Environments\Docker;
+namespace Creode\Environment\Docker;
 
 use Creode\Cdev\Config;
-use Creode\Environments\Environment;
+use Creode\Environment\Environment;
 use Creode\Framework\Framework;
 use Creode\Tools\Logger;
 use Creode\System\Docker\Compose;
