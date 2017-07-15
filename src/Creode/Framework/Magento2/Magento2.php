@@ -8,25 +8,17 @@ class Magento2 implements Framework
 {
     const NAME = 'magento2';
 
-    public function clearCache()
-    {   
-        echo 'not done it yet..' . PHP_EOL;
-        // $output->writeln(
-        //     $this->_environment->runCommand(
-        //         [
-        //             'bin/magento',
-        //             'cache:clean'
-        //         ]
-        //     )
-        // );
+    const MAGERUN = 'bin/magento';
 
-        // $output->writeln(
-        //     $this->_environment->runCommand(
-        //         [
-        //             'bin/magento',
-        //             'cache:flush'
-        //         ]
-        //     )
-        // );
+    /**
+     * Returns commands to clear cache on this framework
+     * @return array
+     */
+    public function clearCache() : array
+    {
+        return [
+            [self::MAGERUN, 'cache:clean'],
+            [self::MAGERUN, 'cache:flush']
+        ];
     }
 }

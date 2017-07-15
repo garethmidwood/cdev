@@ -32,6 +32,9 @@
                 <argument type="service" id="cdev.env_cleanup_command" />
             </call>
             <call method="add">
+                <argument type="service" id="cdev.env_cache_clean_command" />
+            </call>
+            <call method="add">
                 <argument type="service" id="cdev.env_nuke_command" />
             </call>
             <call method="add">
@@ -72,32 +75,30 @@
 
         <service id="cdev.env_cleanup_command" class="Creode\Cdev\Command\Env\CleanupEnvCommand">
             <argument type="service" id="cdev.environment.type" />
-            <argument type="service" id="cdev.environment.framework" />
         </service>
 
         <service id="cdev.env_nuke_command" class="Creode\Cdev\Command\Env\NukeEnvCommand">
             <argument type="service" id="cdev.environment.type" />
-            <argument type="service" id="cdev.environment.framework" />
         </service>
 
         <service id="cdev.env_setup_command" class="Creode\Cdev\Command\Env\SetupEnvCommand">
             <argument type="service" id="cdev.environment.type" />
-            <argument type="service" id="cdev.environment.framework" />
         </service>
 
         <service id="cdev.env_ssh_command" class="Creode\Cdev\Command\Env\SshEnvCommand">
             <argument type="service" id="cdev.environment.type" />
-            <argument type="service" id="cdev.environment.framework" />
         </service>
 
         <service id="cdev.env_start_command" class="Creode\Cdev\Command\Env\StartEnvCommand">
             <argument type="service" id="cdev.environment.type" />
-            <argument type="service" id="cdev.environment.framework" />
         </service>
 
         <service id="cdev.env_stop_command" class="Creode\Cdev\Command\Env\StopEnvCommand">
             <argument type="service" id="cdev.environment.type" />
-            <argument type="service" id="cdev.environment.framework" />
+        </service>
+
+        <service id="cdev.env_cache_clean_command" class="Creode\Cdev\Command\Site\CacheCleanSiteCommand">
+            <argument type="service" id="cdev.environment.type" />
         </service>
 
 

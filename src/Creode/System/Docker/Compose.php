@@ -2,6 +2,7 @@
 namespace Creode\System\Docker;
 
 use Creode\System\Command;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class Compose extends Command
 {
@@ -66,12 +67,22 @@ class Compose extends Command
         $this->run(self::COMMAND, ['exec', "--user=$user", 'php', 'bash'], $path);
     }
 
-    public function runCmd($path, $command, $options)
+    public function runCmd($path, $options)
     {
         if (!$this->_configExists) {
             return self::FILE . ' not found.';
         }
         
-        $this->run(self::COMMAND, $options, $path);        
+        try {
+            $this->run(self::COMMAND, $options, $path);        
+        } catch (ProcessFailedException $e) {
+            $process = $e->getProcess();
+
+            if ($process->getExitCode() == 129) {
+                echo 'Docker hung up - it\'s probably fine, it does that...' . PHP_EOL . PHP_EOL;
+            } else {
+                throw $e;
+            }
+        }
     }
 }

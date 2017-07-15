@@ -18,6 +18,7 @@ abstract class Command
         $liveUpdates = true,
         $inputFile = false
     ) {
+        echo '>>> Running `' . $command . ' ' . implode(' ', $options) . '`' . PHP_EOL;
         array_unshift($options, $command);
 
         $builder = new ProcessBuilder($options);

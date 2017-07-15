@@ -4,5 +4,5 @@ namespace Creode\Framework;
 
 interface Framework
 {
-    public function clearCache();
+    public function clearCache() : array;
 }

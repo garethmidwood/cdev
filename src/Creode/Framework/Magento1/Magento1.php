@@ -8,8 +8,17 @@ class Magento1 implements Framework
 {
     const NAME = 'magento1';
 
-    public function clearCache()
+    const MAGERUN = 'bin/n98-magerun.phar';
+
+    /**
+     * Returns commands to clear cache on this framework
+     * @return array
+     */
+    public function clearCache() : array
     {
-        echo 'Not implemented yet' . PHP_EOL;
+        return [
+            [self::MAGERUN, 'cache:clean'],
+            [self::MAGERUN, 'cache:flush']
+        ];
     }
 }

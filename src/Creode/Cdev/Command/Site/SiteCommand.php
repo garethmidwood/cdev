@@ -1,10 +1,10 @@
 <?php
-namespace Creode\Cdev\Command\Env;
+namespace Creode\Cdev\Command\Site;
 
 use Symfony\Component\Console\Command\Command;
 use Creode\Environment\Environment;
 
-abstract class EnvCommand extends Command
+abstract class SiteCommand extends Command
 {
     /**
      * @var Environment

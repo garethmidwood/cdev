@@ -8,8 +8,16 @@ class Drupal8 implements Framework
 {
     const NAME = 'drupal8';
 
-    public function clearCache()
+    const DRUSH = 'drush';
+
+    /**
+     * Returns commands to clear cache on this framework
+     * @return array
+     */
+    public function clearCache() : array
     {
-        echo 'Not implemented yet' . PHP_EOL;
+        return [
+            [self::DRUSH, 'cc:all']
+        ];
     }
 }

@@ -8,8 +8,12 @@ class WordPress implements Framework
 {
     const NAME = 'wordpress';
 
-    public function clearCache()
+    /**
+     * Returns commands to clear cache on this framework
+     * @return array
+     */
+    public function clearCache() : array
     {
-        echo 'Not implemented yet' . PHP_EOL;
+        return [];
     }
 }

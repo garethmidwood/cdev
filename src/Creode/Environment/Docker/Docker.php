@@ -151,7 +151,6 @@ class Docker extends Logger implements Environment
         $path = $this->_input->getOption('path');
 
         $this->_compose->stop($path);
-        $this->_sync->stop($path);
     }
 
     public function nuke()
@@ -186,23 +185,37 @@ class Docker extends Logger implements Environment
         $this->_compose->ssh($path, $user);
     }
 
-    public function runCommand($cmd, array $options = array(), $elevatePermissions = false)
+    public function cacheClear()
+    {
+        $commands = $this->_framework->clearCache();
+
+        foreach ($commands as $command) {
+            $this->runCommand($command);
+        }
+    }
+
+    /**
+     * Runs a command on the docker-compose php container
+     * @param array $command 
+     * @param bool $elevatePermissions 
+     * @return null
+     */
+    public function runCommand(array $command = array(), $elevatePermissions = false)
     {
         $path = $this->_input->getOption('path');
 
-        $options = array_merge(
+        $command = array_merge(
             [
                 'exec',
                 '--user=' . ($elevatePermissions ? 'root' : 'www-data'),
                 'php'
             ],
-            $options
+            $command
         );
         
         $this->_compose->runCmd(
-            $cmd,
-            $options,
-            $path
+            $path,
+            $command
         );
     }
 

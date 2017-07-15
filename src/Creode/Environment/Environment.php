@@ -16,5 +16,7 @@ interface Environment
 
     public function ssh();
 
-    public function runCommand($cmd, array $options = array(), $elevatePermissions = false);
+    public function runCommand(array $command = array(), $elevatePermissions = false);
+
+    public function cacheClear();
 }
