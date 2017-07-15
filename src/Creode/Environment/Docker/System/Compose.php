@@ -1,5 +1,5 @@
 <?php
-namespace Creode\System\Docker;
+namespace Creode\Environment\Docker\System;
 
 use Creode\System\Command;
 use Symfony\Component\Process\Exception\ProcessFailedException;

@@ -154,15 +154,15 @@
         </service>
 
         <service id="cdev.system_docker"
-            class="Creode\System\Docker\Docker">
+            class="Creode\Environment\Docker\System\Docker">
         </service>
 
         <service id="cdev.system_docker_compose"
-            class="Creode\System\Docker\Compose">
+            class="Creode\Environment\Docker\System\Compose">
         </service>
 
         <service id="cdev.system_docker_sync"
-            class="Creode\System\Docker\Sync">
+            class="Creode\Environment\Docker\System\Sync">
         </service>
 
         <service id="cdev.system_iconv" class="Creode\System\Iconv\Iconv">
