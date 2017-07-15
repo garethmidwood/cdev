@@ -1,10 +1,10 @@
 <?php
-namespace Creode\Cdev\Command;
+namespace Creode\Cdev\Command\Env;
 
 use Symfony\Component\Console\Command\Command;
 use Creode\Tools\ToolInterface;
 
-abstract class ToolCommand extends Command
+abstract class EnvCommand extends Command
 {
     /**
      * @var ToolInterface

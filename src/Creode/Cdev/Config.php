@@ -8,8 +8,17 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 class Config
 {
     const CONFIG_FILE = 'cdev.yml';
+    const CONFIG_DIR = 'config/';
 
+    /**
+     * @var array
+     */
     private $_config = array();
+
+    /**
+     * @var bool
+     */
+    private $_configured = true;
 
     /**
      * @param Filesystem $fs
@@ -24,13 +33,15 @@ class Config
         $this->loadConfig($output);
     }
 
-    private function loadConfig(ConsoleOutput $output) {
-        if (!file_exists(self::CONFIG_FILE)) {
-            $output->writeln('<warning>Config file ' . self::CONFIG_FILE . ' not found. Run cdev:configure</warning>');
+    private function loadConfig(ConsoleOutput $output)
+    {
+        if (!file_exists(self::CONFIG_DIR . self::CONFIG_FILE)) {
+            $this->_configured = false;
+            $output->writeln('<warning>Config file ' . self::CONFIG_DIR . self::CONFIG_FILE . ' not found. Run cdev:configure</warning>');
             return;
         }
 
-        $config = Yaml::parse(file_get_contents(self::CONFIG_FILE));
+        $config = Yaml::parse(file_get_contents(self::CONFIG_DIR . self::CONFIG_FILE));
 
         if (!isset($config['config'])) {
             throw new \Exception('Config file is missing root config node');
@@ -45,11 +56,21 @@ class Config
      * @param mixed|bool $defaultValue 
      * @return mixed|bool
      */
-    public function get($key, $defaultValue = false) {
+    public function get($key, $defaultValue = false)
+    {
         if (isset($this->_config[$key])) {
             return $this->_config[$key];
         }
 
         return $defaultValue;        
+    }
+
+    /**
+     * Does the config file exist?
+     * @return bool
+     */
+    public function isConfigured()
+    {
+        return $this->_configured;
     }
 }

@@ -1,17 +1,17 @@
 <?php
-namespace Creode\Cdev\Command\Docker;
+namespace Creode\Cdev\Command\Env;
 
-use Creode\Cdev\Command\ToolCommand;
+use Creode\Cdev\Command\Env\EnvCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class NukeCommand extends ToolCommand
+class NukeEnvCommand extends EnvCommand
 {
     protected function configure()
     {
-        $this->setName('docker:nuke');
+        $this->setName('env:nuke');
         $this->setDescription('Destroys the project virtual environment');
 
         $this->addOption(

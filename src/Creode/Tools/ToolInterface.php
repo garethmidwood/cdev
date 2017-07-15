@@ -16,5 +16,7 @@ interface ToolInterface
 
     public function cleanup();
 
+    public function ssh();
+
     public function runCommand($cmd, array $options = array(), $elevatePermissions = false);
 }

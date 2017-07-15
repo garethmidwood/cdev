@@ -55,6 +55,15 @@ class Compose extends Command
         $this->run(self::COMMAND, ['rm', '-f'], $path);
 
         return self::COMMAND . ' rm completed';
+    } 
+
+    public function ssh($path, $user)
+    {
+        if (!$this->_configExists) {
+            return self::FILE . ' not found.';
+        }
+        
+        $this->run(self::COMMAND, ['exec', "--user=$user", 'php', 'bash'], $path);
     }
 
     public function runCmd($path, $command, $options)

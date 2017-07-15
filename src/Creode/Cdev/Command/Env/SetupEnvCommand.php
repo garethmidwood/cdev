@@ -1,19 +1,19 @@
 <?php
-namespace Creode\Cdev\Command\Docker;
+namespace Creode\Cdev\Command\Env;
 
-use Creode\Cdev\Command\ToolCommand;
+use Creode\Cdev\Command\Env\EnvCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 
-class SetupCommand extends ToolCommand
+class SetupEnvCommand extends EnvCommand
 {
     protected function configure()
     {
-        $this->setName('docker:setup');
-        $this->setDescription('Sets up the project to run on a virtual environment');
+        $this->setName('env:setup');
+        $this->setDescription('Sets up the project environment');
 
         $this->addOption(
             'path',
@@ -63,10 +63,12 @@ class SetupCommand extends ToolCommand
     {
         $helper = $this->getHelper('question');
 
+        // TODO: This is tool-specific. Find a way to make it so.
+
         $question = new Question('Package name (<vendor>/<name>) ', 'creode/toolazytotype');
         $answers['packageName'] = $helper->ask($input, $output, $question);
 
-        $question = new Question('Docker port suffix (3 digits - e.g. 014) ', 'XXX');
+        $question = new Question('Environment port suffix (3 digits - e.g. 014) ', 'XXX');
         $answers['portNo'] = $helper->ask($input, $output, $question);
 
         $question = new Question('Project name (xxxx).docker ', 'toolazytotype');

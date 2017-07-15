@@ -2,6 +2,8 @@
 
 namespace Creode\Tools\Docker;
 
+use Creode\Cdev\Config;
+use Creode\Framework\Framework;
 use Creode\Tools\ToolInterface;
 use Creode\Tools\Logger;
 use Creode\System\Docker\Compose;
@@ -13,9 +15,11 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Yaml\Yaml;
 
+
+
 class Docker extends Logger implements ToolInterface
 {
-    const CONFIG_FILE = 'cdev.yml';
+    const NAME = 'docker';
     
     /**
      * @var SystemDocker
@@ -31,6 +35,11 @@ class Docker extends Logger implements ToolInterface
      * @var Sync
      */
     private $_sync;
+
+    /**
+     * @var Framework
+     */
+    private $_framework;
 
     /**
      * @var Composer
@@ -68,6 +77,7 @@ class Docker extends Logger implements ToolInterface
         SystemDocker $docker,
         Compose $compose,
         Sync $sync,
+        Framework $framework,
         Composer $composer,
         Filesystem $fs,
         Finder $finder
@@ -75,6 +85,7 @@ class Docker extends Logger implements ToolInterface
         $this->_docker = $docker;
         $this->_compose = $compose;
         $this->_sync = $sync;
+        $this->_framework = $framework;
         $this->_composer = $composer;
         $this->_fs = $fs;
         $this->_finder = $finder;
@@ -161,6 +172,18 @@ class Docker extends Logger implements ToolInterface
         $path = $this->_input->getOption('path');
 
         $this->_docker->cleanup($path);
+    }
+
+    public function ssh()
+    {
+        $this->logTitle('Connecting to server...');
+
+        $path = $this->_input->getOption('path');
+        $user = $this->_input->getOption('user');
+
+        $this->logMessage("Connecting as $user");
+
+        $this->_compose->ssh($path, $user);
     }
 
     public function runCommand($cmd, array $options = array(), $elevatePermissions = false)
@@ -269,7 +292,7 @@ class Docker extends Logger implements ToolInterface
             ->in($path)
             ->depth('== 0')
             ->exclude($src)
-            ->exclude(self::CONFIG_FILE);
+            ->exclude(Config::CONFIG_FILE);
 
         foreach (Repo::TEMPLATES as $dockerTemplate) {
             if ($this->_fs->exists($path . '/' . $dockerTemplate)) {

@@ -1,17 +1,17 @@
 <?php
-namespace Creode\Cdev\Command\Docker;
+namespace Creode\Cdev\Command\Env;
 
-use Creode\Cdev\Command\ToolCommand;
+use Creode\Cdev\Command\Env\EnvCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class StartCommand extends ToolCommand
+class StartEnvCommand extends EnvCommand
 {
     protected function configure()
     {
-        $this->setName('docker:start');
+        $this->setName('env:start');
         $this->setDescription('Starts the project virtual environment');
 
         $this->addOption(
@@ -22,11 +22,12 @@ class StartCommand extends ToolCommand
             getcwd()
         );
 
+        // TODO: This is tool-specific. Find a way to make it so.
         $this->addOption(
             'build',
             'b',
             InputOption::VALUE_NONE,
-            'Rebuilds the docker images'
+            'Rebuilds the environment'
         );
     }
 

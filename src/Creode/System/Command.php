@@ -24,6 +24,8 @@ abstract class Command
         $process = $builder->getProcess();
         $process->setTimeout($timeout);
         $process->setWorkingDirectory($workingDir);
+        $process->setPty(true);
+        
         if ($inputFile) {
             $process->setInput($inputFile);
         }

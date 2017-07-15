@@ -1,5 +1,5 @@
 <?php
-namespace Creode\Cdev\Command\Magento2;
+namespace Creode\Cdev\Command\Env;
 
 use Creode\Cdev\Command\Env\EnvCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -7,12 +7,12 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CacheClearCommand extends EnvCommand
+class CleanupEnvCommand extends EnvCommand
 {
     protected function configure()
     {
-        $this->setName('mage2:cache:clear');
-        $this->setDescription('Clears cache for Magento 2');
+        $this->setName('env:cleanup');
+        $this->setDescription('Cleans up the environment');
 
         $this->addOption(
             'path',
@@ -28,21 +28,7 @@ class CacheClearCommand extends EnvCommand
         $this->_tool->input($input);
         
         $output->writeln(
-            $this->_tool->runCommand(
-                [
-                    'bin/magento',
-                    'cache:clean'
-                ]
-            )
-        );
-
-        $output->writeln(
-            $this->_tool->runCommand(
-                [
-                    'bin/magento',
-                    'cache:flush'
-                ]
-            )
+            $this->_tool->cleanup()
         );
     }
 }

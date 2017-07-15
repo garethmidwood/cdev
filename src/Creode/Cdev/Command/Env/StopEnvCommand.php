@@ -1,18 +1,18 @@
 <?php
-namespace Creode\Cdev\Command\Docker;
+namespace Creode\Cdev\Command\Env;
 
-use Creode\Cdev\Command\ToolCommand;
+use Creode\Cdev\Command\Env\EnvCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class CleanupCommand extends ToolCommand
+class StopEnvCommand extends EnvCommand
 {
     protected function configure()
     {
-        $this->setName('docker:global:cleanup');
-        $this->setDescription('Removes unused docker bits (containers, images etc.)');
+        $this->setName('env:stop');
+        $this->setDescription('Stops the virtual environment');
 
         $this->addOption(
             'path',
@@ -28,7 +28,7 @@ class CleanupCommand extends ToolCommand
         $this->_tool->input($input);
         
         $output->writeln(
-            $this->_tool->cleanup()
+            $this->_tool->stop()
         );
     }
 }

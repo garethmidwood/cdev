@@ -52,7 +52,7 @@ class CleanseCommand extends Command
             'c',
             InputOption::VALUE_REQUIRED,
             'Path to cdev.yml file. Defaults to the directory the command is run from',
-            './cdev.yml'
+            Config::CONFIG_DIR . Config::CONFIG_FILE
         );
 
         $this->addOption(

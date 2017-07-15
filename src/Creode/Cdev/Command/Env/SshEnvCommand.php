@@ -1,18 +1,18 @@
 <?php
-namespace Creode\Cdev\Command\Docker;
+namespace Creode\Cdev\Command\Env;
 
-use Creode\Cdev\Command\ToolCommand;
+use Creode\Cdev\Command\Env\EnvCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class StopCommand extends ToolCommand
+class SshEnvCommand extends EnvCommand
 {
     protected function configure()
     {
-        $this->setName('docker:stop');
-        $this->setDescription('Stops the project virtual environment');
+        $this->setName('env:ssh');
+        $this->setDescription('Starts SSH connection to environment');
 
         $this->addOption(
             'path',
@@ -21,6 +21,14 @@ class StopCommand extends ToolCommand
             'Path to run commands on. Defaults to the directory the command is run from',
             getcwd()
         );
+
+        $this->addOption(
+            'user',
+            'u',
+            InputOption::VALUE_REQUIRED,
+            'The user to connect as',
+            'www-data'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -28,7 +36,7 @@ class StopCommand extends ToolCommand
         $this->_tool->input($input);
         
         $output->writeln(
-            $this->_tool->stop()
+            $this->_tool->ssh()
         );
     }
 }
