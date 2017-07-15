@@ -60,8 +60,9 @@
             <argument type="service" id="cdev.system_ssh" />
         </service>
 
-        <service id="cdev.cdev_configure_command"
-            class="Creode\Cdev\Command\Cdev\ConfigureCommand">
+        <service id="cdev.cdev_configure_command" class="Creode\Cdev\Command\Cdev\ConfigureCommand">
+            <argument type="service" id="symfony.filesystem" />
+            <argument type="service" id="symfony.finder" />
         </service>
 
         <service id="cdev.db_cleanse_command" class="Creode\Cdev\Command\Backup\Db\CleanseCommand">
