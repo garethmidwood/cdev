@@ -107,7 +107,17 @@ class SetupEnvCommand extends ConfigurationCommand
 
         $default = isset($this->_config['config']['docker']['package']) ? $this->_config['config']['docker']['package'] : null;
         $question = new Question('Composer package name (<vendor>/<name>): ', $default);
+        $question->setValidator(function ($answer) {
+            if (!preg_match('/^[A-Za-z0-9]+\/[A-Za-z0-9]+$/', $answer)) {
+                throw new \RuntimeException(
+                    'Package name must be in the format <vendor>/<name> e.g. creode/magento1'
+                );
+            }
+
+            return $answer;
+        });
         $this->_config['config']['docker']['package'] = $helper->ask($this->_input, $this->_output, $question);
+
 
 
         $default = isset($this->_config['config']['docker']['port']) ? $this->_config['config']['docker']['port'] : null;
