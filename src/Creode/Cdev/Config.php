@@ -8,6 +8,7 @@ use Symfony\Component\Console\Formatter\OutputFormatterStyle;
 class Config
 {
     const CONFIG_FILE = 'cdev.yml';
+    const SERVICES_FILE = 'services.env.xml';
     const CONFIG_DIR = 'config/';
 
     /**

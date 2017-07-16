@@ -5,6 +5,7 @@ use Creode\Cdev\Config;
 use Creode\Environment;
 use Creode\Framework;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -38,6 +39,11 @@ class ConfigureCommand extends Command
             )
         )
     );
+
+    // TODO: Get rid of these hard coded lists
+    private $_environments = [
+        'Environment\Docker\Docker'
+    ];
 
     /**
      * @var Filesystem
@@ -78,14 +84,6 @@ class ConfigureCommand extends Command
             'Path to run commands on. Defaults to the directory the command is run from',
             getcwd()
         );
-
-        $this->addOption(
-            'config',
-            'c',
-            InputOption::VALUE_REQUIRED,
-            'Config file to create',
-            Config::CONFIG_FILE
-        );
     }
 
     /**
@@ -101,8 +99,8 @@ class ConfigureCommand extends Command
 
         $path = $this->_input->getOption('path');
         $configDir = $path . '/' . Config::CONFIG_DIR;
-        $configFile = $configDir . $this->_input->getOption('config');
-        $servicesFile = $configDir . 'services.env.xml';
+        $configFile = $configDir . Config::CONFIG_FILE;
+        $servicesFile = $configDir . Config::SERVICES_FILE;
 
         if (file_exists($configFile)) {
             $this->_config = Yaml::parse(file_get_contents($configFile));
@@ -115,6 +113,8 @@ class ConfigureCommand extends Command
 
         $this->_output->writeln('Writing services file to ' . $servicesFile);
         $this->saveServicesXml($servicesFile);
+
+        $this->configureEnvironment($output);
     }
 
     /**
@@ -133,9 +133,12 @@ class ConfigureCommand extends Command
          */
         $originalSrc = $this->_config['config']['dir']['src'];
 
+        $defaultSrc = isset($originalSrc) ? $originalSrc : 'src';
+
         $this->askQuestion(
             'Code directory',
-            $this->_config['config']['dir']['src']
+            $this->_config['config']['dir']['src'],
+            $defaultSrc
         );
 
         if ($this->_config['config']['dir']['src'] != $originalSrc) {
@@ -148,6 +151,12 @@ class ConfigureCommand extends Command
          * ENVIRONMENTAL / FRAMEWORK
          * 
          */
+        $envs = [];
+        foreach ($this->_environments as $env) {
+            $envs[] = $env::NAME;
+        }
+var_dump($envs);
+
         $question = new ChoiceQuestion(
             'Environment type',
             array(
@@ -223,13 +232,16 @@ class ConfigureCommand extends Command
      */
     private function askQuestion(
         $text,
-        &$config
+        &$config,
+        $default = null
     ) {
         $helper = $this->getHelper('question');
 
+        $current = isset($config) ? $config : $default;
+
         $question = new Question(
-            $text . ' : [Current=' . $config . ']',
-            $config
+            $text . ' : [Current=' . $current . ']',
+            $current
         );
 
         $config = $helper->ask($this->_input, $this->_output, $question);
@@ -392,4 +404,27 @@ class ConfigureCommand extends Command
         }
     }
 
+    /**
+     * Runs the setup for the selected environment
+     * @param OutputInterface $output 
+     * @return null
+     */
+    private function configureEnvironment(OutputInterface $output)
+    {
+        $cmdNamespace = $this->_environment::COMMAND_NAMESPACE;
+
+        // TODO: This command name should be enforced by the environment class
+        // will probably need a new abstract class to enable that
+        $cmd = $this->_config['config']['environment']['type'] . ':setup';
+
+        $command = $this->getApplication()->find($cmd);
+
+        $arguments = array(
+            'command' => $cmd
+        );
+
+        $cmdInput = new ArrayInput($arguments);
+
+        $command->run($cmdInput, $output);
+    }
 }

@@ -2,6 +2,9 @@
 namespace Creode\Cdev\Command\Env;
 
 use Creode\Cdev\Command\Env\EnvCommand;
+use Creode\Cdev\Config;
+use Creode\Environment\Environment;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -10,6 +13,24 @@ use Symfony\Component\Console\Question\Question;
 
 class SetupEnvCommand extends EnvCommand
 {
+    /**
+     * @var Config
+     */
+    private $_config;
+
+    /**
+     * @param Config $config 
+     * @return null
+     */
+    public function __construct(
+        Environment $environment,
+        Config $config
+    ) {
+        $this->_config = $config;
+
+        parent::__construct($environment);
+    }
+
     protected function configure()
     {
         $this->setName('env:setup');
@@ -24,22 +45,6 @@ class SetupEnvCommand extends EnvCommand
         );
 
         $this->addOption(
-            'src',
-            's',
-            InputOption::VALUE_REQUIRED,
-            'The name of the src directory to use',
-            'src'
-        );
-
-        $this->addOption(
-            'oldsrc',
-            'o',
-            InputOption::VALUE_OPTIONAL,
-            'If entered, the named directory will be renamed to the value of src',
-            null
-        );
-
-        $this->addOption(
             'composer',
             'c',
             InputOption::VALUE_OPTIONAL,
@@ -50,30 +55,14 @@ class SetupEnvCommand extends EnvCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $answers = $this->askQuestions($input, $output);
+        $command = $this->getApplication()->find('docker:setup');
 
-        $this->_environment->input($input);
-
-        $output->writeln(
-            $this->_environment->setup($answers)
+        $arguments = array(
+            'command' => 'docker:setup'
         );
-    }
 
-    private function askQuestions(InputInterface $input, OutputInterface $output)
-    {
-        $helper = $this->getHelper('question');
+        $cmdInput = new ArrayInput($arguments);
 
-        // TODO: This is tool-specific. Find a way to make it so.
-
-        $question = new Question('Package name (<vendor>/<name>) ', 'creode/toolazytotype');
-        $answers['packageName'] = $helper->ask($input, $output, $question);
-
-        $question = new Question('Environment port suffix (3 digits - e.g. 014) ', 'XXX');
-        $answers['portNo'] = $helper->ask($input, $output, $question);
-
-        $question = new Question('Project name (xxxx).docker ', 'toolazytotype');
-        $answers['projectName'] = $helper->ask($input, $output, $question);
-
-        return $answers;
+        return $command->run($cmdInput, $output);
     }
 }

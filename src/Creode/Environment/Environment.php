@@ -2,21 +2,32 @@
 
 namespace Creode\Environment;
 
-interface Environment
+use Creode\Tools\Logger;
+
+abstract class Environment extends Logger
 {
-    public function setup(array $answers = array());
+    public final function getCommandNamespace()
+    {
+        if (!defined(self::COMMAND_NAMESPACE)) {
+            throw new LogicException(get_class($this) . ' must have a command namespace defined');
+        }
+
+        return $this->_cmdNamespace;
+    }
+
+    abstract public function setup(array $answers = array());
     
-    public function start();
+    abstract public function start();
     
-    public function stop();
+    abstract public function stop();
     
-    public function nuke();
+    abstract public function nuke();
 
-    public function cleanup();
+    abstract public function cleanup();
 
-    public function ssh();
+    abstract public function ssh();
 
-    public function runCommand(array $command = array(), $elevatePermissions = false);
+    abstract public function runCommand(array $command = array(), $elevatePermissions = false);
 
-    public function cacheClear();
+    abstract public function cacheClear();
 }

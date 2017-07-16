@@ -1,5 +1,6 @@
 <?php
 
+use Creode\Cdev\Config;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -10,8 +11,10 @@ $container = new ContainerBuilder();
 $loader = new XmlFileLoader($container, new FileLocator(__DIR__));
 $loader->load('services.xml');
 
-if (file_exists(getcwd() . '/config/services.env.xml')) {
-    $loader->load(getcwd() . '/config/services.env.xml');
+$localServiceConfig = getcwd() . '/' . Config::CONFIG_DIR . Config::SERVICES_FILE;
+
+if (file_exists($localServiceConfig)) {
+    $loader->load($localServiceConfig);
 }
 
 $output = $container->get('symfony.console_output');

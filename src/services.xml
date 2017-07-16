@@ -29,6 +29,9 @@
                 <argument type="service" id="cdev.db_utf8_command" />
             </call>
             <call method="add">
+                <argument type="service" id="cdev.docker_setup" />
+            </call>
+            <call method="add">
                 <argument type="service" id="cdev.env_cleanup_command" />
             </call>
             <call method="add">
@@ -84,6 +87,7 @@
 
         <service id="cdev.env_setup_command" class="Creode\Cdev\Command\Env\SetupEnvCommand">
             <argument type="service" id="cdev.environment.type" />
+            <argument type="service" id="cdev.config" />
         </service>
 
         <service id="cdev.env_ssh_command" class="Creode\Cdev\Command\Env\SshEnvCommand">
@@ -100,6 +104,11 @@
 
         <service id="cdev.env_cache_clean_command" class="Creode\Cdev\Command\Site\CacheCleanSiteCommand">
             <argument type="service" id="cdev.environment.type" />
+        </service>
+
+        <service id="cdev.docker_setup" class="Creode\Environment\Docker\Command\SetupEnvCommand">
+            <argument type="service" id="symfony.filesystem" />
+            <argument type="service" id="symfony.finder" />
         </service>
 
 

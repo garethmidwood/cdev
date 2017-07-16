@@ -14,7 +14,6 @@ abstract class EnvCommand extends Command
     /**
      * Constructor
      * @param Environment $environment
-     * @param Framework $framework 
      * @return null
      */
     public function __construct(

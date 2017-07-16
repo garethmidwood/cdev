@@ -1,9 +1,9 @@
 #!/usr/bin/env php
 <?php
 $pharfile = 'cdev.phar';
-$startfile = 'src/cdev.php';
+$startfile = 'cdev.php';
 
-$basedir = dirname(dirname( __FILE__ ));
+$basedir = dirname(dirname( __FILE__ )) . '/src';
 
 function prunePrefix( $files, $prefix ) {
     $newlist = array();

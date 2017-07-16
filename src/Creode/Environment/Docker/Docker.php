@@ -8,7 +8,6 @@ use Creode\Environment\Docker\System\Docker as SystemDocker;
 use Creode\Environment\Docker\System\Sync;
 use Creode\Environment\Environment;
 use Creode\Framework\Framework;
-use Creode\Tools\Logger;
 use Creode\System\Composer\Composer;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
@@ -17,9 +16,10 @@ use Symfony\Component\Yaml\Yaml;
 
 
 
-class Docker extends Logger implements Environment
+class Docker extends Environment
 {
     const NAME = 'docker';
+    const COMMAND_NAMESPACE = 'docker';
     
     /**
      * @var SystemDocker
