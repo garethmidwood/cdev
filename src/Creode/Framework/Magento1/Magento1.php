@@ -7,6 +7,7 @@ use Creode\Framework\Framework;
 class Magento1 implements Framework
 {
     const NAME = 'magento1';
+    const LABEL = 'Magento 1';
 
     const MAGERUN = 'bin/n98-magerun.phar';
 

@@ -107,8 +107,7 @@
         </service>
 
         <service id="cdev.docker_setup" class="Creode\Environment\Docker\Command\SetupEnvCommand">
-            <argument type="service" id="symfony.filesystem" />
-            <argument type="service" id="symfony.finder" />
+            <argument type="service" id="environment.type.docker" />
         </service>
 
 
@@ -168,11 +167,11 @@
         </service>
 
         <service id="cdev.system_docker_compose"
-            class="Creode\Environment\Docker\System\Compose">
+            class="Creode\Environment\Docker\System\Compose\Compose">
         </service>
 
         <service id="cdev.system_docker_sync"
-            class="Creode\Environment\Docker\System\Sync">
+            class="Creode\Environment\Docker\System\Sync\Sync">
         </service>
 
         <service id="cdev.system_iconv" class="Creode\System\Iconv\Iconv">

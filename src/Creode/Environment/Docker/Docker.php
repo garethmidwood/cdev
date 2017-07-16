@@ -3,9 +3,9 @@
 namespace Creode\Environment\Docker;
 
 use Creode\Cdev\Config;
-use Creode\Environment\Docker\System\Compose;
+use Creode\Environment\Docker\System\Compose\Compose;
 use Creode\Environment\Docker\System\Docker as SystemDocker;
-use Creode\Environment\Docker\System\Sync;
+use Creode\Environment\Docker\System\Sync\Sync;
 use Creode\Environment\Environment;
 use Creode\Framework\Framework;
 use Creode\System\Composer\Composer;
@@ -19,6 +19,7 @@ use Symfony\Component\Yaml\Yaml;
 class Docker extends Environment
 {
     const NAME = 'docker';
+    const LABEL = 'Docker';
     const COMMAND_NAMESPACE = 'docker';
     
     /**
@@ -377,5 +378,23 @@ class Docker extends Environment
         $updatedConfig = Yaml::dump($config);
 
         file_put_contents($template, $updatedConfig);
+    }
+
+    /**
+     * Returns docker compose system object
+     * @return Compose
+     */
+    public function getCompose()
+    {
+        return $this->_compose;
+    }
+
+    /**
+     * Returns docker sync system object
+     * @return Sync
+     */
+    public function getSync()
+    {
+        return $this->_sync;
     }
 }

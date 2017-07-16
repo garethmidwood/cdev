@@ -7,6 +7,7 @@ use Creode\Framework\Framework;
 class WordPress implements Framework
 {
     const NAME = 'wordpress';
+    const LABEL = 'WordPress';
 
     /**
      * Returns commands to clear cache on this framework

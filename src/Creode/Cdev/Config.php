@@ -9,7 +9,7 @@ class Config
 {
     const CONFIG_FILE = 'cdev.yml';
     const SERVICES_FILE = 'services.env.xml';
-    const CONFIG_DIR = 'config/';
+    const CONFIG_DIR = 'cdev/';
 
     /**
      * @var array

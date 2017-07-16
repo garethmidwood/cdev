@@ -7,6 +7,7 @@ use Creode\Framework\Framework;
 class Magento2 implements Framework
 {
     const NAME = 'magento2';
+    const LABEL = 'Magento 2';
 
     const MAGERUN = 'bin/magento';
 

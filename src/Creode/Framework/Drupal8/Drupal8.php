@@ -7,6 +7,7 @@ use Creode\Framework\Framework;
 class Drupal8 implements Framework
 {
     const NAME = 'drupal8';
+    const LABEL = 'Drupal 8';
 
     const DRUSH = 'drush';
 

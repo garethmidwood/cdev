@@ -1,6 +1,7 @@
 <?php
 namespace Creode\Cdev\Command\Cdev;
 
+use Creode\Cdev\Command\ConfigurationCommand;
 use Creode\Cdev\Config;
 use Creode\Environment;
 use Creode\Framework;
@@ -16,16 +17,16 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
-class ConfigureCommand extends Command
+class ConfigureCommand extends ConfigurationCommand
 {
-    private $_config = array(
+    protected $_config = array(
         'version' => '2',
         'config' => array(
             'dir' => array(
                 'src' => null
             ),
             'environment' => array(
-                'type' => 'docker',
+                'type' => null,
                 'framework' => null
             ),
             'backups' => array(
@@ -40,10 +41,29 @@ class ConfigureCommand extends Command
         )
     );
 
-    // TODO: Get rid of these hard coded lists
+    // TODO: Find a better way to include these, ideally by injecting the classes (somehow)
     private $_environments = [
-        'Environment\Docker\Docker'
+        '\Creode\Environment\Docker\Docker'
     ];
+
+    // TODO: Find a better way to include these, ideally by injecting the classes (somehow)
+    private $_frameworks = [
+        '\Creode\Framework\Magento1\Magento1',
+        '\Creode\Framework\Magento2\Magento2',
+        '\Creode\Framework\Drupal7\Drupal7',
+        '\Creode\Framework\Drupal8\Drupal8',
+        '\Creode\Framework\WordPress\WordPress'
+    ];
+
+    /**
+     * @var string
+     */
+    private $_chosenEnvironmentClass;
+
+    /**
+     * @var string
+     */
+    private $_chosenFrameworkClass;
 
     /**
      * @var Filesystem
@@ -98,21 +118,13 @@ class ConfigureCommand extends Command
         $this->_output = $output;
 
         $path = $this->_input->getOption('path');
-        $configDir = $path . '/' . Config::CONFIG_DIR;
-        $configFile = $configDir . Config::CONFIG_FILE;
-        $servicesFile = $configDir . Config::SERVICES_FILE;
 
-        if (file_exists($configFile)) {
-            $this->_config = Yaml::parse(file_get_contents($configFile));
-        }
+        $this->loadConfig($path, $output);
 
-        $answers = $this->askQuestions();
+        $this->askQuestions();
 
-        $this->_output->writeln('Writing config file to ' . $configFile);
-        $this->saveConfigFile($configFile);
-
-        $this->_output->writeln('Writing services file to ' . $servicesFile);
-        $this->saveServicesXml($servicesFile);
+        $this->saveConfig($path, $output);
+        $this->saveServicesXml($path, $output);
 
         $this->configureEnvironment($output);
     }
@@ -148,40 +160,50 @@ class ConfigureCommand extends Command
 
         /**
          * 
-         * ENVIRONMENTAL / FRAMEWORK
+         * ENVIRONMENT
          * 
          */
         $envs = [];
+        $envMap = [];
         foreach ($this->_environments as $env) {
-            $envs[] = $env::NAME;
+            $envs[$env::NAME] = $env::LABEL;
+            $envMap[$env::NAME] = $env;
         }
-var_dump($envs);
+
+        $defaultEnv = count($envs) == 1 ? $envs[key($envs)] : $this->_config['config']['environment']['type'];
 
         $question = new ChoiceQuestion(
-            'Environment type',
-            array(
-                // TODO: Find a better way to include these, ideally by adding the classes somehow
-                Environment\Docker\Docker::NAME
-            )
+            'Environment type: [Current: <fg=green>' . (isset($defaultEnv) ? $defaultEnv : 'None') . '</>]',
+            $envs,
+            $defaultEnv
         );
         $question->setErrorMessage('Environment type %s is invalid.');
         $this->_config['config']['environment']['type'] = $helper->ask($this->_input, $this->_output, $question);
+        $this->_chosenEnvironmentClass = $envMap[$this->_config['config']['environment']['type']];
 
+
+        /**
+         * 
+         * FRAMEWORK
+         * 
+         */
+        $frameworks = [];
+        $frameworkMap = [];
+        foreach ($this->_frameworks as $framework) {
+            $frameworks[$framework::NAME] = $framework::LABEL;
+            $frameworkMap[$framework::NAME] = $framework;
+        }
+
+        $defaultFramework = count($frameworks) == 1 ? $frameworks[key($frameworks)] : $this->_config['config']['environment']['framework'];
 
         $question = new ChoiceQuestion(
-            'Framework',
-            // TODO: Find a better way to include these, ideally by adding the classes somehow
-            array(
-                'magento1', // Framework\Magento1\Magento1::NAME,
-                'magento2', // Framework\Magento2\Magento2::NAME,
-                'drupal7',  // Framework\Drupal7\Drupal7::NAME,
-                'drupal8',  // Framework\Drupal8\Drupal8::NAME,
-                'wordpress' // Framework\WordPress\WordPress::NAME,
-            )
+            'Framework: [Current: <fg=green>' . (isset($defaultFramework) ? $defaultFramework : 'None') . '</>]',
+            $frameworks,
+            $defaultFramework
         );
         $question->setErrorMessage('Framework %s is invalid.');
         $this->_config['config']['environment']['framework'] = $helper->ask($this->_input, $this->_output, $question);
-
+        $this->_chosenFrameworkClass = $frameworkMap[$this->_config['config']['environment']['framework']];
 
         /**
          * 
@@ -247,37 +269,19 @@ var_dump($envs);
         $config = $helper->ask($this->_input, $this->_output, $question);
     }
 
-    /**
-     * Saves project specific config file
-     * @param string $configFile 
-     * @return null
-     */
-    private function saveConfigFile($configFile)
-    {
-        $configDir = dirname($configFile);
-
-        if (!file_exists($configDir)) {
-            mkdir($configDir, 0744);
-        }
-
-        $configuration = Yaml::dump($this->_config);
-
-        file_put_contents(
-            $configFile,
-            $configuration
-        );
-    }
 
     /**
      * Saves project specific service XML based on provided template
      * @param string $servicesFile 
      * @return null
      */
-    private function saveServicesXml($servicesFile)
+    private function saveServicesXml($path, $output)
     {
-        $configDir = dirname($servicesFile);
+        $configDir = $path . '/' . Config::CONFIG_DIR;
+        $servicesFile = $configDir . Config::SERVICES_FILE;
         
         if (!file_exists($configDir)) {
+            $output->writeln('Creating config directory');
             mkdir($configDir, 0744);
         }
 
@@ -295,6 +299,7 @@ var_dump($envs);
 
         $servicesContent = str_replace($searches, $replacements, $servicesContent);
 
+        $output->writeln('Writing services file to ' . $servicesFile);
         file_put_contents(
             $servicesFile,
             $servicesContent
@@ -411,11 +416,11 @@ var_dump($envs);
      */
     private function configureEnvironment(OutputInterface $output)
     {
-        $cmdNamespace = $this->_environment::COMMAND_NAMESPACE;
+        $cmdNamespace = $this->_chosenEnvironmentClass::COMMAND_NAMESPACE;
 
         // TODO: This command name should be enforced by the environment class
         // will probably need a new abstract class to enable that
-        $cmd = $this->_config['config']['environment']['type'] . ':setup';
+        $cmd = $cmdNamespace . ':setup';
 
         $command = $this->getApplication()->find($cmd);
 

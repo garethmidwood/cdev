@@ -1,41 +1,48 @@
 <?php
 namespace Creode\Environment\Docker\Command;
 
+use Creode\Cdev\Command\ConfigurationCommand;
 use Creode\Cdev\Config;
+use Creode\Environment\Docker\Docker;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Finder\Finder;
 use Symfony\Component\Yaml\Yaml;
 
-class SetupEnvCommand extends Command
+class SetupEnvCommand extends ConfigurationCommand
 {
-    /**
-     * @var Filesystem
-     */
-    protected $_fs;
+    protected $_config = array(
+        'version' => '2',
+        'config' => array(
+            'docker' => array(
+                'src' => null
+            ),
+            'compose' => array(
+                'type' => null,
+            ),
+            'sync' => array(
+                'active' => false,
+            )
+        )
+    );
 
     /**
-     * @var Finder
+     * @var Docker
      */
-    protected $_finder;
+    protected $_docker;
 
     /**
      * Constructor
-     * @param Filesystem $fs
-     * @param Finder $finder
+     * @param Docker $docker
      * @return null
      */
     public function __construct(
-        Filesystem $fs,
-        Finder $finder
+        Docker $docker
     ) {
-        $this->_fs = $fs;
-        $this->_finder = $finder;
+        $this->_docker = $docker;
 
         parent::__construct();
     }
@@ -65,44 +72,55 @@ class SetupEnvCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Triggered docker setup');
-        return;
+        $this->_input = $input;
+        $this->_output = $output;
 
         $path = $this->_input->getOption('path');
-        $configDir = $path . '/' . Config::CONFIG_DIR;
-        $configFile = $configDir . Config::CONFIG_FILE;
-        $servicesFile = $configDir . Config::SERVICES_FILE;
 
-        if (file_exists($configFile)) {
-            $this->_config = Yaml::parse(file_get_contents($configFile));
-        }
+        $this->loadConfig($path, $output);
 
+        $this->askQuestions();
 
-
-        $answers = $this->askQuestions($input, $output);
-
-        $this->_environment->input($input);
-
-        $output->writeln(
-            $this->_environment->setup($answers)
-        );
+        $this->saveConfig($path);
+        $this->_docker->getCompose()->generateConfig();
+        $this->_docker->getSync()->generateConfig();
     }
 
-    private function askQuestions(InputInterface $input, OutputInterface $output)
+    private function askQuestions()
     {
         $helper = $this->getHelper('question');
 
-        // TODO: This is tool-specific. Find a way to make it so.
+        $default = isset($this->_config['config']['docker']['name']) ? $this->_config['config']['docker']['name'] : null;
+        $question = new Question('Project name/domain (xxxx).docker: ', $default);
+        $question->setValidator(function ($answer) {
+            if (!filter_var('http://'.$answer.'.com', FILTER_VALIDATE_URL)) {
+                throw new \RuntimeException(
+                    'Docker project name must be suitable for use in domain name (no spaces, underscores etc.)'
+                );
+            }
 
-        $question = new Question('Package name (<vendor>/<name>) ', 'creode/toolazytotype');
-        $answers['packageName'] = $helper->ask($input, $output, $question);
+            return $answer;
+        });
+        $this->_config['config']['docker']['name'] = $helper->ask($this->_input, $this->_output, $question);
 
-        $question = new Question('Environment port suffix (3 digits - e.g. 014) ', 'XXX');
-        $answers['portNo'] = $helper->ask($input, $output, $question);
 
-        $question = new Question('Project name (xxxx).docker ', 'toolazytotype');
-        $answers['projectName'] = $helper->ask($input, $output, $question);
 
-        return $answers;
+        $default = isset($this->_config['config']['docker']['package']) ? $this->_config['config']['docker']['package'] : null;
+        $question = new Question('Composer package name (<vendor>/<name>): ', $default);
+        $this->_config['config']['docker']['package'] = $helper->ask($this->_input, $this->_output, $question);
+
+
+        $default = isset($this->_config['config']['docker']['port']) ? $this->_config['config']['docker']['port'] : null;
+        $question = new Question('Environment port suffix (3 digits - e.g. 014): ', $default);
+        $question->setValidator(function ($answer) {
+            if (!preg_match('/^[0-9]{3}$/', $answer)) {
+                throw new \RuntimeException(
+                    'Docker port number must be a 3 digit number'
+                );
+            }
+
+            return $answer;
+        });
+        $this->_config['config']['docker']['port'] = $helper->ask($this->_input, $this->_output, $question);
     }
 }
