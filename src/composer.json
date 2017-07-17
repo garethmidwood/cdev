@@ -1,6 +1,6 @@
 {
-    "name": "creode/cdock",
-    "description": "Creode Docker tools",
+    "name": "creode/cdev",
+    "description": "Creode Development Environment Tools",
     "type": "executable",
     "authors": [
         {
