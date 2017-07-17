@@ -34,6 +34,7 @@ class SetupEnvCommand extends EnvCommand
     protected function configure()
     {
         $this->setName('env:setup');
+        $this->setHidden(true);
         $this->setDescription('Sets up the project environment');
 
         $this->addOption(

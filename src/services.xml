@@ -120,6 +120,7 @@
             <argument type="service" id="cdev.system_docker_compose" />
             <argument type="service" id="cdev.system_docker_sync" />
             <argument type="service" id="cdev.environment.framework" />
+            <argument type="service" id="cdev.config" />
         </service>
 
 

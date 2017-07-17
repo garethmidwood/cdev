@@ -31,9 +31,9 @@ class Compose extends Command
         $this->requiresConfig();
 
         $params = [
-            'up',
             '-f',
-            Config::CONFIG_DIR . self::FILE
+            Config::CONFIG_DIR . self::FILE,
+            'up'
         ];
 
         if ($build) {
@@ -56,7 +56,11 @@ class Compose extends Command
         
         $this->run(
             self::COMMAND,
-            ['stop', '-f', Config::CONFIG_DIR . self::FILE],
+            [
+                '-f',
+                Config::CONFIG_DIR . self::FILE,
+                'stop'
+            ],
             $path
         );
 
@@ -74,7 +78,12 @@ class Compose extends Command
         
         $this->run(
             self::COMMAND,
-            ['rm', '-f'],
+            [
+                '-f',
+                Config::CONFIG_DIR . self::FILE,
+                'rm',
+                '-f'
+            ],
             $path
         );
 
@@ -91,7 +100,18 @@ class Compose extends Command
     {
         $this->requiresConfig();
         
-        $this->run(self::COMMAND, ['exec', "--user=$user", 'php', 'bash'], $path);
+        $this->run(
+            self::COMMAND,
+            [
+                '-f',
+                Config::CONFIG_DIR . self::FILE,
+                'exec',
+                "--user=$user",
+                'php',
+                'bash'
+            ],
+            $path
+        );
     }
 
     /**

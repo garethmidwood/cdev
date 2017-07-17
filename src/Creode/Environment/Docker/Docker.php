@@ -45,30 +45,55 @@ class Docker extends Environment
     private $_logger;
 
     /**
+     * @var Config
+     */
+    private $_config;
+
+    /**
      *  @var InputInterface
      */
     private $_input;
 
     /**
+     * @var boolean
+     */
+    private $_usingDockerSync = false;
+
+    /**
+     * @param SystemDocker $docker
      * @param Compose $compose 
      * @param Sync $sync 
-     * @param Filesystem $fs 
-     * @param Finder $finder
+     * @param Framework $framework
+     * @param Config $config
      * @return null
      */
     public function __construct(
         SystemDocker $docker,
         Compose $compose,
         Sync $sync,
-        Framework $framework
+        Framework $framework,
+        Config $config
     ) {
         $this->_docker = $docker;
         $this->_compose = $compose;
         $this->_sync = $sync;
         $this->_framework = $framework;
+        $this->_config = $config;
+
+        $conf = $this->_config->get('docker', false);
+
+        $this->_usingDockerSync = isset($conf['sync']['active']) && $conf['sync']['active'];
     }
 
-
+    /**
+     * Sets the inputs
+     * @param InputInterface $input 
+     * @return type
+     */
+    public function input(InputInterface $input)
+    {
+        $this->_input = $input;
+    }
 
     public function start()
     {
@@ -77,7 +102,10 @@ class Docker extends Environment
         $path = $this->_input->getOption('path');
         $build = $this->_input->getOption('build');
 
-        $this->_sync->start($path);
+        if ($this->_usingDockerSync) {
+            $this->_sync->start($path);
+        }
+
         $this->_compose->up($path, $build);
     }
 
@@ -98,7 +126,10 @@ class Docker extends Environment
 
         $this->_compose->stop($path);
         $this->_compose->rm($path);
-        $this->_sync->clean($path);
+
+        if ($this->_usingDockerSync) {
+            $this->_sync->clean($path);
+        }
     }
 
     public function cleanup()

@@ -44,7 +44,7 @@ class SetupEnvCommand extends ConfigurationCommand
                     ]
                 ],
                 'compose' => [
-                    'version' => 2,
+                    'version' => '2',
                     'services' => [
                         'mysql'=> [
                             'active' => true,
@@ -60,8 +60,8 @@ class SetupEnvCommand extends ConfigurationCommand
                                 'MYSQL_PASSWORD' => 'webpassword'
                             ],
                             'volumes' => [
-                                ['./db:/docker-entrypoint-initdb.d'],
-                                ['/var/lib/mysql']
+                                '../db:/docker-entrypoint-initdb.d',
+                                '/var/lib/mysql',
                             ]
                         ],
                         'php' => [
@@ -79,7 +79,7 @@ class SetupEnvCommand extends ConfigurationCommand
                                 'redis'
                             ],
                             'volumes' => [
-                                ['./src:/var/www/html']
+                                ['../src:/var/www/html']
                             ]
                         ],
                         'mailcatcher' => [
@@ -105,7 +105,7 @@ class SetupEnvCommand extends ConfigurationCommand
     /**
      * @var boolean
      */
-    private $_usingImages = false;
+    private $_usingLocalBuilds = false;
 
     /**
      * @var Docker
@@ -255,7 +255,7 @@ class SetupEnvCommand extends ConfigurationCommand
             $this->saveDockerSyncConfig();
         }
 
-        if ($this->_usingImages) {
+        if ($this->_usingLocalBuilds) {
             $this->composerInit();
         }
     }
@@ -309,11 +309,11 @@ class SetupEnvCommand extends ConfigurationCommand
 
         if ($useMysql) {
             $this->buildOrImage(
-                './vendor/creode/docker/images/mysql',
+                '../vendor/creode/docker/images/mysql',
                 'creode:mysql',
                 $this->_config['config']['docker']['compose']['services']['mysql'],
                 [   // builds
-                    './vendor/creode/docker/images/mysql' => 'MySQL'
+                    '../vendor/creode/docker/images/mysql' => 'MySQL'
                 ],
                 [   // images
                     'creode:mysql' => 'MySQL'
@@ -323,8 +323,8 @@ class SetupEnvCommand extends ConfigurationCommand
             $this->_config['config']['docker']['compose']['services']['mysql']['container_name']
                 = $this->_config['config']['docker']['name'] . '_mysql';
 
-            $this->_config['config']['docker']['compose']['services']['mysql']['ports'][]
-                = '4' . $this->_config['config']['docker']['port'] . ':3306';
+            $this->_config['config']['docker']['compose']['services']['mysql']['ports']
+                = ['4' . $this->_config['config']['docker']['port'] . ':3306'];
         }
 
         /**
@@ -339,13 +339,13 @@ class SetupEnvCommand extends ConfigurationCommand
 
         if ($usePhp) {
             $this->buildOrImage(
-                './vendor/creode/docker/images/php/7.0',
+                '../vendor/creode/docker/images/php/7.0',
                 'creode:php70',
                 $this->_config['config']['docker']['compose']['services']['php'],
                 [   // builds
-                    './vendor/creode/docker/images/php/7.0' => 'PHP 7.0',
-                    './vendor/creode/docker/images/php/5.6' => 'PHP 5.6',
-                    './vendor/creode/docker/images/php/5.3' => 'PHP 5.3'
+                    '../vendor/creode/docker/images/php/7.0' => 'PHP 7.0',
+                    '../vendor/creode/docker/images/php/5.6' => 'PHP 5.6',
+                    '../vendor/creode/docker/images/php/5.3' => 'PHP 5.3'
                 ],
                 [   // images
                     'creode:php70' => 'PHP 7.0',
@@ -357,14 +357,14 @@ class SetupEnvCommand extends ConfigurationCommand
             $this->_config['config']['docker']['compose']['services']['php']['container_name']
                 = $this->_config['config']['docker']['name'] . '_php';
 
-            $this->_config['config']['docker']['compose']['services']['php']['ports'][]
-                = '3' . $this->_config['config']['docker']['port'] . ':80';
+            $this->_config['config']['docker']['compose']['services']['php']['ports']
+                = ['3' . $this->_config['config']['docker']['port'] . ':80'];
 
             $this->_config['config']['docker']['compose']['services']['php']['environment']['VIRTUAL_HOST']
                 = '.' . $this->_config['config']['docker']['name'] . '.docker';
 
-            $this->_config['config']['docker']['compose']['services']['php']['volumes'][]
-                = './' . $this->_config['config']['dir']['src'] . ':/var/www/html';
+            $this->_config['config']['docker']['compose']['services']['php']['volumes']
+                = ['../' . $this->_config['config']['dir']['src'] . ':/var/www/html'];
         }
 
         /**
@@ -384,8 +384,8 @@ class SetupEnvCommand extends ConfigurationCommand
             $this->_config['config']['docker']['compose']['services']['mailcatcher']['container_name']
                 = $this->_config['config']['docker']['name'] . '_mailcatcher';
 
-            $this->_config['config']['docker']['compose']['services']['mailcatcher']['ports'][]
-                = '5' . $this->_config['config']['docker']['port'] . ':1080';
+            $this->_config['config']['docker']['compose']['services']['mailcatcher']['ports']
+                = ['5' . $this->_config['config']['docker']['port'] . ':1080'];
         }
 
         /**
@@ -405,8 +405,8 @@ class SetupEnvCommand extends ConfigurationCommand
             $this->_config['config']['docker']['compose']['services']['redis']['container_name']
                 = $this->_config['config']['docker']['name'] . '_redis';
 
-            $this->_config['config']['docker']['compose']['services']['redis']['ports'][]
-                = '6379';
+            $this->_config['config']['docker']['compose']['services']['redis']['ports']
+                = ['6379'];
         }
     }
 
@@ -466,6 +466,8 @@ class SetupEnvCommand extends ConfigurationCommand
 
         switch($chosen) {
             case 'build':
+                $this->_usingLocalBuilds = true;
+
                 if (isset($config['image'])) {
                     unset($config['image']);
                 }
@@ -481,8 +483,6 @@ class SetupEnvCommand extends ConfigurationCommand
                 $config['build'] = $helper->ask($this->_input, $this->_output, $question);
                 break;
             case 'image':
-                $this->_usingImages = true;
-
                 if (isset($config['build'])) {
                     unset($config['build']);
                 }
@@ -508,11 +508,17 @@ class SetupEnvCommand extends ConfigurationCommand
     {
         $path = $this->_input->getOption('path');
 
+        $config = $this->_config['config']['docker']['compose'];
+
+        foreach ($config['services'] as &$service) {
+            unset($service['active']);
+        }
+
         $this->saveConfig(
             $path,
             Config::CONFIG_DIR, 
             Compose::FILE,
-            $this->_config['config']['docker']['compose']
+            $config
         );
     }
 
@@ -524,11 +530,14 @@ class SetupEnvCommand extends ConfigurationCommand
     {
         $path = $this->_input->getOption('path');
         
+        $config = $this->_config['config']['docker']['sync'];
+        unset($config['active']);
+
         $this->saveConfig(
             $path,
             Config::CONFIG_DIR, 
             Sync::FILE,
-            $this->_config['config']['docker']['sync']
+            $config
         );
     }
         
