@@ -15,9 +15,10 @@ composer install
 # build phar file
 # you will need to install the dependencies before you can run this section
 cd ..
-php build/build.php
-# make it available system-wide
-cp cdev.phar /usr/local/bin/cdev
+# this will build and copy the file to /usr/local/bin/cdev
+./build.sh
+# check it worked
+which cdev
 ```
 
 
@@ -66,30 +67,37 @@ libssh2 version => 1.8.0
 
 # Usage
 
-## Docker
 ### Setup dev environment for a project
 ```
 git clone git@your:repo.git
 cd project/dir
-cdev docker:setup
+cdev configure
 ```
+
+## Dev Environment Commands
 
 ### Switch dev environment on
 ```
 cd project/dir
-cdev docker:start
+cdev env:start
 ```
 
 ### Switch dev environment off
 ```
 cd project/dir
-cdev docker:stop
+cdev env:stop
 ```
 
 ### Destroy dev environment
 ```
 cd project/dir
-cdev docker:nuke
+cdev env:nuke
+```
+
+### Clean up dev environment(s)
+```
+# from anywhere
+cdev env:cleanup
 ```
 
 
@@ -97,7 +105,7 @@ cdev docker:nuke
 ### Configure to pull backups
 ```
 cd project/dir
-cdev cdev:configure
+cdev configure
 ```
 
 ### Pull latest DB and/or Media backup
@@ -106,11 +114,17 @@ cd project/dir
 cdev backup:pull
 ```
 
+### Remove unnecessary inserts from the DB dump (framework specific)
+```
+cd project/dir
+cdev backup:db:cleanse
+```
 
-## Magento 2
+
+## Site Commands
 ### Clear caches
 ```
 cd project/dir
-cdev mage2:cache:clear
+cdev site:cache:clear
 ```
 
