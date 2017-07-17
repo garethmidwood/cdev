@@ -31,18 +31,30 @@ abstract class ConfigurationCommand extends Command
     /**
      * Saves config file
      * @param string $path 
+     * @param string $dir 
+     * @param string $file 
+     * @param null|array $config
      * @return null
      */
-    protected function saveConfig($path)
-    {
-        $configDir = $path . '/' . Config::CONFIG_DIR;
-        $configFile = $configDir . Config::CONFIG_FILE;
+    protected function saveConfig(
+        $path,
+        $dir = Config::CONFIG_DIR, 
+        $file = Config::CONFIG_FILE,
+        array $config = null
+    ) {
+        $this->_output->writeln('<info>Saving config file ' .$dir . $file . '</info>');
+
+        $config = isset($config) ? $config : $this->_config;
+
+        $configDir = $path . '/' . $dir;
+        $configFile = $configDir . $file;
 
         if (!file_exists($configDir)) {
+            $this->_output->writeln('<info>Creating config directory ' . $configDir . '</info>');
             mkdir($configDir, 0744);
         }
 
-        $configuration = Yaml::dump($this->_config);
+        $configuration = Yaml::dump($config);
 
         file_put_contents(
             $configFile,

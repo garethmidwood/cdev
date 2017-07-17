@@ -108,6 +108,8 @@
 
         <service id="cdev.docker_setup" class="Creode\Environment\Docker\Command\SetupEnvCommand">
             <argument type="service" id="environment.type.docker" />
+            <argument type="service" id="cdev.system_composer" />
+            <argument type="service" id="symfony.filesystem" />
         </service>
 
 
@@ -118,9 +120,6 @@
             <argument type="service" id="cdev.system_docker_compose" />
             <argument type="service" id="cdev.system_docker_sync" />
             <argument type="service" id="cdev.environment.framework" />
-            <argument type="service" id="cdev.system_composer" />
-            <argument type="service" id="symfony.filesystem" />
-            <argument type="service" id="symfony.finder" />
         </service>
 
 

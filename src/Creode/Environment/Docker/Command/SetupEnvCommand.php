@@ -4,13 +4,18 @@ namespace Creode\Environment\Docker\Command;
 use Creode\Cdev\Command\ConfigurationCommand;
 use Creode\Cdev\Config;
 use Creode\Environment\Docker\Docker;
+use Creode\Environment\Docker\System\Compose\Compose;
+use Creode\Environment\Docker\System\Sync\Sync;
+use Creode\System\Composer\Composer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
+use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Yaml;
 
 class SetupEnvCommand extends ConfigurationCommand
@@ -39,38 +44,98 @@ class SetupEnvCommand extends ConfigurationCommand
                     ]
                 ],
                 'compose' => [
+                    'version' => 2,
                     'services' => [
                         'mysql'=> [
-                            'active' => true
+                            'active' => true,
+                            'container_name' => 'project_mysql',
+                            'restart' => 'always',
+                            'ports' => [
+                                '3306:3306'
+                            ],
+                            'environment' => [
+                                'MYSQL_ROOT_PASSWORD' => 'root',
+                                'MYSQL_DATABASE' => 'website',
+                                'MYSQL_USER' => 'webuser',
+                                'MYSQL_PASSWORD' => 'webpassword'
+                            ],
+                            'volumes' => [
+                                ['./db:/docker-entrypoint-initdb.d'],
+                                ['/var/lib/mysql']
+                            ]
                         ],
                         'php' => [
-                            'active' => true
+                            'active' => true,
+                            'container_name' => 'project_php',
+                            'ports' => [
+                                '80:80'
+                            ],
+                            'environment' => [
+                                'VIRTUAL_HOST' => '.project.docker'
+                            ],
+                            'links' => [
+                                'mysql:mysql',
+                                'mailcatcher:mailcatcher',
+                                'redis'
+                            ],
+                            'volumes' => [
+                                ['./src:/var/www/html']
+                            ]
                         ],
                         'mailcatcher' => [
-                            'active' => true
+                            'active' => true,
+                            'container_name' => 'project_mailcatcher',
+                            'ports' => [
+                                '1080:1080'
+                            ]
                         ],
                         'redis' => [
-                            'active' => true
+                            'active' => true,
+                            'container_name' => 'project_redis',
+                            'ports' => [
+                                '6379'
+                            ]
                         ]
                     ]
                 ]
             ]
         ]
     ];
+
+    /**
+     * @var boolean
+     */
+    private $_usingImages = false;
+
     /**
      * @var Docker
      */
     protected $_docker;
 
     /**
+     * @var Composer
+     */
+    protected $_composer;
+
+    /**
+     * @var Filesystem
+     */
+    protected $_fs;
+
+    /**
      * Constructor
      * @param Docker $docker
+     * @param Composer $composer
      * @return null
      */
     public function __construct(
-        Docker $docker
+        Docker $docker,
+        Composer $composer,
+        Filesystem $fs
     ) {
         $this->_docker = $docker;
+        $this->_composer = $composer;
+        $this->_fs = $fs;
 
         parent::__construct();
     }
@@ -110,8 +175,6 @@ class SetupEnvCommand extends ConfigurationCommand
         $this->askQuestions();
 
         $this->saveConfig($path);
-        $this->_docker->getCompose()->generateConfig();
-        $this->_docker->getSync()->generateConfig();
     }
 
     private function askQuestions()
@@ -185,6 +248,16 @@ class SetupEnvCommand extends ConfigurationCommand
         }
 
         $this->askDockerComposeQuestions();
+
+        $this->saveDockerComposeConfig();
+
+        if ($this->_config['config']['docker']['sync']['active']) {
+            $this->saveDockerSyncConfig();
+        }
+
+        if ($this->_usingImages) {
+            $this->composerInit();
+        }
     }
 
     /**
@@ -224,31 +297,130 @@ class SetupEnvCommand extends ConfigurationCommand
     {
         $helper = $this->getHelper('question');
 
+        /**
+         * 
+         *  MySQL 
+         *
+         */
         $useMysql = $this->containerRequired(
             'MySQL',
             $this->_config['config']['docker']['compose']['services']['mysql']['active']
         );
 
-        $useMysql = $this->containerRequired(
+        if ($useMysql) {
+            $this->buildOrImage(
+                './vendor/creode/docker/images/mysql',
+                'creode:mysql',
+                $this->_config['config']['docker']['compose']['services']['mysql'],
+                [   // builds
+                    './vendor/creode/docker/images/mysql' => 'MySQL'
+                ],
+                [   // images
+                    'creode:mysql' => 'MySQL'
+                ]
+            );
+
+            $this->_config['config']['docker']['compose']['services']['mysql']['container_name']
+                = $this->_config['config']['docker']['name'] . '_mysql';
+
+            $this->_config['config']['docker']['compose']['services']['mysql']['ports'][]
+                = '4' . $this->_config['config']['docker']['port'] . ':3306';
+        }
+
+        /**
+         * 
+         *  PHP
+         *
+         */
+        $usePhp = $this->containerRequired(
             'php',
             $this->_config['config']['docker']['compose']['services']['php']['active']
         );
 
-        $useMysql = $this->containerRequired(
+        if ($usePhp) {
+            $this->buildOrImage(
+                './vendor/creode/docker/images/php/7.0',
+                'creode:php70',
+                $this->_config['config']['docker']['compose']['services']['php'],
+                [   // builds
+                    './vendor/creode/docker/images/php/7.0' => 'PHP 7.0',
+                    './vendor/creode/docker/images/php/5.6' => 'PHP 5.6',
+                    './vendor/creode/docker/images/php/5.3' => 'PHP 5.3'
+                ],
+                [   // images
+                    'creode:php70' => 'PHP 7.0',
+                    'creode:php56' => 'PHP 5.6',
+                    'creode:php53' => 'PHP 5.3'
+                ]
+            );
+
+            $this->_config['config']['docker']['compose']['services']['php']['container_name']
+                = $this->_config['config']['docker']['name'] . '_php';
+
+            $this->_config['config']['docker']['compose']['services']['php']['ports'][]
+                = '3' . $this->_config['config']['docker']['port'] . ':80';
+
+            $this->_config['config']['docker']['compose']['services']['php']['environment']['VIRTUAL_HOST']
+                = '.' . $this->_config['config']['docker']['name'] . '.docker';
+
+            $this->_config['config']['docker']['compose']['services']['php']['volumes'][]
+                = './' . $this->_config['config']['dir']['src'] . ':/var/www/html';
+        }
+
+        /**
+         * 
+         *  Mailcatcher 
+         *
+         */
+        $useMailcatcher = $this->containerRequired(
             'Mailcatcher',
             $this->_config['config']['docker']['compose']['services']['mailcatcher']['active']
         );
 
-        $useMysql = $this->containerRequired(
+        if ($useMailcatcher) {
+            $this->_config['config']['docker']['compose']['services']['mailcatcher']['image'] 
+                = 'schickling/mailcatcher';
+
+            $this->_config['config']['docker']['compose']['services']['mailcatcher']['container_name']
+                = $this->_config['config']['docker']['name'] . '_mailcatcher';
+
+            $this->_config['config']['docker']['compose']['services']['mailcatcher']['ports'][]
+                = '5' . $this->_config['config']['docker']['port'] . ':1080';
+        }
+
+        /**
+         * 
+         *  Redis
+         *
+         */
+        $useRedis = $this->containerRequired(
             'Redis',
             $this->_config['config']['docker']['compose']['services']['redis']['active']
         );
+
+        if ($useRedis) {
+            $this->_config['config']['docker']['compose']['services']['redis']['image'] 
+                = 'redis';
+
+            $this->_config['config']['docker']['compose']['services']['redis']['container_name']
+                = $this->_config['config']['docker']['name'] . '_redis';
+
+            $this->_config['config']['docker']['compose']['services']['redis']['ports'][]
+                = '6379';
+        }
     }
 
 
+    /**
+     * Asks whether a container is required and saves results
+     * @param string $label 
+     * @param string|array &$config 
+     * @return boolean
+     */
     private function containerRequired($label, &$config) 
     {
         $helper = $this->getHelper('question');
+
         $optionsLabel = $config ? 'Y/n' : 'y/N';
         $question = new ConfirmationQuestion(
             '<question>' . $label . '? ' . $optionsLabel . '</question> : [Current: <info>' . ($config ? 'Yes' : 'No') . '</info>]',
@@ -256,5 +428,135 @@ class SetupEnvCommand extends ConfigurationCommand
             '/^(y|j)/i'
         );
         $config = $helper->ask($this->_input, $this->_output, $question);
+
+        return $config;
+    }
+
+    /**
+     * Asks whether to use an image or build the image from local scripts
+     * @param string $defaultBuild 
+     * @param string $defaultImage 
+     * @param array &$config
+     * @param array $builds
+     * @param array $images
+     */
+    private function buildOrImage(
+        $defaultBuild,
+        $defaultImage,
+        array &$config,
+        array $builds = [],
+        array $images = []
+    )
+    {
+        $helper = $this->getHelper('question');
+
+        $current = isset($config['build']) ? 'build' : (isset($config['image']) ? 'image' : null);
+        $default = isset($current) ? $current : 'build';        
+
+        $question = new ChoiceQuestion(
+            '<question>Build or Image:</question> [Current: <info>' . (isset($current) ? $current : 'None') . '</info>]',
+            [
+                'build' => 'build',
+                'image' => 'image'
+            ],
+            $default
+        );
+        $question->setErrorMessage('Choice %s is invalid.');
+        $chosen = $helper->ask($this->_input, $this->_output, $question);
+
+        switch($chosen) {
+            case 'build':
+                if (isset($config['image'])) {
+                    unset($config['image']);
+                }
+
+                $default = isset($config['build']) ? $config['build'] : $defaultBuild;
+
+                $question = new ChoiceQuestion(
+                    '<question>Build:</question> [Current: <info>' . $default . '</info>]',
+                    $builds,
+                    $default
+                );
+                $question->setErrorMessage('Build %s is invalid.');
+                $config['build'] = $helper->ask($this->_input, $this->_output, $question);
+                break;
+            case 'image':
+                $this->_usingImages = true;
+
+                if (isset($config['build'])) {
+                    unset($config['build']);
+                }
+
+                $default = isset($config['image']) ? $config['image'] : $defaultImage;
+
+                $question = new ChoiceQuestion(
+                    '<question>Image:</question> [Current: <info>' . $default . '</info>]',
+                    $images,
+                    $default
+                );
+                $question->setErrorMessage('Image %s is invalid.');
+                $config['image'] = $helper->ask($this->_input, $this->_output, $question);
+                break;
+        }
+    }
+
+    /**
+     * Saves the docker compose config file
+     * @return null
+     */
+    private function saveDockerComposeConfig()
+    {
+        $path = $this->_input->getOption('path');
+
+        $this->saveConfig(
+            $path,
+            Config::CONFIG_DIR, 
+            Compose::FILE,
+            $this->_config['config']['docker']['compose']
+        );
+    }
+
+    /**
+     * Saves the docker sync config file
+     * @return null
+     */
+    private function saveDockerSyncConfig()
+    {
+        $path = $this->_input->getOption('path');
+        
+        $this->saveConfig(
+            $path,
+            Config::CONFIG_DIR, 
+            Sync::FILE,
+            $this->_config['config']['docker']['sync']
+        );
+    }
+        
+    /**
+     * Initialises composer and installs creode docker tools
+     * @return type
+     */
+    private function composerInit()
+    {
+        $this->_composer->setPath(
+            $this->_input->getOption('composer')
+        );
+
+        $path = $this->_input->getOption('path');
+
+        // init
+        $this->_output->writeln('<info>Initialising composer</info>');
+
+        if ($this->_fs->exists($path . '/composer.json')) {
+            $this->_output->writeln('<comment>composer.json already exists, skipping</comment>');
+            return;
+        }
+
+        $this->_composer->init($path, $this->_config['config']['docker']['package']);
+
+        // install
+        $this->_output->writeln('<info>Running composer install</info>');
+
+        $this->_composer->install($path);
     }
 }

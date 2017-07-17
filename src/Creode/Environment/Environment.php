@@ -6,8 +6,6 @@ use Creode\Tools\Logger;
 
 abstract class Environment extends Logger
 {
-    abstract public function setup(array $answers = array());
-    
     abstract public function start();
     
     abstract public function stop();

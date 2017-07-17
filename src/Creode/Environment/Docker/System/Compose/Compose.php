@@ -30,7 +30,11 @@ class Compose extends Command
     {
         $this->requiresConfig();
 
-        $params = ['up'];
+        $params = [
+            'up',
+            '-f',
+            Config::CONFIG_DIR . self::FILE
+        ];
 
         if ($build) {
             array_push($params, '--build');
@@ -50,7 +54,11 @@ class Compose extends Command
     {
         $this->requiresConfig();
         
-        $this->run(self::COMMAND, ['stop'], $path);
+        $this->run(
+            self::COMMAND,
+            ['stop', '-f', Config::CONFIG_DIR . self::FILE],
+            $path
+        );
 
         return self::COMMAND . ' stop completed';
     }
@@ -64,7 +72,11 @@ class Compose extends Command
     {
         $this->requiresConfig();
         
-        $this->run(self::COMMAND, ['rm', '-f'], $path);
+        $this->run(
+            self::COMMAND,
+            ['rm', '-f'],
+            $path
+        );
 
         return self::COMMAND . ' rm completed';
     } 
@@ -91,9 +103,16 @@ class Compose extends Command
     public function runCmd($path, array $options)
     {
         $this->requiresConfig();
+
+        $params = [
+            '-f',
+            Config::CONFIG_DIR . self::FILE
+        ];
+
+        $params = array_merge($params, $options);
         
         try {
-            $this->run(self::COMMAND, $options, $path);        
+            $this->run(self::COMMAND, $params, $path);        
         } catch (ProcessFailedException $e) {
             $process = $e->getProcess();
 
@@ -115,14 +134,5 @@ class Compose extends Command
         if (!$this->_configExists) {
             throw new \Exception('Config file ' . Config::CONFIG_DIR . self::FILE . ' was not found.');
         }
-    }
-
-    /**
-     * Generates the config file
-     * @return null
-     */
-    public function generateConfig()
-    {
-        echo '(NOT REALLY) Generating ' . self::FILE . PHP_EOL;
     }
 }

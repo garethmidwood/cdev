@@ -65,13 +65,4 @@ class Sync extends Command
             throw new \Exception('Config file ' . Config::CONFIG_DIR . self::FILE . ' was not found.');
         }
     }
-
-    /**
-     * Generates the config file
-     * @return null
-     */
-    public function generateConfig()
-    {
-        echo '(NOT REALLY) Generating ' . self::FILE . PHP_EOL;
-    }
 }

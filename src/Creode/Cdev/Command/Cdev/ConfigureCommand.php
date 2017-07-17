@@ -122,8 +122,8 @@ class ConfigureCommand extends ConfigurationCommand
 
         $this->askQuestions();
 
-        $this->saveConfig($path, $output);
-        $this->saveServicesXml($path, $output);
+        $this->saveConfig($path);
+        $this->saveServicesXml($path);
 
         $this->configureEnvironment($output);
     }
@@ -251,13 +251,13 @@ class ConfigureCommand extends ConfigurationCommand
      * @param string $servicesFile 
      * @return null
      */
-    private function saveServicesXml($path, $output)
+    private function saveServicesXml($path)
     {
         $configDir = $path . '/' . Config::CONFIG_DIR;
         $servicesFile = $configDir . Config::SERVICES_FILE;
         
         if (!file_exists($configDir)) {
-            $output->writeln('Creating config directory');
+            $this->_output->writeln('<info>Creating config directory</info>');
             mkdir($configDir, 0744);
         }
 
@@ -275,7 +275,7 @@ class ConfigureCommand extends ConfigurationCommand
 
         $servicesContent = str_replace($searches, $replacements, $servicesContent);
 
-        $output->writeln('Writing services file to ' . $servicesFile);
+        $this->_output->writeln('<info>Writing services file ' . $servicesFile . '</info>');
         file_put_contents(
             $servicesFile,
             $servicesContent
