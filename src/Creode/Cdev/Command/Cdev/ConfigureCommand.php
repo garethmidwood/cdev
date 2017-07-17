@@ -15,7 +15,6 @@ use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
-use Symfony\Component\Yaml\Yaml;
 
 class ConfigureCommand extends ConfigurationCommand
 {
@@ -173,7 +172,7 @@ class ConfigureCommand extends ConfigurationCommand
         $defaultEnv = count($envs) == 1 ? $envs[key($envs)] : $this->_config['config']['environment']['type'];
 
         $question = new ChoiceQuestion(
-            'Environment type: [Current: <fg=green>' . (isset($defaultEnv) ? $defaultEnv : 'None') . '</>]',
+            '<question>Environment type</question> : [Current: <info>' . (isset($defaultEnv) ? $defaultEnv : 'None') . '</info>]',
             $envs,
             $defaultEnv
         );
@@ -197,7 +196,7 @@ class ConfigureCommand extends ConfigurationCommand
         $defaultFramework = count($frameworks) == 1 ? $frameworks[key($frameworks)] : $this->_config['config']['environment']['framework'];
 
         $question = new ChoiceQuestion(
-            'Framework: [Current: <fg=green>' . (isset($defaultFramework) ? $defaultFramework : 'None') . '</>]',
+            '<question>Framework:</question> [Current: <info>' . (isset($defaultFramework) ? $defaultFramework : 'None') . '</info>]',
             $frameworks,
             $defaultFramework
         );
@@ -244,29 +243,6 @@ class ConfigureCommand extends ConfigurationCommand
             'Backups: Media file name',
             $this->_config['config']['backups']['media-file']
         );
-    }
-
-    /**
-     * Convenience method for setting config based on results of questions
-     * @param string $text 
-     * @param string &$config Current config value
-     * @return null
-     */
-    private function askQuestion(
-        $text,
-        &$config,
-        $default = null
-    ) {
-        $helper = $this->getHelper('question');
-
-        $current = isset($config) ? $config : $default;
-
-        $question = new Question(
-            $text . ' : [Current=' . $current . ']',
-            $current
-        );
-
-        $config = $helper->ask($this->_input, $this->_output, $question);
     }
 
 
@@ -318,8 +294,9 @@ class ConfigureCommand extends ConfigurationCommand
         {
             $this->renameSrcDir($oldSrc, $newSrc);
         } else {
-            $this->createSrcDir($newSrc);
-            $this->moveFilesToSrc($newSrc);
+            if ($this->createSrcDir($newSrc)) {
+                $this->moveFilesToSrc($newSrc);
+            }
         }
     }
 
@@ -359,7 +336,7 @@ class ConfigureCommand extends ConfigurationCommand
      */
     private function createSrcDir($src)
     {
-        $this->_output->writeln('===== Creating src directory');
+        $this->_output->writeln('<info>===== Creating src directory</info>');
 
         $path = $this->_input->getOption('path');
 
@@ -367,15 +344,17 @@ class ConfigureCommand extends ConfigurationCommand
 
         if ($this->_fs->exists($srcPath))
         {
-            $this->_output->writeln("$src directory already exists. Continuing with existing dir");
-            return;
+            $this->_output->writeln("<comment>$src directory already exists. Continuing with existing dir</comment>");
+            return false;
         }
             
-        $this->_output->writeln("Creating $src directory");
+        $this->_output->writeln("<comment>Creating $src directory</comment>");
         
         $this->_fs->mkdir($srcPath, 0740);
 
-        $this->_output->writeln("$src directory created");
+        $this->_output->writeln("<comment>$src directory created</comment>");
+
+        return true;
     }
 
     /**
@@ -385,7 +364,7 @@ class ConfigureCommand extends ConfigurationCommand
      */
     private function moveFilesToSrc($src)
     {
-        $this->_output->writeln('===== Moving files to src directory');
+        $this->_output->writeln('<info>===== Moving files to src directory</info>');
 
         $path = $this->_input->getOption('path');
 
@@ -395,12 +374,12 @@ class ConfigureCommand extends ConfigurationCommand
             ->exclude($src);
 
         if (count($this->_finder) == 0) {
-            $this->_output->writeln("No files to move");
+            $this->_output->writeln("<comment>No files to move</comment>");
             return;
         }
 
         foreach ($this->_finder as $file) {
-            $this->_output->writeln("Moving {$file->getFileName()} into $src directory");
+            $this->_output->writeln("<comment>Moving {$file->getFileName()} into $src directory</comment>");
 
             $this->_fs->rename(
                 $file->getPath() . '/' . $file->getFileName(),
