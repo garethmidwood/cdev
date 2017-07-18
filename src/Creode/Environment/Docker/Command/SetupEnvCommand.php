@@ -422,11 +422,14 @@ class SetupEnvCommand extends ConfigurationCommand
 
     private function askDrupalQuestions() 
     {
-        if (!$this->_config['config']['docker']['compose']['services']['php']['active']) {
-            $this->_output->writeln('<info>Skipping Drush setup as php is not active</info>');
+        if (
+            !$this->_config['config']['docker']['compose']['services']['php']['active'] ||
+            !$this->_config['config']['docker']['compose']['services']['mysql']['active']
+        ) {
+            $this->_output->writeln('<info>Skipping Drush setup as php or mysql is not active</info>');
             $this->_config['config']['docker']['compose']['services']['drush']['active'] = false;
         }
-        
+
         /**
          * 
          *  Drush
