@@ -513,10 +513,10 @@ class SetupEnvCommand extends ConfigurationCommand
         $helper = $this->getHelper('question');
 
         $current = isset($config['build']) ? 'build' : (isset($config['image']) ? 'image' : null);
-        $default = isset($current) ? $current : 'build';        
+        $default = isset($current) ? $current : 'image';        
 
         $question = new ChoiceQuestion(
-            '<question>Build or Image:</question> [Current: <info>' . (isset($current) ? $current : 'None') . '</info>]',
+            '<question>Build or Image:</question> [Current: <info>' . $default . '</info>]',
             [
                 'build' => 'build',
                 'image' => 'image'
