@@ -310,13 +310,13 @@ class SetupEnvCommand extends ConfigurationCommand
         if ($useMysql) {
             $this->buildOrImage(
                 '../vendor/creode/docker/images/mysql',
-                'creode:mysql',
+                'creode/mysql:5.6',
                 $this->_config['config']['docker']['compose']['services']['mysql'],
                 [   // builds
                     '../vendor/creode/docker/images/mysql' => 'MySQL'
                 ],
                 [   // images
-                    'creode:mysql' => 'MySQL'
+                    'creode/mysql:5.6' => 'MySQL'
                 ]
             );
 
@@ -340,7 +340,7 @@ class SetupEnvCommand extends ConfigurationCommand
         if ($usePhp) {
             $this->buildOrImage(
                 '../vendor/creode/docker/images/php/7.0',
-                'creode:php-apache:7.0',
+                'creode/php-apache:7.0',
                 $this->_config['config']['docker']['compose']['services']['php'],
                 [   // builds
                     '../vendor/creode/docker/images/php/7.0' => 'PHP 7.0',
@@ -348,9 +348,9 @@ class SetupEnvCommand extends ConfigurationCommand
                     '../vendor/creode/docker/images/php/5.3' => 'PHP 5.3'
                 ],
                 [   // images
-                    'creode:php-apache:7.0' => 'PHP 7.0',
-                    'creode:php-apache:5.6' => 'PHP 5.6',
-                    'creode:php-apache:5.3' => 'PHP 5.3'
+                    'creode/php-apache:7.0' => 'PHP 7.0',
+                    'creode/php-apache:5.6' => 'PHP 5.6',
+                    'creode/php-apache:5.3' => 'PHP 5.3'
                 ]
             );
 
