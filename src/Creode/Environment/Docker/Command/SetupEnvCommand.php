@@ -310,13 +310,13 @@ class SetupEnvCommand extends ConfigurationCommand
         if ($useMysql) {
             $this->buildOrImage(
                 '../vendor/creode/docker/images/mysql',
-                'creode:mysql',
+                'creode/mysql:5.6',
                 $this->_config['config']['docker']['compose']['services']['mysql'],
                 [   // builds
                     '../vendor/creode/docker/images/mysql' => 'MySQL'
                 ],
                 [   // images
-                    'creode:mysql' => 'MySQL'
+                    'creode/mysql:5.6' => 'MySQL'
                 ]
             );
 
@@ -340,7 +340,7 @@ class SetupEnvCommand extends ConfigurationCommand
         if ($usePhp) {
             $this->buildOrImage(
                 '../vendor/creode/docker/images/php/7.0',
-                'creode:php70',
+                'creode/php-apache:7.0',
                 $this->_config['config']['docker']['compose']['services']['php'],
                 [   // builds
                     '../vendor/creode/docker/images/php/7.0' => 'PHP 7.0',
@@ -348,9 +348,9 @@ class SetupEnvCommand extends ConfigurationCommand
                     '../vendor/creode/docker/images/php/5.3' => 'PHP 5.3'
                 ],
                 [   // images
-                    'creode:php70' => 'PHP 7.0',
-                    'creode:php56' => 'PHP 5.6',
-                    'creode:php53' => 'PHP 5.3'
+                    'creode/php-apache:7.0' => 'PHP 7.0',
+                    'creode/php-apache:5.6' => 'PHP 5.6',
+                    'creode/php-apache:5.3' => 'PHP 5.3'
                 ]
             );
 
@@ -362,6 +362,10 @@ class SetupEnvCommand extends ConfigurationCommand
 
             $this->_config['config']['docker']['compose']['services']['php']['environment']['VIRTUAL_HOST']
                 = '.' . $this->_config['config']['docker']['name'] . '.docker';
+
+
+            $this->_config['config']['docker']['compose']['services']['php']['links']
+                = []; 
 
             $this->_config['config']['docker']['compose']['services']['php']['volumes']
                 = ['../' . $this->_config['config']['dir']['src'] . ':/var/www/html'];
@@ -409,6 +413,23 @@ class SetupEnvCommand extends ConfigurationCommand
                 = ['6379'];
         }
 
+
+        // sort out PHP links
+        if ($usePhp) {
+            if ($useMysql) {
+                $this->_config['config']['docker']['compose']['services']['php']['links'][] = 'mysql:mysql';
+            }
+            if ($useMailcatcher) {
+                $this->_config['config']['docker']['compose']['services']['php']['links'][] = 'mailcatcher:mailcatcher';
+            }
+            if ($useRedis) {
+                $this->_config['config']['docker']['compose']['services']['php']['links'][] = 'redis';
+            }
+
+            if (empty($this->_config['config']['docker']['compose']['services']['php']['links'])) {
+                unset($this->_config['config']['docker']['compose']['services']['php']['links']);
+            }
+        }
 
         $drupals = [
             \Creode\Framework\Drupal8\Drupal8::NAME,
@@ -492,10 +513,10 @@ class SetupEnvCommand extends ConfigurationCommand
         $helper = $this->getHelper('question');
 
         $current = isset($config['build']) ? 'build' : (isset($config['image']) ? 'image' : null);
-        $default = isset($current) ? $current : 'build';        
+        $default = isset($current) ? $current : 'image';        
 
         $question = new ChoiceQuestion(
-            '<question>Build or Image:</question> [Current: <info>' . (isset($current) ? $current : 'None') . '</info>]',
+            '<question>Build or Image:</question> [Current: <info>' . $default . '</info>]',
             [
                 'build' => 'build',
                 'image' => 'image'
@@ -551,15 +572,21 @@ class SetupEnvCommand extends ConfigurationCommand
 
         $config = $this->_config['config']['docker']['compose'];
 
-        foreach ($config['services'] as &$service) {
-            unset($service['active']);
+        $activeServices = $config;
+
+        foreach ($config['services'] as $key => &$service) {
+            if ($service['active']) {
+                unset($activeServices['services'][$key]['active']);
+            } else {
+                unset($activeServices['services'][$key]);
+            }
         }
 
         $this->saveConfig(
             $path,
             Config::CONFIG_DIR, 
             Compose::FILE,
-            $config
+            $activeServices
         );
     }
 
