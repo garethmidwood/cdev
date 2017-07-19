@@ -18,7 +18,7 @@ class Drupal8 implements Framework
     public function clearCache() : array
     {
         return [
-            [self::DRUSH, 'cc:all']
+            [self::DRUSH, 'cr']
         ];
     }
 }

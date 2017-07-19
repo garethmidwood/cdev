@@ -408,8 +408,49 @@ class SetupEnvCommand extends ConfigurationCommand
             $this->_config['config']['docker']['compose']['services']['redis']['ports']
                 = ['6379'];
         }
+
+
+        $drupals = [
+            \Creode\Framework\Drupal8\Drupal8::NAME,
+            \Creode\Framework\Drupal7\Drupal7::NAME
+        ];
+
+        if (in_array($this->_config['config']['environment']['framework'], $drupals)) {
+            $this->askDrupalQuestions();
+        }
     }
 
+    private function askDrupalQuestions() 
+    {
+        if (
+            !$this->_config['config']['docker']['compose']['services']['php']['active'] ||
+            !$this->_config['config']['docker']['compose']['services']['mysql']['active']
+        ) {
+            $this->_output->writeln('<info>Skipping Drush setup as php or mysql is not active</info>');
+            $this->_config['config']['docker']['compose']['services']['drush']['active'] = false;
+        }
+
+        /**
+         * 
+         *  Drush
+         *
+         */
+        $useDrush = $this->containerRequired(
+            'Drush',
+            $this->_config['config']['docker']['compose']['services']['drush']['active']
+        );
+
+        if ($useDrush) {
+            $this->_config['config']['docker']['compose']['services']['drush']['image'] 
+                = 'drupaldocker/drush';
+
+            $this->_config['config']['docker']['compose']['services']['drush']['links']
+                = ['mysql'];
+
+            $this->_config['config']['docker']['compose']['services']['drush']['volumes_from']
+                = ['php'];
+        }
+    }
 
     /**
      * Asks whether a container is required and saves results
