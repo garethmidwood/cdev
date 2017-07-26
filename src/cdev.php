@@ -1,4 +1,10 @@
 <?php
+/**
+ * 
+ * version: @package_version@
+ * 
+ * 
+ */
 
 use Creode\Cdev\Config;
 use Symfony\Component\Config\FileLocator;

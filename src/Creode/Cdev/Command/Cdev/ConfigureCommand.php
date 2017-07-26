@@ -118,7 +118,7 @@ class ConfigureCommand extends ConfigurationCommand
 
         $path = $this->_input->getOption('path');
 
-        $this->loadConfig($path, $output);
+        $this->loadConfig($path, Config::CONFIG_DIR, Config::CONFIG_FILE, $output);
 
         $this->askQuestions();
 

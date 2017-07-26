@@ -17,10 +17,14 @@ abstract class ConfigurationCommand extends Command
      * @param string $path 
      * @return null
      */
-    protected function loadConfig($path, OutputInterface $output) 
-    {
-        $configDir = $path . '/' . Config::CONFIG_DIR;
-        $configFile = $configDir . Config::CONFIG_FILE;
+    protected function loadConfig(
+        $path,
+        $dir = Config::CONFIG_DIR, 
+        $file = Config::CONFIG_FILE,
+        OutputInterface $output
+    ) {
+        $configDir = $path . '/' . $dir;
+        $configFile = $configDir . $file;
 
         if (file_exists($configFile)) {
             $output->writeln('<info>Loading config file</info>');

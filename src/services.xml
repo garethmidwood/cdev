@@ -29,6 +29,9 @@
                 <argument type="service" id="cdev.db_utf8_command" />
             </call>
             <call method="add">
+                <argument type="service" id="cdev.docker_container_mysql" />
+            </call>
+            <call method="add">
                 <argument type="service" id="cdev.docker_setup" />
             </call>
             <call method="add">
@@ -109,6 +112,10 @@
         <service id="cdev.docker_setup" class="Creode\Environment\Docker\Command\SetupEnvCommand">
             <argument type="service" id="environment.type.docker" />
             <argument type="service" id="cdev.system_composer" />
+            <argument type="service" id="symfony.filesystem" />
+        </service>
+
+        <service id="cdev.docker_container_mysql" class="Creode\Environment\Docker\Command\Container\Mysql">
             <argument type="service" id="symfony.filesystem" />
         </service>
 

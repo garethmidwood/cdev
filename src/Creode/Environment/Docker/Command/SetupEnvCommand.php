@@ -8,15 +8,16 @@ use Creode\Environment\Docker\System\Compose\Compose;
 use Creode\Environment\Docker\System\Sync\Sync;
 use Creode\System\Composer\Composer;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\Yaml\Yaml;
 
 class SetupEnvCommand extends ConfigurationCommand
 {
@@ -46,42 +47,6 @@ class SetupEnvCommand extends ConfigurationCommand
                 'compose' => [
                     'version' => '2',
                     'services' => [
-                        'mysql'=> [
-                            'active' => true,
-                            'container_name' => 'project_mysql',
-                            'restart' => 'always',
-                            'ports' => [
-                                '3306:3306'
-                            ],
-                            'environment' => [
-                                'MYSQL_ROOT_PASSWORD' => 'root',
-                                'MYSQL_DATABASE' => 'website',
-                                'MYSQL_USER' => 'webuser',
-                                'MYSQL_PASSWORD' => 'webpassword'
-                            ],
-                            'volumes' => [
-                                '../db:/docker-entrypoint-initdb.d',
-                                '/var/lib/mysql',
-                            ]
-                        ],
-                        'php' => [
-                            'active' => true,
-                            'container_name' => 'project_php',
-                            'ports' => [
-                                '80:80'
-                            ],
-                            'environment' => [
-                                'VIRTUAL_HOST' => '.project.docker'
-                            ],
-                            'links' => [
-                                'mysql:mysql',
-                                'mailcatcher:mailcatcher',
-                                'redis'
-                            ],
-                            'volumes' => [
-                                ['../src:/var/www/html']
-                            ]
-                        ],
                         'mailcatcher' => [
                             'active' => true,
                             'container_name' => 'project_mailcatcher',
@@ -170,7 +135,7 @@ class SetupEnvCommand extends ConfigurationCommand
 
         $path = $this->_input->getOption('path');
 
-        $this->loadConfig($path, $output);
+        $this->loadConfig($path, Config::CONFIG_DIR, Config::CONFIG_FILE, $output);
 
         $this->askQuestions();
 
@@ -308,23 +273,9 @@ class SetupEnvCommand extends ConfigurationCommand
         );
 
         if ($useMysql) {
-            $this->buildOrImage(
-                '../vendor/creode/docker/images/mysql',
-                'creode/mysql:5.6',
-                $this->_config['config']['docker']['compose']['services']['mysql'],
-                [   // builds
-                    '../vendor/creode/docker/images/mysql' => 'MySQL'
-                ],
-                [   // images
-                    'creode/mysql:5.6' => 'MySQL'
-                ]
+            $this->configureContainer(
+                \Creode\Environment\Docker\Command\Container\Mysql::COMMAND_NAME
             );
-
-            $this->_config['config']['docker']['compose']['services']['mysql']['container_name']
-                = $this->_config['config']['docker']['name'] . '_mysql';
-
-            $this->_config['config']['docker']['compose']['services']['mysql']['ports']
-                = ['4' . $this->_config['config']['docker']['port'] . ':3306'];
         }
 
         /**
@@ -338,37 +289,9 @@ class SetupEnvCommand extends ConfigurationCommand
         );
 
         if ($usePhp) {
-            $this->buildOrImage(
-                '../vendor/creode/docker/images/php/7.0',
-                'creode/php-apache:7.0',
-                $this->_config['config']['docker']['compose']['services']['php'],
-                [   // builds
-                    '../vendor/creode/docker/images/php/7.0' => 'PHP 7.0',
-                    '../vendor/creode/docker/images/php/5.6' => 'PHP 5.6',
-                    '../vendor/creode/docker/images/php/5.3' => 'PHP 5.3'
-                ],
-                [   // images
-                    'creode/php-apache:7.0' => 'PHP 7.0',
-                    'creode/php-apache:5.6' => 'PHP 5.6',
-                    'creode/php-apache:5.3' => 'PHP 5.3'
-                ]
+            $this->configureContainer(
+                \Creode\Environment\Docker\Command\Container\Php::COMMAND_NAME
             );
-
-            $this->_config['config']['docker']['compose']['services']['php']['container_name']
-                = $this->_config['config']['docker']['name'] . '_php';
-
-            $this->_config['config']['docker']['compose']['services']['php']['ports']
-                = ['3' . $this->_config['config']['docker']['port'] . ':80'];
-
-            $this->_config['config']['docker']['compose']['services']['php']['environment']['VIRTUAL_HOST']
-                = '.' . $this->_config['config']['docker']['name'] . '.docker';
-
-
-            $this->_config['config']['docker']['compose']['services']['php']['links']
-                = []; 
-
-            $this->_config['config']['docker']['compose']['services']['php']['volumes']
-                = ['../' . $this->_config['config']['dir']['src'] . ':/var/www/html'];
         }
 
         /**
@@ -449,6 +372,7 @@ class SetupEnvCommand extends ConfigurationCommand
         ) {
             $this->_output->writeln('<info>Skipping Drush setup as php or mysql is not active</info>');
             $this->_config['config']['docker']['compose']['services']['drush']['active'] = false;
+            return;
         }
 
         /**
@@ -635,5 +559,27 @@ class SetupEnvCommand extends ConfigurationCommand
         $this->_output->writeln('<info>Running composer install</info>');
 
         $this->_composer->install($path);
+    }
+
+
+    /**
+     * Runs the configuration command for this container
+     * @param String $commandName
+     * @return Array
+     */
+    private function configureContainer($commandName)
+    {
+        $command = $this->getApplication()->find($commandName);
+
+        $arguments = array(
+            'command' => $commandName,
+            '--path' => $this->_input->getOption('path'),
+            '--src' => $this->_config['config']['dir']['src'],
+            '--name' => $this->_config['config']['docker']['name'],
+            '--port' => $this->_config['config']['docker']['port']
+        );
+
+        $cmdInput = new ArrayInput($arguments);
+        $command->run($cmdInput, $this->_output);
     }
 }
