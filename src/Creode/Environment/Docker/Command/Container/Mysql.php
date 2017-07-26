@@ -41,7 +41,6 @@ class Mysql extends Container
     protected function askQuestions()
     {
         $path = $this->_input->getOption('path');
-        $config = $this->_input->getOption('config');
         $dockername = $this->_input->getOption('name');
         $dockerport = $this->_input->getOption('port');
 
@@ -61,10 +60,8 @@ class Mysql extends Container
             ]
         );
 
-        $config['container_name'] = $dockername . '_mysql';
+        $this->_config['container_name'] = $dockername . '_mysql';
 
-        $config['ports'] = ['4' . $dockerport . ':3306'];
-
-        return $config;
+        $this->_config['ports'] = ['4' . $dockerport . ':3306'];
     }
 }

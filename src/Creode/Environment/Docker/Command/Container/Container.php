@@ -33,14 +33,6 @@ abstract class Container extends ConfigurationCommand
         );
 
         $this->addOption(
-            'config',
-            'c',
-            InputOption::VALUE_REQUIRED,
-            'Current configuration',
-            []
-        );
-
-        $this->addOption(
             'name',
             'm',
             InputOption::VALUE_REQUIRED,

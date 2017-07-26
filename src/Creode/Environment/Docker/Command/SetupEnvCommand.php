@@ -29,42 +29,74 @@ class SetupEnvCommand extends ConfigurationCommand
                 'port' => null,
                 'sync' => [
                     'active' => false,
-                    'exclusions' => [
-                        '.sass-cache',
-                        'sass',
-                        'sass-cache',
-                        'bower.json',
-                        'package.json',
-                        'Gruntfile',
-                        'bower_components',
-                        'node_modules',
-                        '.gitignore',
-                        '.git',
-                        '*.scss',
-                        '*.sass'
+                    'version' => '2',
+                    'options' => [
+                        'verbose' => true
+                    ],
+                    'syncs' => [
+                        'project-website-code-sync' => [
+                            'src' => '../src',
+                            'sync_userid' => 1000, # www-data
+                            'sync_strategy' => 'unison',
+                            'sync_excludes' => [
+                                '.sass-cache',
+                                'sass',
+                                'sass-cache',
+                                'bower.json',
+                                'package.json',
+                                'Gruntfile',
+                                'bower_components',
+                                'node_modules',
+                                '.gitignore',
+                                '.git',
+                                '*.scss',
+                                '*.sass'
+                            ]
+                        ]
                     ]
                 ],
                 'compose' => [
                     'version' => '2',
-                    'services' => [
-                        'mailcatcher' => [
-                            'active' => true,
-                            'container_name' => 'project_mailcatcher',
-                            'ports' => [
-                                '1080:1080'
-                            ]
-                        ],
-                        'redis' => [
-                            'active' => true,
-                            'container_name' => 'project_redis',
-                            'ports' => [
-                                '6379'
-                            ]
-                        ]
-                    ]
+                    'services' => []
                 ]
             ]
         ]
+    ];
+
+    private $_containers = [
+        'MySQL' => [
+            'node' => 'mysql',
+            'command' => \Creode\Environment\Docker\Command\Container\Mysql::COMMAND_NAME
+        ],
+        'PHP' => [
+            'node' => 'php',
+            'command' => \Creode\Environment\Docker\Command\Container\Php::COMMAND_NAME,
+            'links' => [
+                'mysql',
+                'mailcatcher',
+                'redis'
+            ]
+        ],
+        'Mailcatcher' => [
+            'node' => 'mailcatcher',
+            'command' => \Creode\Environment\Docker\Command\Container\Mailcatcher::COMMAND_NAME
+        ],
+        'Redis' => [
+            'node' => 'redis',
+            'command' => \Creode\Environment\Docker\Command\Container\Redis::COMMAND_NAME
+        ],
+        'Drush' => [
+            'node' => 'drush',
+            'command' => \Creode\Environment\Docker\Command\Container\Drush::COMMAND_NAME,
+            'depends' => [
+                'php',
+                'mysql'
+            ],
+            'frameworks' => [
+                \Creode\Framework\Drupal8\Drupal8::NAME,
+                \Creode\Framework\Drupal7\Drupal7::NAME
+            ]
+        ]   
     ];
 
     /**
@@ -233,25 +265,41 @@ class SetupEnvCommand extends ConfigurationCommand
     {
         $helper = $this->getHelper('question');
 
-        $default = implode(', ', $this->_config['config']['docker']['sync']['exclusions']);
-        $question = new Question(
-            '<question>Exclusions</question> : [Current: <info>' . $default . '</info>]',
-            $default
-        );
-        $question->setValidator(function ($answer) {
-            if (!preg_match('/^[-\w\s*-_.]+(?:,[-\w\s*-_.]*)*$/', $answer)) {
-                throw new \RuntimeException(
-                    'Exclusions must be a comma separated list'
-                );
-            }
+        $syncs = $this->_config['config']['docker']['sync']['syncs'];
 
-            return $answer;
-        });
+        // if we already configured a sync then remove the default
+        if (count($syncs) > 1) {
+            unset($syncs['project-website-code-sync']);
+        }
 
-        $answer = $helper->ask($this->_input, $this->_output, $question);
-        $answer = str_replace(' ', '', $answer);
+        foreach ($syncs as $name => $values) {
+            $newName = str_replace('project', $this->_config['config']['docker']['name'], $name);
 
-        $this->_config['config']['docker']['sync']['exclusions'] = explode(',', $answer);
+            $values['src'] = '../' . $this->_config['config']['dir']['src'];
+
+            $default = implode(', ', $values['sync_excludes']);
+            $question = new Question(
+                '<question>Exclusions</question> : [Current: <info>' . $default . '</info>]',
+                $default
+            );
+            $question->setValidator(function ($answer) {
+                if (!preg_match('/^[-\w\s*-_.]+(?:,[-\w\s*-_.]*)*$/', $answer)) {
+                    throw new \RuntimeException(
+                        'Exclusions must be a comma separated list'
+                    );
+                }
+
+                return $answer;
+            });
+
+            $answer = $helper->ask($this->_input, $this->_output, $question);
+            $answer = str_replace(' ', '', $answer);
+
+            $values['sync_excludes'] = explode(',', $answer);
+
+            unset($this->_config['config']['docker']['sync']['syncs'][$name]);
+            $this->_config['config']['docker']['sync']['syncs'][$newName] = $values;
+        }
     }
 
     /**
@@ -262,139 +310,68 @@ class SetupEnvCommand extends ConfigurationCommand
     {
         $helper = $this->getHelper('question');
 
-        /**
-         * 
-         *  MySQL 
-         *
-         */
-        $useMysql = $this->containerRequired(
-            'MySQL',
-            $this->_config['config']['docker']['compose']['services']['mysql']['active']
-        );
+        foreach ($this->_containers as $label => $container) {
+            $node = $container['node'];
 
-        if ($useMysql) {
-            $this->configureContainer(
-                \Creode\Environment\Docker\Command\Container\Mysql::COMMAND_NAME
+            if (isset($container['frameworks'])) {
+                if (!in_array(
+                    $this->_config['config']['environment']['framework'],
+                    $container['frameworks']
+                )) {
+                    $this->_output->writeln('<info>Skipping ' .$label . ' setup as ' . $this->_config['config']['environment']['framework'] . ' is not supported</info>');
+                    $this->_config['config']['docker']['compose']['services'][$node]['active'] = false;
+                    continue;
+                }
+            }
+
+            if (isset($container['depends'])) {
+                foreach($container['depends'] as $dependency) {
+                    if (!$this->_config['config']['docker']['compose']['services'][$dependency]['active']) {
+                        $this->_output->writeln('<info>Skipping ' .$label . ' setup as ' . $dependency . ' is not active</info>');
+                        $this->_config['config']['docker']['compose']['services'][$node]['active'] = false;
+                        continue;
+                    }
+                }
+            }
+
+            $useContainer = $this->containerRequired(
+                $label,
+                $this->_config['config']['docker']['compose']['services'][$node]['active']
             );
-        }
 
-        /**
-         * 
-         *  PHP
-         *
-         */
-        $usePhp = $this->containerRequired(
-            'php',
-            $this->_config['config']['docker']['compose']['services']['php']['active']
-        );
-
-        if ($usePhp) {
-            $this->configureContainer(
-                \Creode\Environment\Docker\Command\Container\Php::COMMAND_NAME
-            );
-        }
-
-        /**
-         * 
-         *  Mailcatcher 
-         *
-         */
-        $useMailcatcher = $this->containerRequired(
-            'Mailcatcher',
-            $this->_config['config']['docker']['compose']['services']['mailcatcher']['active']
-        );
-
-        if ($useMailcatcher) {
-            $this->_config['config']['docker']['compose']['services']['mailcatcher']['image'] 
-                = 'schickling/mailcatcher';
-
-            $this->_config['config']['docker']['compose']['services']['mailcatcher']['container_name']
-                = $this->_config['config']['docker']['name'] . '_mailcatcher';
-
-            $this->_config['config']['docker']['compose']['services']['mailcatcher']['ports']
-                = ['5' . $this->_config['config']['docker']['port'] . ':1080'];
-        }
-
-        /**
-         * 
-         *  Redis
-         *
-         */
-        $useRedis = $this->containerRequired(
-            'Redis',
-            $this->_config['config']['docker']['compose']['services']['redis']['active']
-        );
-
-        if ($useRedis) {
-            $this->_config['config']['docker']['compose']['services']['redis']['image'] 
-                = 'redis';
-
-            $this->_config['config']['docker']['compose']['services']['redis']['container_name']
-                = $this->_config['config']['docker']['name'] . '_redis';
-
-            $this->_config['config']['docker']['compose']['services']['redis']['ports']
-                = ['6379'];
-        }
-
-
-        // sort out PHP links
-        if ($usePhp) {
-            if ($useMysql) {
-                $this->_config['config']['docker']['compose']['services']['php']['links'][] = 'mysql:mysql';
-            }
-            if ($useMailcatcher) {
-                $this->_config['config']['docker']['compose']['services']['php']['links'][] = 'mailcatcher:mailcatcher';
-            }
-            if ($useRedis) {
-                $this->_config['config']['docker']['compose']['services']['php']['links'][] = 'redis';
-            }
-
-            if (empty($this->_config['config']['docker']['compose']['services']['php']['links'])) {
-                unset($this->_config['config']['docker']['compose']['services']['php']['links']);
+            if ($useContainer) {
+                $this->configureContainer(
+                    $container['command']
+                );
             }
         }
 
-        $drupals = [
-            \Creode\Framework\Drupal8\Drupal8::NAME,
-            \Creode\Framework\Drupal7\Drupal7::NAME
-        ];
+        // build links 
+        foreach ($this->_containers as $label => $container) {
+            if (!isset($container['links'])) {
+                continue;
+            }
 
-        if (in_array($this->_config['config']['environment']['framework'], $drupals)) {
-            $this->askDrupalQuestions();
+            $activeLinks = [];
+
+            foreach ($container['links'] as $linkNode) {
+                if ($this->_config['config']['docker']['compose']['services'][$linkNode]['active']) {
+                    $activeLinks[] = $linkNode;
+                }
+            }
+
+            $node = $container['node'];
+
+            if (count($activeLinks) > 0) {
+                $this->_config['config']['docker']['compose']['services'][$node]['links'] = $activeLinks;
+            } else {
+                unset($this->_config['config']['docker']['compose']['services'][$node]['links']);
+            }
         }
-    }
 
-    private function askDrupalQuestions() 
-    {
-        if (
-            !$this->_config['config']['docker']['compose']['services']['php']['active'] ||
-            !$this->_config['config']['docker']['compose']['services']['mysql']['active']
-        ) {
-            $this->_output->writeln('<info>Skipping Drush setup as php or mysql is not active</info>');
-            $this->_config['config']['docker']['compose']['services']['drush']['active'] = false;
-            return;
-        }
 
-        /**
-         * 
-         *  Drush
-         *
-         */
-        $useDrush = $this->containerRequired(
-            'Drush',
-            $this->_config['config']['docker']['compose']['services']['drush']['active']
-        );
+        // TOOD build combined docker-compose file from active containers
 
-        if ($useDrush) {
-            $this->_config['config']['docker']['compose']['services']['drush']['image'] 
-                = 'drupaldocker/drush';
-
-            $this->_config['config']['docker']['compose']['services']['drush']['links']
-                = ['mysql'];
-
-            $this->_config['config']['docker']['compose']['services']['drush']['volumes_from']
-                = ['php'];
-        }
     }
 
     /**
