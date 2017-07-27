@@ -60,6 +60,11 @@ class Docker extends Environment
     private $_usingDockerSync = false;
 
     /**
+     * @var string
+     */
+    private $_networkName;
+
+    /**
      * @param SystemDocker $docker
      * @param Compose $compose 
      * @param Sync $sync 
@@ -81,6 +86,9 @@ class Docker extends Environment
         $this->_config = $config;
 
         $conf = $this->_config->get('docker', false);
+
+        $this->_networkName = isset($conf['name']) ? $conf['name'] : 'unknown';
+        $this->_compose->setNetwork($this->_networkName);
 
         $this->_usingDockerSync = isset($conf['sync']['active']) && $conf['sync']['active'];
     }

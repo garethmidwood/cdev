@@ -15,9 +15,23 @@ class Compose extends Command
      */
     private $_configExists = false;
 
+    /**
+     * @var string
+     */
+    private $_networkName;
+
     public function __construct() 
     {
         $this->_configExists = file_exists(Config::CONFIG_DIR . self::FILE);
+    }
+
+    /**
+     * Sets name of the network to create
+     * @param string $networkName 
+     */
+    public function setNetwork($networkName)
+    {
+        $this->_networkName = $networkName;
     }
 
     /**
@@ -34,7 +48,7 @@ class Compose extends Command
             '-f',
             Config::CONFIG_DIR . self::FILE,
             '-p',
-            rand(),
+            $this->_networkName,
             'up'
         ];
 
@@ -61,6 +75,8 @@ class Compose extends Command
             [
                 '-f',
                 Config::CONFIG_DIR . self::FILE,
+                '-p',
+                $this->_networkName,
                 'stop'
             ],
             $path
@@ -83,6 +99,8 @@ class Compose extends Command
             [
                 '-f',
                 Config::CONFIG_DIR . self::FILE,
+                '-p',
+                $this->_networkName,
                 'rm',
                 '-f'
             ],
@@ -107,6 +125,8 @@ class Compose extends Command
             [
                 '-f',
                 Config::CONFIG_DIR . self::FILE,
+                '-p',
+                $this->_networkName,
                 'exec',
                 "--user=$user",
                 'php',
@@ -128,7 +148,9 @@ class Compose extends Command
 
         $params = [
             '-f',
-            Config::CONFIG_DIR . self::FILE
+            Config::CONFIG_DIR . self::FILE,
+            '-p',
+            $this->_networkName
         ];
 
         $params = array_merge($params, $options);
