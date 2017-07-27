@@ -252,11 +252,14 @@ class SetupEnvCommand extends ConfigurationCommand
         );
         $this->_config['config']['docker']['sync']['active'] = $helper->ask($this->_input, $this->_output, $question);
 
+        if ($this->_config['config']['docker']['sync']['active']) {
+            $this->askDockerSyncQuestions();
+        }
+
         $this->askDockerComposeQuestions();
         $this->saveDockerComposeConfig();
 
         if ($this->_config['config']['docker']['sync']['active']) {
-            $this->askDockerSyncQuestions();
             $this->saveDockerSyncConfig();
         }
 
@@ -495,7 +498,8 @@ class SetupEnvCommand extends ConfigurationCommand
             Compose::FILE,
             [
                 'version' => '2',
-                'services' => $activeServices
+                'services' => $activeServices,
+                'volumes' => $this->_config['config']['docker']['compose']['volumes']
             ]
         );
     }
@@ -585,6 +589,7 @@ class SetupEnvCommand extends ConfigurationCommand
             $syncData['src'] = $this->_config['config']['dir']['src'];
 
             $this->_config['config']['docker']['sync']['syncs'][$volumeName] = $syncData;
+            $this->_config['config']['docker']['compose']['volumes'][$volumeName]['external'] = true;
         } else {
             $volumeName = false;
         } 

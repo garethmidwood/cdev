@@ -23,7 +23,15 @@ class Sync extends Command
     {
         $this->requiresConfig();
 
-        $this->run(self::COMMAND, ['start'], $path);
+        $this->run(
+            self::COMMAND,
+            [
+                'start',
+                '-c',
+                Config::CONFIG_DIR . self::FILE
+            ],
+            $path
+        );
 
         return self::COMMAND . ' start completed';
     }
@@ -32,7 +40,15 @@ class Sync extends Command
     {
         $this->requiresConfig();
 
-        $this->run(self::COMMAND, ['stop'], $path);
+        $this->run(
+            self::COMMAND,
+            [
+                'stop',
+                '-c',
+                Config::CONFIG_DIR . self::FILE
+            ],
+            $path
+        );
 
         return self::COMMAND . ' stop completed';
     }
@@ -41,7 +57,15 @@ class Sync extends Command
     {
         $this->requiresConfig();
 
-        $this->run(self::COMMAND, ['clean'], $path);
+        $this->run(
+            self::COMMAND,
+            [
+                'clean',
+                '-c',
+                Config::CONFIG_DIR . self::FILE
+            ],
+            $path
+        );
 
         return self::COMMAND . ' clean completed';
     }
@@ -50,7 +74,15 @@ class Sync extends Command
     {
         $this->requiresConfig();
 
-        $this->run(self::COMMAND, ['sync'], $path);
+        $this->run(
+            self::COMMAND, 
+            [
+                'sync',
+                '-c',
+                Config::CONFIG_DIR . self::FILE
+            ],
+            $path
+        );
 
         return self::COMMAND . ' sync completed';
     }
