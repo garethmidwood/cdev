@@ -33,6 +33,8 @@ class Compose extends Command
         $params = [
             '-f',
             Config::CONFIG_DIR . self::FILE,
+            '-p',
+            rand(),
             'up'
         ];
 
