@@ -55,6 +55,14 @@ abstract class Container extends ConfigurationCommand
             'Code source directory',
             'src'
         );
+
+        $this->addOption(
+            'volume',
+            'l',
+            InputOption::VALUE_REQUIRED,
+            'Use Docker Sync volume?',
+            false
+        );
     }
 
     /**

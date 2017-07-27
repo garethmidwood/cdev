@@ -18,14 +18,36 @@ class Php extends Container
         'environment' => [
             'VIRTUAL_HOST' => '.project.docker'
         ],
-        'links' => [
-            // TODO these links need to be added somehow..
-            'mysql:mysql',
-            'mailcatcher:mailcatcher',
-            'redis'
-        ],
         'volumes' => [
             ['../src:/var/www/html']
+        ]
+    ];
+
+    private $_syncConfig = [
+        'sync' => [
+            'name' => 'project-website-code-sync',
+            'default' => [
+                'src' => '../src',
+                'sync_userid' => 1000, # www-data
+                'sync_strategy' => 'unison',
+                'sync_excludes' => [
+                    '.sass-cache',
+                    'sass',
+                    'sass-cache',
+                    'bower.json',
+                    'package.json',
+                    'Gruntfile',
+                    'bower_components',
+                    'node_modules',
+                    '.gitignore',
+                    '.git',
+                    '*.scss',
+                    '*.sass'
+                ]
+            ]
+        ],
+        'volumes' => [
+            ['syncname:/var/www/html:nocopy']
         ]
     ];
 
@@ -35,6 +57,7 @@ class Php extends Container
         $src = $this->_input->getOption('src');
         $dockername = $this->_input->getOption('name');
         $dockerport = $this->_input->getOption('port');
+        $volumeName = $this->_input->getOption('volume');
 
         // TODO: What if there are multiple sites? Can we setup multiple PHP containers
         // usage example will be Drupal sites where clearing cache doesn't do all sites
@@ -62,6 +85,11 @@ class Php extends Container
 
         $this->_config['links'] = []; 
 
-        $this->_config['volumes'] = ['../' . $src . ':/var/www/html'];
+        if ($volumeName) {
+            $this->_config['volumes'] = [$volumeName . ':/var/www/html:nocopy'];
+        } else {
+            $this->_config['volumes'] = ['../' . $src . ':/var/www/html'];
+        }
+        
     }
 }

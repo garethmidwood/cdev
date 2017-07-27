@@ -18,6 +18,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\Yaml\Yaml;
 
 class SetupEnvCommand extends ConfigurationCommand
 {
@@ -32,27 +33,6 @@ class SetupEnvCommand extends ConfigurationCommand
                     'version' => '2',
                     'options' => [
                         'verbose' => true
-                    ],
-                    'syncs' => [
-                        'project-website-code-sync' => [
-                            'src' => '../src',
-                            'sync_userid' => 1000, # www-data
-                            'sync_strategy' => 'unison',
-                            'sync_excludes' => [
-                                '.sass-cache',
-                                'sass',
-                                'sass-cache',
-                                'bower.json',
-                                'package.json',
-                                'Gruntfile',
-                                'bower_components',
-                                'node_modules',
-                                '.gitignore',
-                                '.git',
-                                '*.scss',
-                                '*.sass'
-                            ]
-                        ]
                     ]
                 ],
                 'compose' => [
@@ -66,28 +46,60 @@ class SetupEnvCommand extends ConfigurationCommand
     private $_containers = [
         'MySQL' => [
             'node' => 'mysql',
-            'command' => \Creode\Environment\Docker\Command\Container\Mysql::COMMAND_NAME
+            'command' => \Creode\Environment\Docker\Command\Container\Mysql::COMMAND_NAME,
+            'config' => \Creode\Environment\Docker\Command\Container\Mysql::CONFIG_DIR . '/' .
+                \Creode\Environment\Docker\Command\Container\Mysql::CONFIG_FILE
         ],
         'PHP' => [
             'node' => 'php',
             'command' => \Creode\Environment\Docker\Command\Container\Php::COMMAND_NAME,
+            'config' => \Creode\Environment\Docker\Command\Container\Php::CONFIG_DIR . '/' .
+                \Creode\Environment\Docker\Command\Container\Php::CONFIG_FILE,
             'links' => [
                 'mysql',
                 'mailcatcher',
                 'redis'
+            ],
+            'sync' => [
+                'name' => 'project-website-code-sync',
+                'default' => [
+                    'src' => '../src',
+                    'sync_userid' => 1000, # www-data
+                    'sync_strategy' => 'unison',
+                    'sync_excludes' => [
+                        '.sass-cache',
+                        'sass',
+                        'sass-cache',
+                        'bower.json',
+                        'package.json',
+                        'Gruntfile',
+                        'bower_components',
+                        'node_modules',
+                        '.gitignore',
+                        '.git',
+                        '*.scss',
+                        '*.sass'
+                    ]
+                ]
             ]
         ],
         'Mailcatcher' => [
             'node' => 'mailcatcher',
-            'command' => \Creode\Environment\Docker\Command\Container\Mailcatcher::COMMAND_NAME
+            'command' => \Creode\Environment\Docker\Command\Container\Mailcatcher::COMMAND_NAME,
+            'config' => \Creode\Environment\Docker\Command\Container\Mailcatcher::CONFIG_DIR . '/' .
+                \Creode\Environment\Docker\Command\Container\Mailcatcher::CONFIG_FILE
         ],
         'Redis' => [
             'node' => 'redis',
-            'command' => \Creode\Environment\Docker\Command\Container\Redis::COMMAND_NAME
+            'command' => \Creode\Environment\Docker\Command\Container\Redis::COMMAND_NAME,
+            'config' => \Creode\Environment\Docker\Command\Container\Redis::CONFIG_DIR . '/' .
+                \Creode\Environment\Docker\Command\Container\Redis::CONFIG_FILE
         ],
         'Drush' => [
             'node' => 'drush',
             'command' => \Creode\Environment\Docker\Command\Container\Drush::COMMAND_NAME,
+            'config' => \Creode\Environment\Docker\Command\Container\Drush::CONFIG_DIR . '/' .
+                \Creode\Environment\Docker\Command\Container\Drush::CONFIG_FILE,
             'depends' => [
                 'php',
                 'mysql'
@@ -240,15 +252,11 @@ class SetupEnvCommand extends ConfigurationCommand
         );
         $this->_config['config']['docker']['sync']['active'] = $helper->ask($this->_input, $this->_output, $question);
 
-        if ($this->_config['config']['docker']['sync']['active']) {
-            $this->askDockerSyncQuestions();
-        }
-
         $this->askDockerComposeQuestions();
-
         $this->saveDockerComposeConfig();
 
         if ($this->_config['config']['docker']['sync']['active']) {
+            $this->askDockerSyncQuestions();
             $this->saveDockerSyncConfig();
         }
 
@@ -265,14 +273,11 @@ class SetupEnvCommand extends ConfigurationCommand
     {
         $helper = $this->getHelper('question');
 
-        $syncs = $this->_config['config']['docker']['sync']['syncs'];
+        $syncs = &$this->_config['config']['docker']['sync']['syncs'];
 
-        // if we already configured a sync then remove the default
-        if (count($syncs) > 1) {
-            unset($syncs['project-website-code-sync']);
-        }
+        unset($syncs['project-website-code-sync']);
 
-        foreach ($syncs as $name => $values) {
+        foreach($syncs as $name => $values) {
             $newName = str_replace('project', $this->_config['config']['docker']['name'], $name);
 
             $values['src'] = '../' . $this->_config['config']['dir']['src'];
@@ -310,7 +315,7 @@ class SetupEnvCommand extends ConfigurationCommand
     {
         $helper = $this->getHelper('question');
 
-        foreach ($this->_containers as $label => $container) {
+        foreach($this->_containers as $label => $container) {
             $node = $container['node'];
 
             if (isset($container['frameworks'])) {
@@ -320,6 +325,7 @@ class SetupEnvCommand extends ConfigurationCommand
                 )) {
                     $this->_output->writeln('<info>Skipping ' .$label . ' setup as ' . $this->_config['config']['environment']['framework'] . ' is not supported</info>');
                     $this->_config['config']['docker']['compose']['services'][$node]['active'] = false;
+                    unset($this->_containers[$label]);
                     continue;
                 }
             }
@@ -329,6 +335,7 @@ class SetupEnvCommand extends ConfigurationCommand
                     if (!$this->_config['config']['docker']['compose']['services'][$dependency]['active']) {
                         $this->_output->writeln('<info>Skipping ' .$label . ' setup as ' . $dependency . ' is not active</info>');
                         $this->_config['config']['docker']['compose']['services'][$node]['active'] = false;
+                        unset($this->_containers[$label]);
                         continue;
                     }
                 }
@@ -341,37 +348,33 @@ class SetupEnvCommand extends ConfigurationCommand
 
             if ($useContainer) {
                 $this->configureContainer(
-                    $container['command']
+                    $label
                 );
+            } else {
+                unset($this->_containers[$label]);
             }
         }
 
         // build links 
-        foreach ($this->_containers as $label => $container) {
-            if (!isset($container['links'])) {
-                continue;
-            }
+        foreach($this->_containers as $label => $container) {
+            if (isset($container['links'])) {
+                $activeLinks = [];
 
-            $activeLinks = [];
+                foreach($container['links'] as $linkNode) {
+                    if ($this->_config['config']['docker']['compose']['services'][$linkNode]['active']) {
+                        $activeLinks[] = $linkNode;
+                    }
+                }
 
-            foreach ($container['links'] as $linkNode) {
-                if ($this->_config['config']['docker']['compose']['services'][$linkNode]['active']) {
-                    $activeLinks[] = $linkNode;
+                $node = $container['node'];
+
+                if (count($activeLinks) > 0) {
+                    $this->_config['config']['docker']['compose']['services'][$node]['links'] = $activeLinks;
+                } else {
+                    unset($this->_config['config']['docker']['compose']['services'][$node]['links']);
                 }
             }
-
-            $node = $container['node'];
-
-            if (count($activeLinks) > 0) {
-                $this->_config['config']['docker']['compose']['services'][$node]['links'] = $activeLinks;
-            } else {
-                unset($this->_config['config']['docker']['compose']['services'][$node]['links']);
-            }
         }
-
-
-        // TOOD build combined docker-compose file from active containers
-
     }
 
     /**
@@ -471,24 +474,42 @@ class SetupEnvCommand extends ConfigurationCommand
     {
         $path = $this->_input->getOption('path');
 
-        $config = $this->_config['config']['docker']['compose'];
+        $activeServices = [];
 
-        $activeServices = $config;
+        foreach($this->_containers as $label => $values) {
+            $configFile = Config::CONFIG_DIR . $values['config'];
+            $config = Yaml::parse(file_get_contents($configFile));
+            unset($config['active']);
 
-        foreach ($config['services'] as $key => &$service) {
-            if ($service['active']) {
-                unset($activeServices['services'][$key]['active']);
-            } else {
-                unset($activeServices['services'][$key]);
+            $links = $this->getContainerLinks($values['node']);
+            if ($links) {
+                $config['links'] = $this->getContainerLinks($values['node']);
             }
+
+            $activeServices[$values['node']] = $config;
         }
 
         $this->saveConfig(
             $path,
             Config::CONFIG_DIR, 
             Compose::FILE,
-            $activeServices
+            [
+                'version' => '2',
+                'services' => $activeServices
+            ]
         );
+    }
+
+    /**
+     * Gets container links for a node
+     * @param string $nodeName 
+     * @return array
+     */
+    private function getContainerLinks($nodeName)
+    {
+        return isset($this->_config['config']['docker']['compose']['services'][$nodeName]['links'])
+            ? $this->_config['config']['docker']['compose']['services'][$nodeName]['links']
+            : false;
     }
 
     /**
@@ -541,19 +562,40 @@ class SetupEnvCommand extends ConfigurationCommand
 
     /**
      * Runs the configuration command for this container
-     * @param String $commandName
+     * @param String $containerName
      * @return Array
      */
-    private function configureContainer($commandName)
+    private function configureContainer($containerName)
     {
-        $command = $this->getApplication()->find($commandName);
+        $container = $this->_containers[$containerName];
+
+        $command = $this->getApplication()->find($container['command']);
+        $useDockerSync = $this->_config['config']['docker']['sync']['active'];
+
+        if ($useDockerSync && isset($container['sync'])) {
+            $sync = $container['sync'];
+
+            $volumeName = str_replace(
+                'project',
+                $this->_config['config']['docker']['name'],
+                $sync['name']
+            );
+
+            $syncData = $sync['default'];
+            $syncData['src'] = $this->_config['config']['dir']['src'];
+
+            $this->_config['config']['docker']['sync']['syncs'][$volumeName] = $syncData;
+        } else {
+            $volumeName = false;
+        } 
 
         $arguments = array(
-            'command' => $commandName,
+            'command' => $command,
             '--path' => $this->_input->getOption('path'),
             '--src' => $this->_config['config']['dir']['src'],
             '--name' => $this->_config['config']['docker']['name'],
-            '--port' => $this->_config['config']['docker']['port']
+            '--port' => $this->_config['config']['docker']['port'],
+            '--volume' => $volumeName
         );
 
         $cmdInput = new ArrayInput($arguments);
