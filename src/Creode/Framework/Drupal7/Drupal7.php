@@ -18,6 +18,7 @@ class Drupal7 implements Framework
     public function clearCache() : array
     {
         return [
+            // TODO: This will only clear the cache for one site
             [self::DRUSH, 'cc:all']
         ];
     }

@@ -29,6 +29,21 @@
                 <argument type="service" id="cdev.db_utf8_command" />
             </call>
             <call method="add">
+                <argument type="service" id="cdev.docker_container_mysql" />
+            </call>
+            <call method="add">
+                <argument type="service" id="cdev.docker_container_php" />
+            </call>
+            <call method="add">
+                <argument type="service" id="cdev.docker_container_mailcatcher" />
+            </call>
+            <call method="add">
+                <argument type="service" id="cdev.docker_container_redis" />
+            </call>
+            <call method="add">
+                <argument type="service" id="cdev.docker_container_drush" />
+            </call>
+            <call method="add">
                 <argument type="service" id="cdev.docker_setup" />
             </call>
             <call method="add">
@@ -112,6 +127,26 @@
             <argument type="service" id="symfony.filesystem" />
         </service>
 
+        <service id="cdev.docker_container_mysql" class="Creode\Environment\Docker\Command\Container\Mysql">
+            <argument type="service" id="symfony.filesystem" />
+        </service>
+
+        <service id="cdev.docker_container_php"
+            class="Creode\Environment\Docker\Command\Container\Php">
+        </service>
+
+        <service id="cdev.docker_container_mailcatcher"
+            class="Creode\Environment\Docker\Command\Container\Mailcatcher">
+        </service>
+
+        <service id="cdev.docker_container_redis"
+            class="Creode\Environment\Docker\Command\Container\Redis">
+        </service>
+
+        <service id="cdev.docker_container_drush"
+            class="Creode\Environment\Docker\Command\Container\Drush">
+        </service>
+        
 
         <!-- Environments -->
 
