@@ -33,6 +33,8 @@ class SetupEnvCommand extends ConfigurationCommand
                     'version' => '2',
                     'options' => [
                         'verbose' => true
+                    ],
+                    'syncs' => [
                     ]
                 ],
                 'compose' => [
