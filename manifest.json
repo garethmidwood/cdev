@@ -1,8 +1,8 @@
 [
     {
         "name": "cdev.phar",
-        "sha1": "17a99552961fe15b4f4c9cf161774a2507880057",
-        "url": "https://garethmidwood.github.io/cdev/downloads/cdev-1.0.8.phar",
-        "version": "1.0.8"
+        "sha1": "9d505d0a6c3828513cac9cbf39a64be0a8c0be52",
+        "url": "https://garethmidwood.github.io/cdev/downloads/cdev-1.0.9.phar",
+        "version": "1.0.9"
     }
 ]
