@@ -23,6 +23,9 @@
                 <argument type="service" id="cdev.cdev_configure_command" />
             </call>
             <call method="add">
+                <argument type="service" id="cdev.cdev_update_command" />
+            </call>
+            <call method="add">
                 <argument type="service" id="cdev.db_cleanse_command" />
             </call>
             <call method="add">
@@ -81,6 +84,10 @@
         <service id="cdev.cdev_configure_command" class="Creode\Cdev\Command\Cdev\ConfigureCommand">
             <argument type="service" id="symfony.filesystem" />
             <argument type="service" id="symfony.finder" />
+        </service>
+
+        <service id="cdev.cdev_update_command"
+            class="Creode\Cdev\Command\Cdev\UpdateCommand">
         </service>
 
         <service id="cdev.db_cleanse_command" class="Creode\Cdev\Command\Backup\Db\CleanseCommand">

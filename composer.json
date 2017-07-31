@@ -1,0 +1,5 @@
+{
+    "require": {
+        "herrera-io/phar-update": "1.*"
+    }
+}
