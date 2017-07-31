@@ -27,7 +27,7 @@ abstract class ConfigurationCommand extends Command
         $configFile = $configDir . $file;
 
         if (file_exists($configFile)) {
-            $output->writeln('<info>Loading config file</info>');
+            $output->writeln('<info>Loading config file ' . $configFile . '</info>');
             $this->_config = array_replace_recursive($this->_config, Yaml::parse(file_get_contents($configFile)));
         }
     }
