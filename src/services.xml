@@ -15,7 +15,7 @@
         <service id="symfony.application"
             class="Symfony\Component\Console\Application">
             <argument key="name">Creode Dev</argument>
-            <argument key="version">1.0.3</argument>
+            <argument key="version">@package_version@</argument>
             <call method="add">
                 <argument type="service" id="cdev.backup_pull_command" />
             </call>

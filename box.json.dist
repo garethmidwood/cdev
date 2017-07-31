@@ -1,0 +1,21 @@
+{
+  "chmod": "0755",
+  "directories": [
+    "src"
+  ],
+  "files": [],
+  "finder": [
+    {
+      "name": "*.php",
+      "exclude": [
+        "tests",
+        "test"
+      ],
+      "in": "src/vendor"
+    }
+  ],
+  "git-version": "package_version",
+  "main": "src/cdev.php",
+  "output": "cdev.phar",
+  "stub": true
+}
