@@ -46,11 +46,13 @@ git add manifest.json
 
 git commit -m "Add version ${TAG}"
 
+git push origin gh-pages
+
 #
 # Go back to master
 #
 git checkout master
-
+git push --tags
 echo "New version created. Now you should run:"
-echo "git push origin gh-pages"
-echo "git push ${TAG}"
+# echo "git push origin gh-pages"
+# echo "git push ${TAG}"
