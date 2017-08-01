@@ -25,7 +25,7 @@ cp cdev.phar downloads/cdev-${TAG}.phar
 git add downloads/cdev-${TAG}.phar
 
 # SHA1=$(openssl sha1 cdev.phar)
-SHA1=$(shasum cdev.phar)
+SHA1=$(shasum cdev.phar | awk '{print $1;}')
 
 JSON='name:"cdev.phar"'
 JSON="${JSON},sha1:\"${SHA1}\""
