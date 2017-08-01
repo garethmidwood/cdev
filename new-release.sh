@@ -53,6 +53,6 @@ git push origin gh-pages
 #
 git checkout master
 git push --tags
-echo "New version created. Now you should run:"
+echo "New version created."
 # echo "git push origin gh-pages"
 # echo "git push ${TAG}"
