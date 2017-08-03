@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# credit to: https://moquet.net/blog/distributing-php-cli/ 
+
 set -e
 
 if [ $# -ne 1 ]; then
