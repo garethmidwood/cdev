@@ -22,4 +22,15 @@ class Drupal8 implements Framework
             [self::DRUSH, 'cr']
         ];
     }
+
+    /**
+     * Returns commands to run updates on this framework
+     * @return array
+     */
+    public function update() : array
+    {
+        return [
+            [self::DRUSH, 'updatedb']
+        ];
+    }
 }

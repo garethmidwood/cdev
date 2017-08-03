@@ -22,4 +22,15 @@ class Drupal7 implements Framework
             [self::DRUSH, 'cc:all']
         ];
     }
+
+    /**
+     * Returns commands to run updates on this framework
+     * @return array
+     */
+    public function update() : array
+    {
+        return [
+            [self::DRUSH, 'updatedb']
+        ];
+    }
 }

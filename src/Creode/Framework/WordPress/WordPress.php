@@ -17,4 +17,15 @@ class WordPress implements Framework
     {
         return [];
     }
+
+    /**
+     * Returns commands to run updates on this framework
+     * @return array
+     */
+    public function update() : array
+    {
+        return [
+            []
+        ];
+    }
 }

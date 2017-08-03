@@ -170,6 +170,15 @@ class Docker extends Environment
         }
     }
 
+    public function update()
+    {
+        $commands = $this->_framework->update();
+
+        foreach ($commands as $command) {
+            $this->runCommand($command);
+        }
+    }
+
     /**
      * Runs a command on the docker-compose php container
      * @param array $command 

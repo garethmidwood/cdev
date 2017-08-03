@@ -19,4 +19,6 @@ abstract class Environment extends Logger
     abstract public function runCommand(array $command = array(), $elevatePermissions = false);
 
     abstract public function cacheClear();
+
+    abstract public function update();
 }

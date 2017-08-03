@@ -56,6 +56,9 @@
                 <argument type="service" id="cdev.env_cache_clean_command" />
             </call>
             <call method="add">
+                <argument type="service" id="cdev.env_site_update_command" />
+            </call>
+            <call method="add">
                 <argument type="service" id="cdev.env_nuke_command" />
             </call>
             <call method="add">
@@ -125,6 +128,10 @@
         </service>
 
         <service id="cdev.env_cache_clean_command" class="Creode\Cdev\Command\Site\CacheCleanSiteCommand">
+            <argument type="service" id="cdev.environment.type" />
+        </service>
+
+        <service id="cdev.env_site_update_command" class="Creode\Cdev\Command\Site\UpdateSiteCommand">
             <argument type="service" id="cdev.environment.type" />
         </service>
 

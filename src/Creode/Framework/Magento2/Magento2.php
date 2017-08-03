@@ -22,4 +22,15 @@ class Magento2 implements Framework
             [self::MAGERUN, 'cache:flush']
         ];
     }
+
+    /**
+     * Returns commands to run updates on this framework
+     * @return array
+     */
+    public function update() : array
+    {
+        return [
+            [self::MAGERUN, 'setup:upgrade']
+        ];
+    }
 }
