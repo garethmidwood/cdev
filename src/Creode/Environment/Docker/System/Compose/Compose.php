@@ -137,6 +137,36 @@ class Compose extends Command
     }
 
     /**
+     * Connects to database
+     * @param string $path 
+     * @param string $database Database to connect to
+     * @param string $user User to connect as 
+     * @param string $password Password for user
+     */
+    public function dbConnect($path, $database, $user, $password)
+    {
+        $this->requiresConfig();
+        
+        $this->run(
+            self::COMMAND,
+            [
+                '-f',
+                Config::CONFIG_DIR . self::FILE,
+                '-p',
+                $this->_networkName,
+                'exec',
+                'mysql',
+                'mysql',
+                '-u',
+                $user,
+                '-p'.$password,
+                $database
+            ],
+            $path
+        );
+    }
+
+    /**
      * Runs a command on the running environment
      * @param string $path 
      * @param array $options Command and options as array 

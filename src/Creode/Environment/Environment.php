@@ -16,6 +16,8 @@ abstract class Environment extends Logger
 
     abstract public function ssh();
 
+    abstract public function dbConnect();
+
     abstract public function runCommand(array $command = array(), $elevatePermissions = false);
 
     abstract public function cacheClear();
