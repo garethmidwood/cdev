@@ -73,6 +73,9 @@
             <call method="add">
                 <argument type="service" id="cdev.env_stop_command" />
             </call>
+            <call method="add">
+                <argument type="service" id="cdev.env_db_connect_command" />
+            </call>
         </service>
 
 
@@ -116,6 +119,10 @@
         </service>
 
         <service id="cdev.env_ssh_command" class="Creode\Cdev\Command\Env\SshEnvCommand">
+            <argument type="service" id="cdev.environment.type" />
+        </service>
+
+        <service id="cdev.env_db_connect_command" class="Creode\Cdev\Command\Env\DbConnectEnvCommand">
             <argument type="service" id="cdev.environment.type" />
         </service>
 

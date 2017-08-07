@@ -161,6 +161,20 @@ class Docker extends Environment
         $this->_compose->ssh($path, $user);
     }
 
+    public function dbConnect()
+    {
+        $this->logTitle('Connecting to database...');
+
+        $path = $this->_input->getOption('path');
+        $database = $this->_input->getOption('database');
+        $user = $this->_input->getOption('user');
+        $password = $this->_input->getOption('password');
+
+        $this->logMessage("Connecting to $database as $user");
+
+        $this->_compose->dbConnect($path, $database, $user, $password);
+    }
+
     public function cacheClear()
     {
         $commands = $this->_framework->clearCache();
