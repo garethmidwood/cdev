@@ -128,3 +128,12 @@ cd project/dir
 cdev site:cache:clear
 ```
 
+
+## Troubleshooting ##
+After I've run cdev configure and got through the process I'm presented with these errors:
+```PHP Notice:  Undefined index: volumes in phar:///usr/local/bin/cdev/Creode/Environment/Docker/Command/SetupEnvCommand.php on line 504```
+
+```Notice: Undefined index: volumes in phar:///usr/local/bin/cdev/Creode/Environment/Docker/Command/SetupEnvCommand.php on line 504```
+
+This is caused by selecting "N" for docker-sync. You can fix the issue by opening the yml file cdev/docker-compose.yml and removing the line
+```volumes: null```
