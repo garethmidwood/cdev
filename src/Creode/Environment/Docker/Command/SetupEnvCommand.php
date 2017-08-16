@@ -494,15 +494,26 @@ class SetupEnvCommand extends ConfigurationCommand
             $activeServices[$values['node']] = $config;
         }
 
+
+
+
+        $configArray['version'] = '2';
+        $configArray['services'] = $activeServices;
+        
+
+        //check if volumes var is null. If is dont add to config file
+        $volumes = $this->_config['config']['docker']['compose']['volumes'];
+        if(!is_null($volumes)){
+            $configArray['volumes'] = $volumes;
+        }
+        
+
+
         $this->saveConfig(
             $path,
             Config::CONFIG_DIR, 
             Compose::FILE,
-            [
-                'version' => '2',
-                'services' => $activeServices,
-                'volumes' => $this->_config['config']['docker']['compose']['volumes']
-            ]
+            $configArray
         );
     }
 
