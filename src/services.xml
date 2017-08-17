@@ -90,6 +90,7 @@
         <service id="cdev.cdev_configure_command" class="Creode\Cdev\Command\Cdev\ConfigureCommand">
             <argument type="service" id="symfony.filesystem" />
             <argument type="service" id="symfony.finder" />
+            <argument type="service" id="cdev.system_git" />
         </service>
 
         <service id="cdev.cdev_update_command"
@@ -228,6 +229,10 @@
 
         <service id="cdev.system_docker_sync"
             class="Creode\Environment\Docker\System\Sync\Sync">
+        </service>
+
+        <service id="cdev.system_git"
+            class="Creode\System\Git\Git">
         </service>
 
         <service id="cdev.system_iconv" class="Creode\System\Iconv\Iconv">
