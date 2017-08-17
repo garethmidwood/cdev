@@ -328,10 +328,7 @@ class ConfigureCommand extends ConfigurationCommand
      */
     private function changeSrcDir($oldSrc = null, $newSrc, $moveRepo = false)
     {
-        echo 'old src [';
-        var_dump($oldSrc);
-        echo '] done ..' . PHP_EOL;
-        if (isset($oldSrc)) 
+        if (isset($oldSrc))
         {
             $this->renameSrcDir($oldSrc, $newSrc);
         } else {
@@ -360,6 +357,12 @@ class ConfigureCommand extends ConfigurationCommand
         {
             $this->_output->writeln("$oldSrc directory doesn't exist. Aborting");
             throw new \Exception("$oldSrc directory doesn't exist");
+        }
+
+        if ($oldSrcPath == $srcPath)
+        {
+            $this->_output->writeln("old and new directories are the same, skipping rename");
+            return;
         }
             
         $this->_output->writeln("Renaming $oldSrc directory to $src");
@@ -476,6 +479,7 @@ GITSUBMODULE;
 
         $this->_fs->dumpFile('.gitmodules', $submoduleTemplate);
 
+        // TODO: This shouldn't include docker specifics
         $gitignoreTemplate = <<<GITIGNORE
 .docker-sync
 db/backup.sql
