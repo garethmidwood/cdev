@@ -5,6 +5,7 @@ use Creode\Cdev\Command\ConfigurationCommand;
 use Creode\Cdev\Config;
 use Creode\Environment;
 use Creode\Framework;
+use Creode\System\Git\Git;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -13,6 +14,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Console\Question\ChoiceQuestion;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Finder\Finder;
 
@@ -22,6 +24,7 @@ class ConfigureCommand extends ConfigurationCommand
         'version' => '2',
         'config' => array(
             'dir' => array(
+                'wrapper-repo' => false,
                 'src' => null
             ),
             'environment' => array(
@@ -75,6 +78,13 @@ class ConfigureCommand extends ConfigurationCommand
     protected $_finder;
 
     /**
+     * @var Git
+     */
+    protected $_git;
+
+
+
+    /**
      * Constructor
      * @param Filesystem $fs
      * @param Finder $finder
@@ -82,10 +92,12 @@ class ConfigureCommand extends ConfigurationCommand
      */
     public function __construct(
         Filesystem $fs,
-        Finder $finder
+        Finder $finder,
+        Git $git
     ) {
         $this->_fs = $fs;
         $this->_finder = $finder;
+        $this->_git = $git;
 
         parent::__construct();
     }
@@ -137,25 +149,51 @@ class ConfigureCommand extends ConfigurationCommand
         $helper = $this->getHelper('question');
         $path = $this->_input->getOption('path');
 
-        /**
-         * 
-         * DIRECTORY STRUCTURE
-         * 
-         */
-        $originalSrc = $this->_config['config']['dir']['src'];
 
+        $originalSrc = $this->_config['config']['dir']['src'];
         $defaultSrc = isset($originalSrc) ? $originalSrc : 'src';
 
-        $this->askQuestion(
-            'Code directory',
-            $this->_config['config']['dir']['src'],
-            $defaultSrc
-        );
+        $originalWrapperRepo = $this->_config['config']['dir']['wrapper-repo'];
+        $alreadyUsingWrapperRepo = isset($originalWrapperRepo) ? $originalWrapperRepo : false;
 
-        if ($this->_config['config']['dir']['src'] != $originalSrc) {
-            $this->changeSrcDir($originalSrc, $this->_config['config']['dir']['src']);
+        // you can't stop using a wrapper repo if you already configured it
+        if (!$alreadyUsingWrapperRepo) {
+            /**
+             * 
+             * WRAPPER REPOSITORY
+             * 
+             */
+
+            $default = false;
+            $optionsLabel = $default ? 'Y/n' : 'y/N';
+            $question = new ConfirmationQuestion(
+                '<question>Use wrapper repository? ' . $optionsLabel . '</question> : [Current: <info>' . ($default ? 'Yes' : 'No') . '</info>]',
+                $default,
+                '/^(y|j)/i'
+            );
+            $this->_config['config']['dir']['wrapper-repo'] = $helper->ask($this->_input, $this->_output, $question);
+
+
+            if ($this->_config['config']['dir']['wrapper-repo']) {
+                $this->_config['config']['dir']['src'] = $defaultSrc;
+                $this->createWrapperRepo($originalSrc, $defaultSrc);
+            } else {
+                /**
+                 * 
+                 * DIRECTORY STRUCTURE
+                 * 
+                 */
+                $this->askQuestion(
+                    'Code directory',
+                    $this->_config['config']['dir']['src'],
+                    $defaultSrc
+                );
+
+                if ($this->_config['config']['dir']['src'] != $originalSrc) {
+                    $this->changeSrcDir($originalSrc, $this->_config['config']['dir']['src']);
+                }
+            }
         }
-
 
         /**
          * 
@@ -288,14 +326,14 @@ class ConfigureCommand extends ConfigurationCommand
      * @param string $newSrc 
      * @return null
      */
-    private function changeSrcDir($oldSrc = null, $newSrc)
+    private function changeSrcDir($oldSrc = null, $newSrc, $moveRepo = false)
     {
-        if (isset($oldSrc)) 
+        if (isset($oldSrc))
         {
             $this->renameSrcDir($oldSrc, $newSrc);
         } else {
             if ($this->createSrcDir($newSrc)) {
-                $this->moveFilesToSrc($newSrc);
+                $this->moveFilesToSrc($newSrc, $moveRepo);
             }
         }
     }
@@ -319,6 +357,12 @@ class ConfigureCommand extends ConfigurationCommand
         {
             $this->_output->writeln("$oldSrc directory doesn't exist. Aborting");
             throw new \Exception("$oldSrc directory doesn't exist");
+        }
+
+        if ($oldSrcPath == $srcPath)
+        {
+            $this->_output->writeln("old and new directories are the same, skipping rename");
+            return;
         }
             
         $this->_output->writeln("Renaming $oldSrc directory to $src");
@@ -362,16 +406,23 @@ class ConfigureCommand extends ConfigurationCommand
      * @param string $src 
      * @return null
      */
-    private function moveFilesToSrc($src)
+    private function moveFilesToSrc($src, $moveRepo = false)
     {
-        $this->_output->writeln('<info>===== Moving files to src directory</info>');
-
         $path = $this->_input->getOption('path');
+
+        $exclusions = [$src];
+        if (!$moveRepo) {
+            $this->_output->writeln('<info>===== Moving files to src directory</info>');
+            $exclusions[] = '.git';
+        } else {
+            $this->_output->writeln("<info>===== Moving entire repository to src directory</info>");
+        }
 
         $this->_finder
             ->in($path)
             ->depth('== 0')
-            ->exclude($src);
+            ->ignoreDotFiles(false)
+            ->exclude($exclusions);
 
         if (count($this->_finder) == 0) {
             $this->_output->writeln("<comment>No files to move</comment>");
@@ -386,6 +437,59 @@ class ConfigureCommand extends ConfigurationCommand
                 $file->getPath() . '/' . $src . '/' . $file->getFileName() 
             );
         }
+
+        if ($moveRepo) {
+            $this->_fs->rename(
+                $file->getPath() . '/.git',
+                $file->getPath() . '/' . $src . '/.git' 
+            );
+        }
+    }
+
+
+    /**
+     * Sets up a wrapper repository for the current repo
+     * @param string|null $oldSrc 
+     * @param string $newSrc 
+     * @return null
+     */
+    private function createWrapperRepo($oldSrc = null, $newSrc)
+    {
+        $this->_output->writeln('===== Creating wrapper repository');
+
+        $path = $this->_input->getOption('path');
+
+        // move code into src dir
+        $this->changeSrcDir($oldSrc, $newSrc, true);
+
+        // initialise this as a repo
+        $this->_git->init($path);
+
+        // set up the gitmodules file
+        $repo = $this->_git->getRepoURL($path . '/' . $newSrc);
+        if (!$repo) {
+            throw new \Exception('You do not appear to be in a repository, or the repo does not have an origin remote');
+        }
+
+        $submoduleTemplate = <<<GITSUBMODULE
+[submodule "{$newSrc}"]
+    path = {$newSrc}
+    url = {$repo}
+GITSUBMODULE;
+
+        $this->_fs->dumpFile('.gitmodules', $submoduleTemplate);
+
+        // TODO: This shouldn't include docker specifics
+        $gitignoreTemplate = <<<GITIGNORE
+.docker-sync
+db/backup.sql
+GITIGNORE;
+    
+        $this->_fs->dumpFile('.gitignore', $gitignoreTemplate);
+
+        $this->_git->add($path);
+
+        $this->_git->commit($path, 'Initial cdev wrapper repo setup');
     }
 
     /**
