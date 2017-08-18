@@ -7,8 +7,8 @@ There are also a smattering of site commands for popular frameworks
 
 [![Dependency Status](https://www.versioneye.com/user/projects/599720fc0fb24f0bf7c2082a/badge.svg?style=flat)](https://www.versioneye.com/user/projects/599720fc0fb24f0bf7c2082a)
 
-Installation / Usage
---------------------
+Installation
+------------
 Download the latest release from [GitHub](https://github.com/garethmidwood/cdev/releases/latest).
 
 ### Installation on mac/linux
@@ -46,6 +46,13 @@ sudo make install
 php -i | grep php.ini
 # file: php.ini
 extension=ssh2.so
+```
+
+Self Updating
+-------------
+cdev will update itself to the latest version when you run
+```
+cdev update
 ```
 
 
