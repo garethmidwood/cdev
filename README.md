@@ -5,6 +5,8 @@ cdev helps you configure your repository to run on virtual environments.
 It provides a consistent approach to configure, start, stop and destroy environments
 There are also a smattering of site commands for popular frameworks
 
+[![Dependency Status](https://www.versioneye.com/user/projects/599720fc0fb24f0bf7c2082a/badge.svg?style=flat)](https://www.versioneye.com/user/projects/599720fc0fb24f0bf7c2082a)
+
 Installation / Usage
 --------------------
 Download the latest release from [GitHub](https://github.com/garethmidwood/cdev/releases/latest).
