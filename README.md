@@ -11,7 +11,7 @@ Installation / Usage
 --------------------
 Download the latest release from [GitHub](https://github.com/garethmidwood/cdev/releases/latest).
 
-# Installation on mac/linux
+### Installation on mac/linux
 ```
 cd /path/to/downloads
 
@@ -28,7 +28,7 @@ Dependencies
 ------------
 In order to run SSH commands (e.g. to retrieve backups) you will need to install the PHP SSH module
 
-# Mac instructions
+### Mac instructions
 ```
 # Install libssh2
 brew install libssh2
@@ -61,7 +61,7 @@ All contributions are welcome, please submit a pull request!
 
 The repository is packaged with a `local-build.sh` script that will generate a `cdev-local` app for you to test your changes.
 
-# Installation instructions
+### Installation instructions
 ```
 git clone git@github.com:garethmidwood/cdev.git cdev && cd cdev
 
@@ -96,14 +96,13 @@ libssh2 version => 1.8.0
 Usage
 -----
 
-### Setup dev environment for a project
+### Configure dev environment for a project
+In order to use cdev on a project you must first configure it:
 ```
 git clone git@your:repo.git
 cd project/dir
 cdev configure
 ```
-
-## Dev Environment Commands
 
 ### Switch dev environment on
 ```
@@ -129,30 +128,3 @@ cdev env:nuke
 cdev env:cleanup
 ```
 
-
-## Backups
-### Configure to pull backups
-```
-cd project/dir
-cdev configure
-```
-
-### Pull latest DB and/or Media backup
-```
-cd project/dir
-cdev backup:pull
-```
-
-### Remove unnecessary inserts from the DB dump (framework specific)
-```
-cd project/dir
-cdev backup:db:cleanse
-```
-
-
-## Site Commands
-### Clear caches
-```
-cd project/dir
-cdev site:cache:clear
-```
