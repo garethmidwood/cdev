@@ -68,11 +68,13 @@ class Php extends Container
             [   // builds
                 '../vendor/creode/docker/images/php/7.0' => 'PHP 7.0',
                 '../vendor/creode/docker/images/php/5.6' => 'PHP 5.6',
+                '../vendor/creode/docker/images/php/5.6-ioncube' => 'PHP 5.6 with ionCube',
                 '../vendor/creode/docker/images/php/5.3' => 'PHP 5.3'
             ],
             [   // images
                 'creode/php-apache:7.0' => 'PHP 7.0',
                 'creode/php-apache:5.6' => 'PHP 5.6',
+                'creode/php-apache:5.6-ioncube' => 'PHP 5.6 with ionCube',
                 'creode/php-apache:5.3' => 'PHP 5.3'
             ]
         );
