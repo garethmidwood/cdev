@@ -502,7 +502,7 @@ class SetupEnvCommand extends ConfigurationCommand
         
 
         //check if volumes var is null. If is dont add to config file
-        $volumes = $this->_config['config']['docker']['compose']['volumes'];
+        $volumes = isset($this->_config['config']['docker']['compose']['volumes']) ? $this->_config['config']['docker']['compose']['volumes'] : null;
         if(!is_null($volumes)){
             $configArray['volumes'] = $volumes;
         }
