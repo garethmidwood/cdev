@@ -124,6 +124,10 @@ class Docker extends Environment
         $path = $this->_input->getOption('path');
 
         $this->_compose->stop($path);
+ 
+        if ($this->_usingDockerSync) {
+            $this->_sync->stop($path);
+        }
     }
 
     public function nuke()
@@ -138,6 +142,8 @@ class Docker extends Environment
         if ($this->_usingDockerSync) {
             $this->_sync->clean($path);
         }
+
+        $this->cleanup();
     }
 
     public function cleanup()
