@@ -3,9 +3,7 @@ namespace Creode\System\Ssh;
 
 use Creode\Cdev\Config;
 use Creode\System\Command;
-use Creode\System\Ssh\Factory;
 use Symfony\Component\Console\Output\OutputInterface;
-use hexpang\Client\SSHClient\SSHClient;
 use Psr\Log\LoggerInterface;
 
 class Ssh extends Command
@@ -20,21 +18,13 @@ class Ssh extends Command
     private $_config;
 
     /**
-     * @var SSHClient
-     */
-    private $_sshClient;
-
-    /**
-     * @param Factory $sshFactory 
      * @param Config $config 
      * @return null
      */
     public function __construct(
-        Factory $sshFactory,
         Config $config
     ) {
         $this->_config = $config;
-        $this->_sshFactory = $sshFactory;
     }
 
     /**
