@@ -47,6 +47,16 @@ cat manifest.json | jsawk -a "this.push({${JSON}})" | python -mjson.tool > manif
 mv manifest.json.tmp manifest.json
 git add manifest.json
 
+#
+# Update latest version in install script
+#
+sed -i.bak "3s#.*#LATEST_RELEASE='https://garethmidwood.github.io/cdev/downloads/cdev-${TAG}.phar'#" install
+git add install
+rm install.bak
+
+#
+# Commit and push
+#
 git commit -m "Add version ${TAG}"
 
 git push origin gh-pages
