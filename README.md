@@ -114,3 +114,15 @@ cdev env:nuke
 cdev env:cleanup
 ```
 
+### Open SSH connection to environment
+```
+cd project/dir
+cdev env:ssh
+```
+
+### Open Database connection to environment
+```
+cd project/dir
+cdev env:db:connect
+```
+
