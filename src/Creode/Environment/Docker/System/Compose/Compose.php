@@ -120,7 +120,7 @@ class Compose extends Command
     {
         $this->requiresConfig();
         
-        $this->run(
+        $this->runExternalCommand(
             self::COMMAND,
             [
                 '-f',
@@ -147,7 +147,7 @@ class Compose extends Command
     {
         $this->requiresConfig();
         
-        $this->run(
+        $this->runExternalCommand(
             self::COMMAND,
             [
                 '-f',

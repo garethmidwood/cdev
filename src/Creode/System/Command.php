@@ -52,4 +52,34 @@ abstract class Command
 
         return $process->getOutput();
     }
+
+
+    /**
+     * execute an external command
+     *
+     * @param string $command
+     */
+    protected function runExternalCommand(
+        $command,
+        array $options,
+        $workingDir
+    ) {
+        $cmd = $command . ' ' . implode(' ', $options);
+
+        echo '>>> Running `' . $cmd . '`' . PHP_EOL;
+
+        $descriptorSpec = array(
+            0 => STDIN,
+            1 => STDOUT,
+            2 => STDERR,
+        );
+
+        $pipes = array();
+
+        $process = proc_open($cmd, $descriptorSpec, $pipes, $workingDir);
+
+        if (is_resource($process)) {
+            proc_close($process);
+        }
+    }
 }
