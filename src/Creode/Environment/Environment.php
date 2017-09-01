@@ -20,7 +20,21 @@ abstract class Environment extends Logger
 
     abstract public function runCommand(array $command = array(), $elevatePermissions = false);
 
-    abstract public function cacheClear();
+    public function cacheClear()
+    {
+        $commands = $this->_framework->clearCache();
 
-    abstract public function update();
+        foreach ($commands as $command) {
+            $this->runCommand($command);
+        }
+    }
+
+    public function update()
+    {
+        $commands = $this->_framework->update();
+
+        foreach ($commands as $command) {
+            $this->runCommand($command);
+        }
+    }
 }

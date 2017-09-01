@@ -181,24 +181,6 @@ class Docker extends Environment
         $this->_compose->dbConnect($path, $database, $user, $password);
     }
 
-    public function cacheClear()
-    {
-        $commands = $this->_framework->clearCache();
-
-        foreach ($commands as $command) {
-            $this->runCommand($command);
-        }
-    }
-
-    public function update()
-    {
-        $commands = $this->_framework->update();
-
-        foreach ($commands as $command) {
-            $this->runCommand($command);
-        }
-    }
-
     /**
      * Runs a command on the docker-compose php container
      * @param array $command 
