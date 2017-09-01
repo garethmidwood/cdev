@@ -30,15 +30,6 @@ class ConfigureCommand extends ConfigurationCommand
             'environment' => array(
                 'type' => null,
                 'framework' => null
-            ),
-            'backups' => array(
-                'user' => 'creode',
-                'host' => '192.168.0.97',
-                'port' => '22',
-                'db-dir' => 'e.g. /var/services/homes/creode/clients/{client}/database/',
-                'db-file' => 'weekly-backup.sql',
-                'media-dir' => 'e.g. /var/services/homes/creode/clients/{client}/media/',
-                'media-file' => 'weekly-backup.tar',
             )
         )
     );
@@ -130,11 +121,12 @@ class ConfigureCommand extends ConfigurationCommand
 
         $path = $this->_input->getOption('path');
 
-        $this->loadConfig($path, Config::CONFIG_DIR, Config::CONFIG_FILE, $output);
+        $this->loadConfig(Config::getGlobalConfigDir(), Config::CONFIG_FILE, $output);
+        $this->loadConfig($path . '/' . Config::CONFIG_DIR, Config::CONFIG_FILE, $output);
 
         $this->askQuestions();
 
-        $this->saveConfig($path);
+        $this->saveConfig($path . '/' . Config::CONFIG_DIR, Config::CONFIG_FILE);
         $this->saveServicesXml($path);
 
         $this->configureEnvironment($output);

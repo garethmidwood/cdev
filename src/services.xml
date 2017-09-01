@@ -23,6 +23,9 @@
                 <argument type="service" id="cdev.cdev_configure_command" />
             </call>
             <call method="add">
+                <argument type="service" id="cdev.cdev_global_configure_command" />
+            </call>
+            <call method="add">
                 <argument type="service" id="cdev.cdev_update_command" />
             </call>
             <call method="add">
@@ -91,6 +94,10 @@
             <argument type="service" id="symfony.filesystem" />
             <argument type="service" id="symfony.finder" />
             <argument type="service" id="cdev.system_git" />
+        </service>
+
+        <service id="cdev.cdev_global_configure_command"
+            class="Creode\Cdev\Command\Cdev\GlobalConfigureCommand">
         </service>
 
         <service id="cdev.cdev_update_command"

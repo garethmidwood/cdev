@@ -181,11 +181,11 @@ class SetupEnvCommand extends ConfigurationCommand
 
         $path = $this->_input->getOption('path');
 
-        $this->loadConfig($path, Config::CONFIG_DIR, Config::CONFIG_FILE, $output);
+        $this->loadConfig($path . '/' . Config::CONFIG_DIR, Config::CONFIG_FILE, $output);
 
         $this->askQuestions();
 
-        $this->saveConfig($path);
+        $this->saveConfig($path . '/' . Config::CONFIG_DIR, Config::CONFIG_FILE);
     }
 
     private function askQuestions()
@@ -507,14 +507,7 @@ class SetupEnvCommand extends ConfigurationCommand
             $configArray['volumes'] = $volumes;
         }
         
-
-
-        $this->saveConfig(
-            $path,
-            Config::CONFIG_DIR, 
-            Compose::FILE,
-            $configArray
-        );
+        $this->saveConfig($path . '/' . Config::CONFIG_DIR, Compose::FILE, $configArray);
     }
 
     /**
@@ -540,12 +533,7 @@ class SetupEnvCommand extends ConfigurationCommand
         $config = $this->_config['config']['docker']['sync'];
         unset($config['active']);
 
-        $this->saveConfig(
-            $path,
-            Config::CONFIG_DIR, 
-            Sync::FILE,
-            $config
-        );
+        $this->saveConfig($path . '/' . Config::CONFIG_DIR, Sync::FILE, $config);
     }
         
     /**

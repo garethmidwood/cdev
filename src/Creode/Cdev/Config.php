@@ -10,6 +10,7 @@ class Config
     const CONFIG_FILE = 'cdev.yml';
     const SERVICES_FILE = 'services.env.xml';
     const CONFIG_DIR = 'cdev/';
+    const GLOBAL_CONFIG_DIR = '.cdev/';
 
     /**
      * @var array
@@ -36,19 +37,36 @@ class Config
 
     private function loadConfig(ConsoleOutput $output)
     {
-        if (!file_exists(self::CONFIG_DIR . self::CONFIG_FILE)) {
+        // load global config
+        $this->loadConfigFile(
+            $output,
+            self::getGlobalConfigDir() . self::CONFIG_FILE,
+            'Global config file ' . self::getGlobalConfigDir() . self::CONFIG_FILE . ' not found. Run cdev global:configure'
+        );
+
+        // load local config
+        $this->loadConfigFile(
+            $output,
+            self::getLocalConfigDir() . self::CONFIG_FILE,
+            'Project config file ' . self::getLocalConfigDir() . self::CONFIG_FILE . ' not found. Run cdev configure'
+        );
+    }
+
+    private function loadConfigFile(ConsoleOutput $output, $file, $error)
+    {
+        if (!file_exists($file)) {
             $this->_configured = false;
-            $output->writeln('<warning>Config file ' . self::CONFIG_DIR . self::CONFIG_FILE . ' not found. Run cdev:configure</warning>');
+            $output->writeln('<warning>' . $error . '</warning>');
             return;
         }
 
-        $config = Yaml::parse(file_get_contents(self::CONFIG_DIR . self::CONFIG_FILE));
+        $config = Yaml::parse(file_get_contents($file));
 
         if (!isset($config['config'])) {
             throw new \Exception('Config file is missing root config node');
         }
 
-        $this->_config = $config['config'];
+        $this->_config = array_merge($this->_config, $config['config']);
     }
 
     /**
@@ -73,5 +91,23 @@ class Config
     public function isConfigured()
     {
         return $this->_configured;
+    }
+
+    /**
+     * Returns path to global config directory
+     * @return string
+     */
+    public static function getGlobalConfigDir()
+    {
+        return getenv('HOME') . '/' . self::GLOBAL_CONFIG_DIR;
+    }
+
+    /**
+     * Returns path to local config directory
+     * @return string
+     */
+    public static function getLocalConfigDir()
+    {
+        return self::CONFIG_DIR;
     }
 }

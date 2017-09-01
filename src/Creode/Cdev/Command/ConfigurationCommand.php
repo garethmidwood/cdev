@@ -17,14 +17,20 @@ abstract class ConfigurationCommand extends Command
      * @param string $path 
      * @return null
      */
+
+    /**
+     * Loads a config file
+     * @param string $dir 
+     * @param string $file 
+     * @param OutputInterface $output 
+     * @return null
+     */
     protected function loadConfig(
-        $path,
-        $dir = Config::CONFIG_DIR, 
-        $file = Config::CONFIG_FILE,
+        $dir, 
+        $file,
         OutputInterface $output
     ) {
-        $configDir = $path . '/' . $dir;
-        $configFile = $configDir . $file;
+        $configFile = $dir . $file;
 
         if (file_exists($configFile)) {
             $output->writeln('<info>Loading config file ' . $configFile . '</info>');
@@ -34,31 +40,28 @@ abstract class ConfigurationCommand extends Command
 
     /**
      * Saves config file
-     * @param string $path 
      * @param string $dir 
      * @param string $file 
      * @param null|array $config
      * @return null
      */
     protected function saveConfig(
-        $path,
-        $dir = Config::CONFIG_DIR, 
-        $file = Config::CONFIG_FILE,
+        $dir, 
+        $file,
         array $config = null
     ) {
-        $this->_output->writeln('<info>Saving config file ' .$dir . $file . '</info>');
-
         $config = isset($config) ? $config : $this->_config;
 
-        $configDir = $path . '/' . $dir;
-        $configFile = $configDir . $file;
+        $configFile = $dir . $file;
 
-        if (!file_exists($configDir)) {
-            $this->_output->writeln('<info>Creating config directory ' . $configDir . '</info>');
-            mkdir($configDir, 0744);
+        if (!file_exists($dir)) {
+            $this->_output->writeln('<info>Creating config directory ' . $dir . '</info>');
+            mkdir($dir, 0744);
         }
 
         $configuration = Yaml::dump($config);
+
+        $this->_output->writeln('<info>Saving config file ' .$dir . $file . '</info>');
 
         file_put_contents(
             $configFile,

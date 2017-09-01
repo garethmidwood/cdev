@@ -80,11 +80,11 @@ abstract class Container extends ConfigurationCommand
 
         $containerConfigDir = Config::CONFIG_DIR . self::CONFIG_DIR . '/';
 
-        $this->loadConfig($path, $containerConfigDir, static::CONFIG_FILE, $output);
+        $this->loadConfig($path . '/' . $containerConfigDir, static::CONFIG_FILE, $output);
 
         $this->askQuestions();
 
-        $this->saveConfig($path, $containerConfigDir, static::CONFIG_FILE);
+        $this->saveConfig($path . '/' . $containerConfigDir, static::CONFIG_FILE);
     }
 
     /**
