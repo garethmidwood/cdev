@@ -9,16 +9,10 @@ There are also a smattering of site commands for popular frameworks
 
 Installation
 ------------
-Download the latest release from [GitHub](https://github.com/garethmidwood/cdev/releases/latest).
 
 ### Installation on mac/linux
 ```
-cd /path/to/downloads
-
-# filename will vary per version
-chmod +x cdev.phar
-# move phar file to a location in your PATH
-mv cdev.phar /usr/local/bin/cdev
+curl -s https://garethmidwood.github.io/cdev/install | bash -s
 
 # confirm installation
 which cdev
