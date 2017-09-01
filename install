@@ -1,9 +1,9 @@
 
-LATEST_RELEASE="https://garethmidwood.github.io/cdev/downloads/cdev-1.0.25.phar"
+LATEST_RELEASE='https://garethmidwood.github.io/cdev/downloads/cdev-1.0.25.phar'
 
 TMP_FILE=$(mktemp)
 
-TARGET_PATH="/usr/local/bin/cdev"
+TARGET_PATH='/usr/local/bin/cdev'
 
 echo 'Downloading latest cdev release'
 
