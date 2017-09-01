@@ -1,0 +1,29 @@
+#!/bin/bash
+
+LATEST_RELEASE="https://garethmidwood.github.io/cdev/downloads/cdev-1.0.25.phar"
+
+TMP_FILE=$(mktemp)
+
+TARGET_PATH="/usr/local/bin/cdev"
+
+echo 'Downloading latest cdev release'
+
+if curl -o $TMP_FILE $LATEST_RELEASE ; then
+  echo 'Copying to' $TARGET_PATH
+  if cp $TMP_FILE $TARGET_PATH ; then
+
+    echo 'Making executable'
+    if chmod +x $TARGET_PATH ; then
+      echo 'cdev was successfully installed. Run `cdev` for usage'
+    else
+      echo 'Error when granting execute permissions on' $TARGET_PATH
+    fi
+  else
+    echo 'Error when copying cdev release to' $TARGET_PATH
+  fi
+else
+  echo 'Error when downloading cdev release from' $LATEST_RELEASE
+fi
+
+
+
