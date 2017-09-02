@@ -50,7 +50,7 @@ class CleanseCommand extends Command
     protected function configure()
     {
         $this->setName('backup:db:cleanse');
-        $this->setDescription('Preps the backup for the dev environment (UTF8, removes unnecessary lines etc)');
+        $this->setDescription('Preps the backup for the dev environment (removes unnecessary inserts etc)');
 
         $this->addOption(
             'config',
