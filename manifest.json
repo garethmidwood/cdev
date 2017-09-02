@@ -100,5 +100,11 @@
         "sha1": "083ee59ddfd90454dabd8bc2aba1be54cc3c6edf",
         "url": "https://garethmidwood.github.io/cdev/downloads/cdev-1.0.26.phar",
         "version": "1.0.26"
+    },
+    {
+        "name": "cdev.phar",
+        "sha1": "70a2bc1fac2581adc6992a0548e3a487260d3c2b",
+        "url": "https://garethmidwood.github.io/cdev/downloads/cdev-1.0.27.phar",
+        "version": "1.0.27"
     }
 ]
