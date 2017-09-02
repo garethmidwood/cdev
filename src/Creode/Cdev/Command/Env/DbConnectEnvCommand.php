@@ -12,7 +12,7 @@ class DbConnectEnvCommand extends EnvCommand
     protected function configure()
     {
         $this->setName('env:db');
-        $this->setAlias('env:db:connect')
+        $this->setAliases(['env:db:connect']);
         $this->setDescription('Connects to Database');
 
         $this->addOption(

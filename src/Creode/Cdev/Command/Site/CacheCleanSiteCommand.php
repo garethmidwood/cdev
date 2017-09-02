@@ -12,7 +12,7 @@ class CacheCleanSiteCommand extends SiteCommand
     protected function configure()
     {
         $this->setName('site:cache:clean');
-        $this->setAlias('site:cc');
+        $this->setAliases(['site:cc']);
         $this->setDescription('Clears [& flushes] caches');
 
         $this->addOption(
