@@ -41,7 +41,7 @@ class PullCommand extends Command
     protected function configure()
     {
         $this->setName('backup:pull');
-        $this->setDescription('Pulls the latest backups from the office NAS');
+        $this->setDescription('Pulls the latest backups');
 
         $this->addOption(
             'config',
