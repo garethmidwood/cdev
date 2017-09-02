@@ -4,7 +4,7 @@ namespace Creode\Framework\WordPress;
 
 use Creode\Framework\Framework;
 
-class WordPress implements Framework
+class WordPress extends Framework
 {
     const NAME = 'wordpress';
     const LABEL = 'WordPress';
@@ -24,8 +24,15 @@ class WordPress implements Framework
      */
     public function update() : array
     {
-        return [
-            []
-        ];
+        return [];
+    }
+
+    /**
+     * Returns an array of tables that can have their data cleansed on dev environments
+     * @return array
+     */
+    public function getDBTableCleanseList() : array
+    {
+        return [];
     }
 }

@@ -1,12 +1,10 @@
 <?php
-namespace Creode\System\Awk;
+namespace Creode\System\String;
 
 use Creode\System\Command;
 use Symfony\Component\Filesystem\Filesystem;
 
-// TODO: Move this to a 'string' sub dir and create an interface. Use it in the CleanseCommand
-
-class Awk extends Command
+class Awk extends Command implements StringManipulation
 {
     const COMMAND = 'awk';
 
@@ -22,7 +20,7 @@ class Awk extends Command
         $this->_fs = $fs;
     }
 
-    public function removeLinesMatching($path, $file, array $matches = [], $plainMatch = true, $replaceFile = true) 
+    public function removeLinesMatching($path, $file, array $matches = [], $plainMatch = true) 
     {
         $terms = [];
 

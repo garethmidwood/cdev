@@ -32,9 +32,6 @@
                 <argument type="service" id="cdev.db_cleanse_command" />
             </call>
             <call method="add">
-                <argument type="service" id="cdev.db_utf8_command" />
-            </call>
-            <call method="add">
                 <argument type="service" id="cdev.docker_container_mysql" />
             </call>
             <call method="add">
@@ -107,10 +104,7 @@
         <service id="cdev.db_cleanse_command" class="Creode\Cdev\Command\Backup\Db\CleanseCommand">
             <argument type="service" id="cdev.config" />
             <argument type="service" id="cdev.system_awk" />
-        </service>
-
-        <service id="cdev.db_utf8_command" class="Creode\Cdev\Command\Backup\Db\Utf8Command">
-            <argument type="service" id="cdev.system_iconv" />
+            <argument type="service" id="cdev.environment.framework" />
         </service>
 
         <service id="cdev.env_cleanup_command" class="Creode\Cdev\Command\Env\CleanupEnvCommand">
@@ -218,7 +212,7 @@
 
         <!-- System commands -->
 
-        <service id="cdev.system_awk" class="Creode\System\Awk\Awk">
+        <service id="cdev.system_awk" class="Creode\System\String\Awk">
             <argument type="service" id="symfony.filesystem" />
         </service>
 

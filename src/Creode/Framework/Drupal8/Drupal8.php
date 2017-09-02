@@ -4,7 +4,7 @@ namespace Creode\Framework\Drupal8;
 
 use Creode\Framework\Framework;
 
-class Drupal8 implements Framework
+class Drupal8 extends Framework
 {
     const NAME = 'drupal8';
     const LABEL = 'Drupal 8';

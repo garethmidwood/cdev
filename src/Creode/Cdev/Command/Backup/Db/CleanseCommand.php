@@ -3,12 +3,8 @@ namespace Creode\Cdev\Command\Backup\Db;
 
 use Creode\Cdev\Command\Backup\Files;
 use Creode\Cdev\Config;
-use Creode\Cdev\Framework\Magento1;
-use Creode\Cdev\Framework\Magento2;
-use Creode\Cdev\Framework\Drupal7;
-use Creode\Cdev\Framework\Drupal8;
-use Creode\Cdev\Framework\WordPress;
-use Creode\System\Awk\Awk;
+use Creode\Framework\Framework;
+use Creode\System\String\StringManipulation;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -24,20 +20,29 @@ class CleanseCommand extends Command
     private $_config;
 
     /**
-     * @var Awk
+     * @var StringManipulation
      */
-    private $_strrep;
+    private $_strManipulation;
+
+    /**
+     * @var Framework
+     */
+    private $_framework;
 
     /**
      * @param Config $config 
+     * @param StringManipulation $StringManipulation
+     * @param Framework $framework
      * @return null
      */
     public function __construct(
         Config $config,
-        Awk $awk
+        StringManipulation $StringManipulation,
+        Framework $framework
     ) {
         $this->_config = $config;
-        $this->_strrep = $awk;
+        $this->_strManipulation = $StringManipulation;
+        $this->_framework = $framework;
 
         parent::__construct();
     }
@@ -66,55 +71,22 @@ class CleanseCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $framework = $this->_config->get('framework');
-
         $cwd = $input->getOption('path');
         
-        echo 'Cleansing ' . Files::DB_FILE . ' for ' . $framework . PHP_EOL;
+        $output->writeln('Cleansing ' . Files::DB_FILE);
 
-        switch($framework) {
-            case Magento1::NAME:
-                $this->cleanseMagento1($cwd, Files::DB_FILE);
-                break;
-            case Magento2::NAME:
-            case Drupal7::NAME:
-            case Drupal8::NAME:
-            case WordPress::NAME:
-            default:
-                echo 'Your framework is not (yet) supported' . PHP_EOL;
-                break;
-        }
+        $this->cleanseDB($cwd, Files::DB_FILE);
 
         return 'Cleanse complete';
     }
 
-    private function cleanseMagento1($pwd, $filePath)
+    private function cleanseDB($pwd, $filePath)
     {
-        $insertTerms = [
-            'adminnotification_inbox',
-            'aw_core_logger',
-            'dataflow_batch_export',
-            'dataflow_batch_import',
-            'log_customer',
-            'log_quote',
-            'log_summary',
-            'log_summary_type',
-            'log_url',
-            'log_url_info',
-            'log_visitor',
-            'log_visitor_info',
-            'log_visitor_online',
-            'index_event',
-            'report_event',
-            'report_viewed_product_index',
-            'report_compared_product_index',
-            'catalog_compare_item',
-            'catalogindex_aggregation',
-            'catalogindex_aggregation_tag',
-            'catalogindex_aggregation_to_tag',
-            'core_session',
-            'catalogsearch_result'
-        ];
+        $insertTerms = $this->_framework->getDBTableCleanseList();
+
+        if (empty($insertTerms)) {
+            return 'No DB tables were specified for deletion for this framework';
+        }
 
         $this->removeInserts($pwd, $filePath, $insertTerms);
     }
@@ -134,6 +106,6 @@ class CleanseCommand extends Command
             $matches[] = 'INSERT INTO `' . $term . '`';
         }
 
-        $this->_strrep->removeLinesMatching($pwd, $filePath, $matches);
+        $this->_strManipulation->removeLinesMatching($pwd, $filePath, $matches);
     }
 }
