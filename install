@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LATEST_RELEASE='https://garethmidwood.github.io/cdev/downloads/cdev-1.0.30.phar'
+LATEST_RELEASE='https://garethmidwood.github.io/cdev/downloads/cdev-1.0.31.phar'
 
 TMP_FILE=$(mktemp)
 
