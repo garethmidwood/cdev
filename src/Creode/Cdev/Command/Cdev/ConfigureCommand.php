@@ -3,6 +3,8 @@ namespace Creode\Cdev\Command\Cdev;
 
 use Creode\Cdev\Command\ConfigurationCommand;
 use Creode\Cdev\Config;
+use Creode\Collections\EnvironmentCollection;
+use Creode\Collections\FrameworkCollection;
 use Creode\Environment;
 use Creode\Framework;
 use Creode\System\Git\Git;
@@ -34,20 +36,6 @@ class ConfigureCommand extends ConfigurationCommand
         )
     );
 
-    // TODO: Find a better way to include these, ideally by injecting the classes (somehow)
-    private $_environments = [
-        '\Creode\Environment\Docker\Docker'
-    ];
-
-    // TODO: Find a better way to include these, ideally by injecting the classes (somehow)
-    private $_frameworks = [
-        '\Creode\Framework\Magento1\Magento1',
-        '\Creode\Framework\Magento2\Magento2',
-        '\Creode\Framework\Drupal7\Drupal7',
-        '\Creode\Framework\Drupal8\Drupal8',
-        '\Creode\Framework\WordPress\WordPress'
-    ];
-
     /**
      * @var string
      */
@@ -57,6 +45,16 @@ class ConfigureCommand extends ConfigurationCommand
      * @var string
      */
     private $_chosenFrameworkClass;
+
+    /**
+     * @var array
+     */
+    private $_environments;
+
+    /**
+     * @var array
+     */
+    private $_frameworks;
 
     /**
      * @var Filesystem
@@ -84,11 +82,15 @@ class ConfigureCommand extends ConfigurationCommand
     public function __construct(
         Filesystem $fs,
         Finder $finder,
-        Git $git
+        Git $git,
+        EnvironmentCollection $environmentCollection,
+        FrameworkCollection $frameworkCollection
     ) {
         $this->_fs = $fs;
         $this->_finder = $finder;
         $this->_git = $git;
+        $this->_environments = $environmentCollection->getItems();
+        $this->_frameworks = $frameworkCollection->getItems();
 
         parent::__construct();
     }

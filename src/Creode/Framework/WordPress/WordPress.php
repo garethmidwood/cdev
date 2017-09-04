@@ -26,13 +26,4 @@ class WordPress extends Framework
     {
         return [];
     }
-
-    /**
-     * Returns an array of tables that can have their data cleansed on dev environments
-     * @return array
-     */
-    public function getDBTableCleanseList() : array
-    {
-        return [];
-    }
 }

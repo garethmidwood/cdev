@@ -7,9 +7,24 @@ class Git extends Command
 {
     const COMMAND = 'git';
 
+    public function clone($path, $repoUrl, $dir = null)
+    {
+        $this->runExternalCommand(
+            self::COMMAND,
+            [
+                'clone',
+                $repoUrl,
+                $dir
+            ],
+            $path
+        );
+
+        return 'git init completed';
+    }
+
     public function init($path)
     {
-        $this->run(
+        $this->runExternalCommand(
             self::COMMAND,
             [
                 'init'
@@ -46,7 +61,7 @@ class Git extends Command
 
     public function add($path, $files = '.')
     {
-        $this->run(
+        $this->runExternalCommand(
             self::COMMAND,
             [
                 'add',
@@ -60,16 +75,45 @@ class Git extends Command
 
     public function commit($path, $message)
     {
-        $this->run(
+        $this->runExternalCommand(
             self::COMMAND,
             [
                 'commit',
                 '-m',
-                $message
+                "'$message'"
             ],
             $path
         );
 
         return 'git commit completed';
+    }
+
+    public function removeRemote($path, $remoteName = 'origin')
+    {
+        $this->runExternalCommand(
+            self::COMMAND,
+            [
+                'remote',
+                'rm',
+                $remoteName
+            ],
+            $path
+        );
+
+        return 'git remote removed';
+    }
+
+    public function removeRepository($path)
+    {
+        $this->runExternalCommand(
+            'rm',
+            [
+                '-rf',
+                '.git'
+            ],
+            $path
+        );
+
+        return 'git repo removed';
     }
 }

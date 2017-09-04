@@ -3,6 +3,7 @@ namespace Creode\Cdev\Command\Cdev;
 
 use Creode\Cdev\Command\ConfigurationCommand;
 use Creode\Cdev\Config;
+use Creode\Collections\FrameworkCollection;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
@@ -17,6 +18,11 @@ use Symfony\Component\Finder\Finder;
 
 class GlobalConfigureCommand extends ConfigurationCommand
 {
+    /**
+     * @var array
+     */
+    private $_frameworks;
+
     protected $_config = array(
         'version' => '2',
         'config' => array(
@@ -31,6 +37,14 @@ class GlobalConfigureCommand extends ConfigurationCommand
             )
         )
     );
+
+    public function __construct(
+        FrameworkCollection $frameworkCollection
+    ) {
+        $this->_frameworks = $frameworkCollection->getItems();
+
+        parent::__construct();
+    }
 
     protected function configure()
     {
@@ -75,30 +89,6 @@ class GlobalConfigureCommand extends ConfigurationCommand
         $helper = $this->getHelper('question');
         $path = $this->_input->getOption('path');
 
-        // /**
-        //  * 
-        //  * ENVIRONMENT
-        //  * 
-        //  */
-        // $envs = [];
-        // $envMap = [];
-        // foreach ($this->_environments as $env) {
-        //     $envs[$env::NAME] = $env::LABEL;
-        //     $envMap[$env::NAME] = $env;
-        // }
-
-        // $defaultEnv = count($envs) == 1 ? $envs[key($envs)] : $this->_config['config']['environment']['type'];
-
-        // $question = new ChoiceQuestion(
-        //     '<question>Environment type</question> : [Current: <info>' . (isset($defaultEnv) ? $defaultEnv : 'None') . '</info>]',
-        //     $envs,
-        //     $defaultEnv
-        // );
-        // $question->setErrorMessage('Environment type %s is invalid.');
-        // $this->_config['config']['environment']['type'] = $helper->ask($this->_input, $this->_output, $question);
-        // $this->_chosenEnvironmentClass = $envMap[$this->_config['config']['environment']['type']];
-
-
         /**
          * 
          * BACKUPS
@@ -138,5 +128,124 @@ class GlobalConfigureCommand extends ConfigurationCommand
             'Backups: Media file name',
             $this->_config['config']['backups']['media-file']
         );
+
+
+        /**
+         * 
+         * ENVIRONMENT
+         * 
+         */
+        // $envs = [];
+        // $envMap = [];
+        // foreach ($this->_environments as $env) {
+        //     $envs[$env::NAME] = $env::LABEL;
+        //     $envMap[$env::NAME] = $env;
+        // }
+
+        // $defaultEnv = count($envs) == 1 ? $envs[key($envs)] : $this->_config['config']['environment']['type'];
+
+        // $question = new ChoiceQuestion(
+        //     '<question>Environment type</question> : [Current: <info>' . (isset($defaultEnv) ? $defaultEnv : 'None') . '</info>]',
+        //     $envs,
+        //     $defaultEnv
+        // );
+        // $question->setErrorMessage('Environment type %s is invalid.');
+        // $this->_config['config']['environment']['type'] = $helper->ask($this->_input, $this->_output, $question);
+        // $this->_chosenEnvironmentClass = $envMap[$this->_config['config']['environment']['type']];
+
+        /**
+         * 
+         * Boilerplate sites
+         * 
+         */
+        $this->_setupFrameworkBoilerplates();
+    }
+
+
+    private function _setupFrameworkBoilerplates() 
+    {
+        $frameworks = [];
+        $frameworkMap = [];
+        foreach ($this->_frameworks as $framework) {
+            $frameworks[$framework::NAME] = $framework::LABEL;
+            $frameworkMap[$framework::NAME] = $framework;
+
+            $editBoilerplates = false;
+
+            $this->askYesNoQuestion(
+                'Edit boilerplates for ' . $framework::NAME,
+                $editBoilerplates
+            );
+
+            if ($editBoilerplates) {
+                $this->_editBoilerplates($framework);
+            }
+        }
+    }
+
+    private function _editBoilerplates($framework)
+    {
+        if (isset($this->_config['config']['boilerplates'][$framework::NAME]['boilerplates'])
+            && count($this->_config['config']['boilerplates'][$framework::NAME]['boilerplates']) > 0
+        ) {
+            $this->_removeBoilerplates($framework);
+        }
+
+        $this->_addBoilerplates($framework);
+    }
+
+    private function _removeBoilerplates($framework)
+    {
+        $removeBoilerplates = false;
+
+        $this->askYesNoQuestion(
+            'Remove boilerplates',
+            $removeBoilerplates
+        );
+
+        if (!$removeBoilerplates) {
+            return;
+        }
+
+        foreach($this->_config['config']['boilerplates'][$framework::NAME]['boilerplates'] as $index => $repo) {
+            $removeRepo = false;
+
+            $this->askYesNoQuestion(
+                'Remove ' . $repo,
+                $removeRepo
+            );     
+
+            if ($removeRepo) {
+                unset(
+                    $this->_config['config']['boilerplates'][$framework::NAME]['boilerplates'][$index]
+                );
+            }   
+        }
+    }
+
+    private function _addBoilerplates($framework)
+    {
+        $addNewBoilerplate = false;
+
+        $this->askYesNoQuestion(
+            'Add new boilerplate',
+            $addNewBoilerplate
+        );
+
+        if (!$addNewBoilerplate) {
+            return;
+        }
+
+        $repo = null;
+
+        $this->askQuestion(
+            'Repo address',
+            $repo
+        );
+
+        $this->_config['config']['boilerplates'][$framework::NAME]['boilerplates'][] = $repo;
+
+        // offer to add another
+        $this->_addBoilerplates($framework);
     }
 }

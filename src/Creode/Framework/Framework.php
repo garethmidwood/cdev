@@ -2,9 +2,7 @@
 
 namespace Creode\Framework;
 
-use Creode\Tools\Logger;
-
-abstract class Framework extends Logger
+abstract class Framework
 {
     /**
      * Returns commands to clear cache on this framework

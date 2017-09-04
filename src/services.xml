@@ -59,6 +59,9 @@
                 <argument type="service" id="cdev.env_site_update_command" />
             </call>
             <call method="add">
+                <argument type="service" id="cdev.site_create_command" />
+            </call>
+            <call method="add">
                 <argument type="service" id="cdev.env_nuke_command" />
             </call>
             <call method="add">
@@ -91,10 +94,12 @@
             <argument type="service" id="symfony.filesystem" />
             <argument type="service" id="symfony.finder" />
             <argument type="service" id="cdev.system_git" />
+            <argument type="service" id="cdev.collections.environment" />
+            <argument type="service" id="cdev.collections.framework" />
         </service>
 
-        <service id="cdev.cdev_global_configure_command"
-            class="Creode\Cdev\Command\Cdev\GlobalConfigureCommand">
+        <service id="cdev.cdev_global_configure_command" class="Creode\Cdev\Command\Cdev\GlobalConfigureCommand">
+            <argument type="service" id="cdev.collections.framework" />
         </service>
 
         <service id="cdev.cdev_update_command"
@@ -142,6 +147,13 @@
 
         <service id="cdev.env_site_update_command" class="Creode\Cdev\Command\Site\UpdateSiteCommand">
             <argument type="service" id="cdev.environment.type" />
+        </service>
+
+        <service id="cdev.site_create_command" class="Creode\Cdev\Command\Site\CreateSiteCommand">
+            <argument type="service" id="symfony.filesystem" />
+            <argument type="service" id="symfony.finder" />
+            <argument type="service" id="cdev.system_git" />
+            <argument type="service" id="cdev.collections.framework" />
         </service>
 
         <service id="cdev.docker_setup" class="Creode\Environment\Docker\Command\SetupEnvCommand">
@@ -234,6 +246,14 @@
 
         <service id="cdev.system_git"
             class="Creode\System\Git\Git">
+        </service>
+
+        <service id="cdev.collections.environment"
+            class="Creode\Collections\EnvironmentCollection">
+        </service>
+
+        <service id="cdev.collections.framework"
+            class="Creode\Collections\FrameworkCollection">
         </service>
 
         <service id="cdev.system_iconv" class="Creode\System\Iconv\Iconv">

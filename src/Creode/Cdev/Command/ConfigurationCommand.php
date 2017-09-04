@@ -5,18 +5,13 @@ namespace Creode\Cdev\Command;
 use Creode\Cdev\Config;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\Yaml\Yaml;
 
 abstract class ConfigurationCommand extends Command
 {
     protected $_config = array();
-
-    /**
-     * Loads config file
-     * @param string $path 
-     * @return null
-     */
 
     /**
      * Loads a config file
@@ -87,6 +82,32 @@ abstract class ConfigurationCommand extends Command
         $question = new Question(
             '<question>' . $text . '</question> : [Current: <info>' . $current . '</info>] ',
             $current
+        );
+
+        // TODO: input and output don't exist here yet! Well maybe they do .. argh
+        $config = $helper->ask($this->_input, $this->_output, $question);
+    }
+
+    /**
+     * Convenience method for setting config based on results of yes/no
+     * @param string $text 
+     * @param string &$config Current config value
+     * @return null
+     */
+    protected function askYesNoQuestion(
+        $text,
+        &$config,
+        $default = false
+    ) {
+        $helper = $this->getHelper('question');
+
+        $current = isset($config) ? $config : $default;
+
+        $optionsLabel = $default ? 'Y/n' : 'y/N';
+        $question = new ConfirmationQuestion(
+            '<question>' . $text . '</question> : [Current: <info>' . ($current ? 'Yes' : 'No') . '</info>]',
+            $current,
+            '/^(y|j)/i'
         );
 
         // TODO: input and output don't exist here yet! Well maybe they do .. argh
