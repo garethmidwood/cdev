@@ -33,40 +33,6 @@ PHP 7+
 
 
 
-Contributing to cdev
---------------------
-All contributions are welcome, please submit a pull request!
-
-The repository is packaged with a `local-build.sh` script that will generate a `cdev-local` app for you to test your changes.
-
-### Installation instructions
-```
-git clone git@github.com:garethmidwood/cdev.git cdev && cd cdev
-
-# install dependencies
-cd src && composer install && cd -
-
-# Allow phar files to be created
-# file: php.ini
-[Phar]
-; http://php.net/phar.readonly
-phar.readonly = Off
-```
-
-### Local build instructions
-
-```
-# build a local copy of cdev for testing
-# this will build and copy the file to /usr/local/bin/cdev-local
-./local-build.sh
-
-# check it worked
-which cdev-local
-# should output /usr/local/bin/cdev-local
-```
-
-
-
 Usage
 -----
 
@@ -118,5 +84,38 @@ cdev env:ssh
 ```
 cd project/dir
 cdev env:db:connect
+```
+
+
+Contributing to cdev
+--------------------
+All contributions are welcome, please submit a pull request!
+
+The repository is packaged with a `local-build.sh` script that will generate a `cdev-local` app for you to test your changes.
+
+### Installation instructions
+```
+git clone git@github.com:garethmidwood/cdev.git cdev && cd cdev
+
+# install dependencies
+cd src && composer install && cd -
+
+# Allow phar files to be created
+# file: php.ini
+[Phar]
+; http://php.net/phar.readonly
+phar.readonly = Off
+```
+
+### Local build instructions
+
+```
+# build a local copy of cdev for testing
+# this will build and copy the file to /usr/local/bin/cdev-local
+./local-build.sh
+
+# check it worked
+which cdev-local
+# should output /usr/local/bin/cdev-local
 ```
 
