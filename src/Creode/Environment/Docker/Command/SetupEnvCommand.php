@@ -45,6 +45,8 @@ class SetupEnvCommand extends ConfigurationCommand
         ]
     ];
 
+    protected $_previousConfig;
+
     private $_containers = [
         'MySQL' => [
             'node' => 'mysql',
@@ -65,7 +67,7 @@ class SetupEnvCommand extends ConfigurationCommand
             'sync' => [
                 'name' => 'project-website-code-sync',
                 'default' => [
-                    'src' => '../src',
+                    'src' => 'src',
                     'sync_userid' => 1000, # www-data
                     'sync_strategy' => 'unison',
                     'sync_excludes' => [
@@ -183,6 +185,8 @@ class SetupEnvCommand extends ConfigurationCommand
 
         $this->loadConfig($path . '/' . Config::CONFIG_DIR, Config::CONFIG_FILE, $output);
 
+        $this->_previousConfig = $this->_config;
+
         $this->askQuestions();
 
         $this->saveConfig($path . '/' . Config::CONFIG_DIR, Config::CONFIG_FILE);
@@ -282,8 +286,16 @@ class SetupEnvCommand extends ConfigurationCommand
 
         unset($syncs['project-website-code-sync']);
 
+        $previousProjectName = isset($this->_previousConfig['config']['docker']['name'])
+                                ? $this->_previousConfig['config']['docker']['name']
+                                : 'project';
+
         foreach($syncs as $name => $values) {
-            $newName = str_replace('project', $this->_config['config']['docker']['name'], $name);
+            $newName = str_replace(
+                $previousProjectName,
+                $this->_config['config']['docker']['name'],
+                $name
+            );
 
             $values['src'] = '../' . $this->_config['config']['dir']['src'];
 
@@ -307,8 +319,8 @@ class SetupEnvCommand extends ConfigurationCommand
 
             $values['sync_excludes'] = explode(',', $answer);
 
-            unset($this->_config['config']['docker']['sync']['syncs'][$name]);
-            $this->_config['config']['docker']['sync']['syncs'][$newName] = $values;
+            unset($syncs[$name]);
+            $syncs[$newName] = $values;
         }
     }
 
@@ -494,9 +506,6 @@ class SetupEnvCommand extends ConfigurationCommand
             $activeServices[$values['node']] = $config;
         }
 
-
-
-
         $configArray['version'] = '2';
         $configArray['services'] = $activeServices;
         
@@ -577,6 +586,10 @@ class SetupEnvCommand extends ConfigurationCommand
         $command = $this->getApplication()->find($container['command']);
         $useDockerSync = $this->_config['config']['docker']['sync']['active'];
 
+        $previousProjectName = isset($this->_previousConfig['config']['docker']['name'])
+                                ? $this->_previousConfig['config']['docker']['name']
+                                : 'project';
+
         if ($useDockerSync && isset($container['sync'])) {
             $sync = $container['sync'];
 
@@ -586,9 +599,19 @@ class SetupEnvCommand extends ConfigurationCommand
                 $sync['name']
             );
 
+            $previousVolumeName = str_replace(
+                'project',
+                $previousProjectName,
+                $sync['name']
+            );
+
             $syncData = $sync['default'];
             $syncData['src'] = $this->_config['config']['dir']['src'];
 
+            unset($this->_config['config']['docker']['sync']['syncs'][$sync['name']]);
+            unset($this->_config['config']['docker']['compose']['volumes'][$sync['name']]);
+            unset($this->_config['config']['docker']['sync']['syncs'][$previousVolumeName]);
+            unset($this->_config['config']['docker']['compose']['volumes'][$previousVolumeName]);
             $this->_config['config']['docker']['sync']['syncs'][$volumeName] = $syncData;
             $this->_config['config']['docker']['compose']['volumes'][$volumeName]['external'] = true;
         } else {
