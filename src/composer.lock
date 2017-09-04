@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "7e5459a293f0acfabca825bb05d32cfc",
-    "content-hash": "3f4e3f921ad171e44662d99a8fe61637",
+    "hash": "faceccb3a00d0cd71f63a34a12c4f110",
+    "content-hash": "e8dfdaaa07b58a05ab61ccb032919e1f",
     "packages": [
         {
             "name": "herrera-io/json",
@@ -177,51 +177,6 @@
             ],
             "abandoned": true,
             "time": "2014-08-10 03:40:12"
-        },
-        {
-            "name": "hexpang/ssh-client",
-            "version": "v0.5.x-dev",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/HexPang/ssh-client.git",
-                "reference": "701a6bc59ebf9b0638509e7b3845f9f4a7ee3513"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/HexPang/ssh-client/zipball/701a6bc59ebf9b0638509e7b3845f9f4a7ee3513",
-                "reference": "701a6bc59ebf9b0638509e7b3845f9f4a7ee3513",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.5"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "^5.5"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "hexpang\\": "./src/hexpang"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "HexPang",
-                    "email": "hexpang@jabstruse.com"
-                }
-            ],
-            "description": "SSH Client",
-            "homepage": "https://github.com/hexpang/ssh-client",
-            "keywords": [
-                "client",
-                "ssh",
-                "ssh-client"
-            ],
-            "time": "2016-08-26 19:10:39"
         },
         {
             "name": "justinrainbow/json-schema",
@@ -440,12 +395,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/config.git",
-                "reference": "d668d8c0502d2b485c00d107db65fdbc56c26282"
+                "reference": "a25ed1faff97d587e648336b3658c9938bd30d2f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/config/zipball/d668d8c0502d2b485c00d107db65fdbc56c26282",
-                "reference": "d668d8c0502d2b485c00d107db65fdbc56c26282",
+                "url": "https://api.github.com/repos/symfony/config/zipball/a25ed1faff97d587e648336b3658c9938bd30d2f",
+                "reference": "a25ed1faff97d587e648336b3658c9938bd30d2f",
                 "shasum": ""
             },
             "require": {
@@ -494,7 +449,7 @@
             ],
             "description": "Symfony Config Component",
             "homepage": "https://symfony.com",
-            "time": "2017-08-05 17:34:46"
+            "time": "2017-08-29 15:54:12"
         },
         {
             "name": "symfony/console",
@@ -502,12 +457,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/console.git",
-                "reference": "b789be584eeefa72bcc0d726b6da451e5d24a6df"
+                "reference": "bab3bc775e2b175dcc0ada0169c6b8ae0efb6a6b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/console/zipball/b789be584eeefa72bcc0d726b6da451e5d24a6df",
-                "reference": "b789be584eeefa72bcc0d726b6da451e5d24a6df",
+                "url": "https://api.github.com/repos/symfony/console/zipball/bab3bc775e2b175dcc0ada0169c6b8ae0efb6a6b",
+                "reference": "bab3bc775e2b175dcc0ada0169c6b8ae0efb6a6b",
                 "shasum": ""
             },
             "require": {
@@ -563,7 +518,7 @@
             ],
             "description": "Symfony Console Component",
             "homepage": "https://symfony.com",
-            "time": "2017-08-24 14:43:56"
+            "time": "2017-08-31 09:02:44"
         },
         {
             "name": "symfony/debug",
@@ -571,12 +526,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/debug.git",
-                "reference": "50bda5b4b8641616d45254c6855bcd45f2f64187"
+                "reference": "f43bc2e05d4ac6fb36d6931fe41bd0a6d5c21a2b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/debug/zipball/50bda5b4b8641616d45254c6855bcd45f2f64187",
-                "reference": "50bda5b4b8641616d45254c6855bcd45f2f64187",
+                "url": "https://api.github.com/repos/symfony/debug/zipball/f43bc2e05d4ac6fb36d6931fe41bd0a6d5c21a2b",
+                "reference": "f43bc2e05d4ac6fb36d6931fe41bd0a6d5c21a2b",
                 "shasum": ""
             },
             "require": {
@@ -619,7 +574,7 @@
             ],
             "description": "Symfony Debug Component",
             "homepage": "https://symfony.com",
-            "time": "2017-08-10 07:07:17"
+            "time": "2017-08-29 21:00:42"
         },
         {
             "name": "symfony/dependency-injection",
@@ -627,12 +582,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dependency-injection.git",
-                "reference": "bc11e2bbe6cc1c21feb172e1ae79aef24006efbd"
+                "reference": "f221ab655e2d4048b950d7af9a5e21a8d4ce7696"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/bc11e2bbe6cc1c21feb172e1ae79aef24006efbd",
-                "reference": "bc11e2bbe6cc1c21feb172e1ae79aef24006efbd",
+                "url": "https://api.github.com/repos/symfony/dependency-injection/zipball/f221ab655e2d4048b950d7af9a5e21a8d4ce7696",
+                "reference": "f221ab655e2d4048b950d7af9a5e21a8d4ce7696",
                 "shasum": ""
             },
             "require": {
@@ -690,7 +645,7 @@
             ],
             "description": "Symfony DependencyInjection Component",
             "homepage": "https://symfony.com",
-            "time": "2017-08-22 22:02:44"
+            "time": "2017-08-31 21:26:27"
         },
         {
             "name": "symfony/filesystem",
@@ -904,12 +859,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "5a58daa633a14651d7b2a34613c9b62c02faf873"
+                "reference": "bd9dcffc3eb2984afd4c534864f2802eccd3435a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/5a58daa633a14651d7b2a34613c9b62c02faf873",
-                "reference": "5a58daa633a14651d7b2a34613c9b62c02faf873",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/bd9dcffc3eb2984afd4c534864f2802eccd3435a",
+                "reference": "bd9dcffc3eb2984afd4c534864f2802eccd3435a",
                 "shasum": ""
             },
             "require": {
@@ -954,7 +909,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2017-08-24 14:43:56"
+            "time": "2017-08-30 06:19:03"
         }
     ],
     "packages-dev": [],

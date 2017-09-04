@@ -3,14 +3,14 @@ namespace Creode\System\Ssh;
 
 use Creode\Cdev\Config;
 use Creode\System\Command;
-use Creode\System\Ssh\Factory;
 use Symfony\Component\Console\Output\OutputInterface;
-use hexpang\Client\SSHClient\SSHClient;
 use Psr\Log\LoggerInterface;
 
 class Ssh extends Command
 {
     const CONFIG_GROUP = 'backups';
+    const COMMAND_DOWNLOAD = 'scp';
+    const COMMAND_CONNECT = 'ssh';
 
     /**
      * @var Config
@@ -18,32 +18,25 @@ class Ssh extends Command
     private $_config;
 
     /**
-     * @var SSHClient
-     */
-    private $_sshClient;
-
-    /**
-     * @param Factory $sshFactory 
      * @param Config $config 
      * @return null
      */
     public function __construct(
-        Factory $sshFactory,
         Config $config
     ) {
         $this->_config = $config;
-        $this->_sshFactory = $sshFactory;
     }
 
     /**
      * Downloads a file from the host
+     * @param string $path Working directory
      * @param string $configNode The name of the server details node in the config yml file
      * @param string $srcPath The file to download
      * @param string $targetPath Where to store the downloaded file
      * @param OutputInterface $output
      * @return string
      */
-    public function download($configNode, $srcPath, $targetPath, $password, OutputInterface $output)
+    public function download($path, $configNode, $srcPath, $targetPath, OutputInterface $output)
     {
         $downloadDir = dirname($targetPath);
 
@@ -54,43 +47,28 @@ class Ssh extends Command
 
         $conf = $this->_config->get($configNode);
 
-        $sshClient = $this->_sshFactory::create(
-            $conf['host'],
-            $conf['port'],
-            $conf['user'],
-            $password
+        $this->runExternalCommand(
+            self::COMMAND_DOWNLOAD,
+            [
+                '-P' . $conf['port'],
+                $conf['user'] . '@' . $conf['host'] . ':' . $srcPath,
+                $targetPath
+            ],
+            $path
         );
-
-        $output->writeln("Connecting to server");
-        $this->connect(
-            $sshClient,
-            $conf['host'],
-            $conf['port']
-        );
-
-        $output->writeln("Downloading $srcPath");
-        $sshClient->scp_recv($srcPath, $targetPath);
-        
-        $output->writeln("Disconnecting from server");
-        $sshClient->disconnect();
-
-        return 'Download complete';
     }
 
-    private function connect(SSHClient $sshClient, $host, $port)
+    private function connect($path, $configNode, OutputInterface $output)
     {
-        if ($sshClient->ping($host, $port, 10)) {
+        $conf = $this->_config->get($configNode);
 
-            if (!$sshClient->connect() || !$sshClient->authorize()) {
-                throw new \Exception("Could not authorize connection to $host");
-            }  
-
-            return true;
-
-        } else {
-            throw new \Exception("Timed out when pinging $host");
-        }
-
-        return false;
+        $this->runExternalCommand(
+            self::COMMAND_CONNECT,
+            [
+                '-p' . $conf['port'],
+                $conf['user'] . '@' . $conf['host']
+            ],
+            $path
+        );
     }
 }

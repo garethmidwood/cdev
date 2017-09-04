@@ -245,15 +245,7 @@
         </service>
 
         <service id="cdev.system_ssh" class="Creode\System\Ssh\Ssh">
-            <argument type="service" id="ssh.factory" />
             <argument type="service" id="cdev.config" />
-        </service>
-
-
-        <!-- Factories -->
-
-        <service id="ssh.factory"
-            class="Creode\System\Ssh\Factory">
         </service>
 
 

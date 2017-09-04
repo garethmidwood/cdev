@@ -65,8 +65,9 @@ class PullCommand extends Command
         $answers = $this->askQuestions($input, $output);
 
         $backupServer = $this->_config->get('backups');
+        $path = $input->getOption('path');
 
-        $cwd = $input->getOption('path') . '/';
+        $cwd = $path . '/';
         
         $transfers = [];
 
@@ -98,10 +99,10 @@ class PullCommand extends Command
 
         foreach ($transfers as $transfer) {
             $this->_ssh->download(
+                $path,
                 'backups',
                 $transfer['source'],
                 $transfer['target'],
-                $answers['password'],
                 $output
             );
         }
@@ -122,20 +123,6 @@ class PullCommand extends Command
         $question->setErrorMessage('Backup %s is invalid.');
 
         $answers['backupType'] = $helper->ask($input, $output, $question);
-
-        $question = new Question('SSH Password');
-        $question->setHidden(true);
-        $question->setHiddenFallback(false);
-        $question->setValidator(function ($answer) {
-            if (!is_string($answer) || strlen($answer) == 0) {
-                throw new \RuntimeException(
-                    'You must enter a password'
-                );
-            }
-
-            return $answer;
-        });
-        $answers['password'] = $helper->ask($input, $output, $question);
 
         return $answers;
     }

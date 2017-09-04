@@ -18,29 +18,6 @@ curl -s https://garethmidwood.github.io/cdev/install | bash -s
 which cdev
 ```
 
-Dependencies
-------------
-In order to run SSH commands (e.g. to retrieve backups) you will need to install the PHP SSH module
-
-### Mac instructions
-```
-# Install libssh2
-brew install libssh2
-
-# Install PHP7 SSH
-wget https://github.com/Sean-Der/pecl-networking-ssh2/archive/php7.zip
-unzip php7.zip
-cd pecl-networking-ssh2-php7/
-phpize
-./configure
-make
-sudo make install
-
-# Activate module. In php.ini file add:
-php -i | grep php.ini
-# file: php.ini
-extension=ssh2.so
-```
 
 Self Updating
 -------------
@@ -52,7 +29,7 @@ cdev update
 
 Requirements
 ------------
-PHP 5.6 or above
+PHP 7+
 
 
 
@@ -69,6 +46,16 @@ git clone git@github.com:garethmidwood/cdev.git cdev && cd cdev
 # install dependencies
 cd src && composer install && cd -
 
+# Allow phar files to be created
+# file: php.ini
+[Phar]
+; http://php.net/phar.readonly
+phar.readonly = Off
+```
+
+### Local build instructions
+
+```
 # build a local copy of cdev for testing
 # this will build and copy the file to /usr/local/bin/cdev-local
 ./local-build.sh
@@ -76,20 +63,6 @@ cd src && composer install && cd -
 # check it worked
 which cdev-local
 # should output /usr/local/bin/cdev-local
-
-# Allow phar files to be created
-# file: php.ini
-[Phar]
-; http://php.net/phar.readonly
-phar.readonly = Off
-
-# Test it has activated
-php -i | grep ssh
-
-# You should see something like:
-Registered PHP Streams => https, ftps, compress.zlib, compress.bzip2, php, file, glob, data, http, ftp, phar, zip, ssh2.shell, ssh2.exec, ssh2.tunnel, ssh2.scp, ssh2.sftp
-ssh2
-libssh2 version => 1.8.0
 ```
 
 
@@ -97,7 +70,13 @@ libssh2 version => 1.8.0
 Usage
 -----
 
-### Configure dev environment for a project
+### Configure global defaults
+Global config is used as default values for project configuration.
+```
+cdev global:configure
+```
+
+### Configure environment for a project
 In order to use cdev on a project you must first configure it:
 ```
 git clone git@your:repo.git
@@ -105,27 +84,39 @@ cd project/dir
 cdev configure
 ```
 
-### Switch dev environment on
+### Switch environment on
 ```
 cd project/dir
 cdev env:start
 ```
 
-### Switch dev environment off
+### Switch environment off
 ```
 cd project/dir
 cdev env:stop
 ```
 
-### Destroy dev environment
+### Destroy environment
 ```
 cd project/dir
 cdev env:nuke
 ```
 
-### Clean up dev environment(s)
+### Clean up environment(s)
 ```
 # from anywhere
 cdev env:cleanup
+```
+
+### Open SSH connection to environment
+```
+cd project/dir
+cdev env:ssh
+```
+
+### Open Database connection to environment
+```
+cd project/dir
+cdev env:db:connect
 ```
 
