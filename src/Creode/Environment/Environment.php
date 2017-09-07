@@ -6,6 +6,11 @@ use Creode\Tools\Logger;
 
 abstract class Environment extends Logger
 {
+    /**
+     * @var Framework
+     */
+    protected $_framework;
+    
     abstract public function start();
     
     abstract public function stop();
