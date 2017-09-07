@@ -35,11 +35,6 @@ class Docker extends Environment
     private $_sync;
 
     /**
-     * @var Framework
-     */
-    private $_framework;
-
-    /**
      * @var ConsoleLogger
      */
     private $_logger;

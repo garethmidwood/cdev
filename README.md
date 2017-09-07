@@ -99,6 +99,7 @@ git clone git@github.com:garethmidwood/cdev.git cdev && cd cdev
 
 # install dependencies
 cd src && composer install && cd -
+brew install jsawk
 
 # Allow phar files to be created
 # file: php.ini
