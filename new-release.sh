@@ -22,6 +22,7 @@ box build
 # Copy executable file into GH pages
 #
 git checkout gh-pages
+git pull
 
 cp cdev.phar downloads/cdev-${TAG}.phar
 git add downloads/cdev-${TAG}.phar
