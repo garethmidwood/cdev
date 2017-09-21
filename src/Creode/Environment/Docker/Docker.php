@@ -109,6 +109,8 @@ class Docker extends Environment
             $this->_sync->start($path);
         }
 
+        $this->_compose->pullImages($path);
+
         $this->_compose->up($path, $build);
     }
 
