@@ -140,19 +140,33 @@ class CreateSiteCommand extends ConfigurationCommand
             return;
         }
 
+        $bpChoices = $bpMap = [];
+        foreach ($boilerplates as $key => $bp) {
+            $repo = is_string($bp)
+                ? ['repo' => $bp, 'branch' => 'master']
+                : $bp;
+
+            $repoName = $repo['repo'] . ' [' . $repo['branch'] . ']';
+
+            $bpChoices[$key] = $repoName;
+            $bpMap[$repoName] = $repo;
+        }
+
         $question = new ChoiceQuestion(
             '<question>Boilerplate</question>',
-            $boilerplates
+            $bpChoices
         );
         $question->setErrorMessage('Boilerplate %s is invalid.');
-        $boilerplateRepoURL = $helper->ask($this->_input, $this->_output, $question);   
+        $chosenBp = $helper->ask($this->_input, $this->_output, $question);
+
+        $chosenBoilerplate = $bpMap[$chosenBp];
 
         /**
          * 
          *  Clone repository
          * 
          */
-        $this->_git->clone($path, $boilerplateRepoURL, $dirName);
+        $this->_git->clone($path, $chosenBoilerplate['repo'], $chosenBoilerplate['branch'], $dirName);
 
         /**
          * 
