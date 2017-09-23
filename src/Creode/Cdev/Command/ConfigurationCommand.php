@@ -11,6 +11,7 @@ use Symfony\Component\Yaml\Yaml;
 
 abstract class ConfigurationCommand extends Command
 {
+    private $_exclusions = array();
     protected $_config = array();
 
     /**
@@ -54,6 +55,14 @@ abstract class ConfigurationCommand extends Command
             mkdir($dir, 0744);
         }
 
+        if (isset($config["config"])) {
+            foreach ($config["config"] as $key => $val) {
+                if (in_array($key, $this->_exclusions)) {
+                    unset($config["config"][$key]);
+                }
+            }
+        }
+
         $configuration = Yaml::dump($config);
 
         $this->_output->writeln('<info>Saving config file ' .$dir . $file . '</info>');
@@ -62,6 +71,11 @@ abstract class ConfigurationCommand extends Command
             $configFile,
             $configuration
         );
+    }
+
+    protected function addConfigExclusions(array $exclusions)
+    {
+        $this->_exclusions = array_merge($this->_exclusions, $exclusions);
     }
 
     /**
