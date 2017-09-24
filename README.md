@@ -11,6 +11,7 @@ Installation
 ------------
 
 ### Installation on mac/linux
+This will install the phar to the ~/.cdev directory, and create an alias at /usr/local/bin/cdev
 ```
 curl -s https://garethmidwood.github.io/cdev/install | bash -s
 
@@ -23,7 +24,7 @@ Self Updating
 -------------
 cdev will update itself to the latest version when you run
 ```
-cdev update
+cdev self-update
 ```
 
 
