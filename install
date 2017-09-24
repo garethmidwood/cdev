@@ -1,26 +1,62 @@
 #!/bin/bash
 
-LATEST_RELEASE='https://garethmidwood.github.io/cdev/downloads/cdev-1.0.33.phar'
+RELEASE='https://garethmidwood.github.io/cdev/downloads/cdev.phar'
+RELEASE_KEY='https://garethmidwood.github.io/cdev/downloads/cdev.phar.pubkey'
 
-TMP_FILE=$(mktemp)
+TMP_RELEASE_FILE=$(mktemp)
+TMP_RELEASE_KEY_FILE=$(mktemp)
 
-TARGET_PATH='/usr/local/bin/cdev'
+TARGET_RELEASE_PATH='/usr/local/bin/cdev'
+TARGET_RELEASE_KEY_PATH='/usr/local/bin/cdev.pubkey'
 
-echo 'Downloading latest cdev release to' $TMP_FILE
 
-if curl -o $TMP_FILE $LATEST_RELEASE ; then
-  echo 'Copying to' $TARGET_PATH
-  if cp $TMP_FILE $TARGET_PATH ; then
+
+
+echo 'Downloading latest cdev release to' $TMP_RELEASE_FILE
+
+if curl -o $TMP_RELEASE_FILE $RELEASE ; then
+
+  echo 'Copying to' $TARGET_RELEASE_PATH
+  if cp $TMP_RELEASE_FILE $TARGET_RELEASE_PATH ; then
 
     echo 'Making executable'
-    if chmod +x $TARGET_PATH ; then
+    if chmod +x $TARGET_RELEASE_PATH ; then
       echo 'cdev was successfully installed. Run `cdev` for usage'
     else
-      echo 'Error when granting execute permissions on' $TARGET_PATH
+      echo 'Error when granting execute permissions on' $TARGET_RELEASE_PATH
+      exit 1
     fi
+
   else
-    echo 'Error when copying cdev release to' $TARGET_PATH
+    echo 'Error when copying cdev release to' $TARGET_RELEASE_PATH
+    exit 1
   fi
+
 else
-  echo 'Error when downloading cdev release from' $LATEST_RELEASE
+  echo 'Error when downloading cdev release from' $RELEASE
+  exit 1
 fi
+
+
+
+
+echo 'Downloading latest cdev release key to' $TMP_RELEASE_KEY_FILE
+
+if curl -o $TMP_RELEASE_KEY_FILE $RELEASE_KEY ; then
+
+  echo 'Copying to' $TARGET_RELEASE_KEY_PATH
+  if cp $TMP_RELEASE_KEY_FILE $TARGET_RELEASE_KEY_PATH ; then
+
+  else
+    echo 'Error when copying cdev release to' $TARGET_RELEASE_KEY_PATH
+    exit 1
+  fi
+
+else
+  echo 'Error when downloading cdev release from' $RELEASE_KEY
+  exit 1
+fi
+
+
+
+exit 0
