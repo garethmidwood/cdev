@@ -41,6 +41,7 @@ function err {
 } 
 
 function log {
+  touch ${INSTALL_DIR}/${LOGFILE}
   echo $1 >> ${INSTALL_DIR}/${LOGFILE}
 }
 
