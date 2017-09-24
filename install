@@ -73,9 +73,9 @@ function progress {
 
 
 
-initLogEntry
-
 mkdir -p ${INSTALL_DIR}
+
+initLogEntry
 
 progress 10
 
