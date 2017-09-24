@@ -6,8 +6,11 @@ RELEASE_KEY='https://garethmidwood.github.io/cdev/downloads/cdev.phar.pubkey'
 TMP_RELEASE_FILE=$(mktemp)
 TMP_RELEASE_KEY_FILE=$(mktemp)
 
-TARGET_RELEASE_PATH='/usr/local/bin/cdev'
-TARGET_RELEASE_KEY_PATH='/usr/local/bin/cdev.pubkey'
+mkdir -p ~/.cdev
+TARGET_RELEASE_PATH=~/.cdev/cdev.phar
+TARGET_RELEASE_KEY_PATH=~/.cdev/cdev.phar.pubkey
+
+ALIAS='/usr/local/bin/cdev'
 
 
 
@@ -39,7 +42,7 @@ if curl -o $TMP_RELEASE_FILE $RELEASE ; then
 
     echo 'Making executable'
     if chmod +x $TARGET_RELEASE_PATH ; then
-      echo 'cdev was successfully installed. Run `cdev` for usage'
+      echo 'cdev.phar successfully installed.'
     else
       echo 'Error when granting execute permissions on' $TARGET_RELEASE_PATH
       exit 1
@@ -56,6 +59,9 @@ else
 fi
 
 
+echo 'Creating alias'
+ln -s $TARGET_RELEASE_PATH $ALIAS 
 
+echo 'cdev was successfully installed. Run `cdev` for usage'
 
 exit 0
