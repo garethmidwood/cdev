@@ -11,6 +11,24 @@ TARGET_RELEASE_KEY_PATH='/usr/local/bin/cdev.pubkey'
 
 
 
+echo 'Downloading latest cdev release key to' $TMP_RELEASE_KEY_FILE
+
+if curl -o $TMP_RELEASE_KEY_FILE $RELEASE_KEY ; then
+
+  echo 'Copying to' $TARGET_RELEASE_KEY_PATH
+  if cp $TMP_RELEASE_KEY_FILE $TARGET_RELEASE_KEY_PATH ; then
+    echo 'cdev key was successfully installed.'
+  else
+    echo 'Error when copying cdev release to' $TARGET_RELEASE_KEY_PATH
+    exit 1
+  fi
+
+else
+  echo 'Error when downloading cdev release from' $RELEASE_KEY
+  exit 1
+fi
+
+
 
 echo 'Downloading latest cdev release to' $TMP_RELEASE_FILE
 
@@ -37,25 +55,6 @@ else
   exit 1
 fi
 
-
-
-
-echo 'Downloading latest cdev release key to' $TMP_RELEASE_KEY_FILE
-
-if curl -o $TMP_RELEASE_KEY_FILE $RELEASE_KEY ; then
-
-  echo 'Copying to' $TARGET_RELEASE_KEY_PATH
-  if cp $TMP_RELEASE_KEY_FILE $TARGET_RELEASE_KEY_PATH ; then
-
-  else
-    echo 'Error when copying cdev release to' $TARGET_RELEASE_KEY_PATH
-    exit 1
-  fi
-
-else
-  echo 'Error when downloading cdev release from' $RELEASE_KEY
-  exit 1
-fi
 
 
 
