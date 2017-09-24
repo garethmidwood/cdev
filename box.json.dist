@@ -1,4 +1,5 @@
 {
+  "algorithm": "SHA1",
   "chmod": "0755",
   "directories": [
     "src"
