@@ -141,6 +141,19 @@ class Docker extends Environment
         $this->cleanup();
     }
 
+    public function status()
+    {
+        $this->logTitle('Environment status');
+
+        $path = $this->_input->getOption('path');
+
+        $this->_compose->ps($path);
+ 
+        if ($this->_usingDockerSync) {
+            $this->_sync->list($path);
+        }
+    }
+
     public function cleanup()
     {
         $this->logTitle('Cleaning up Docker leftovers...');
