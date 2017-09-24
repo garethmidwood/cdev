@@ -84,7 +84,7 @@ cdev env:ssh
 ### Open Database connection to environment
 ```
 cd project/dir
-cdev env:db:connect
+cdev env:db
 ```
 
 
