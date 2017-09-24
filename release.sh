@@ -26,12 +26,12 @@ git checkout gh-pages
 git pull
 
 mv cdev.phar downloads/cdev.phar
+mv cdev.phar.pubkey downloads/cdev.phar.pubkey
 shasum downloads/cdev.phar > downloads/cdev.version
-shasum downloads/cdev.phar > downloads/cdev.phar.pubkey
 
 git add downloads/cdev.phar
-git add downloads/cdev.version
 git add downloads/cdev.phar.pubkey
+git add downloads/cdev.version
 
 #
 # Commit and push
