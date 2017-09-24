@@ -15,7 +15,7 @@ class Magento2 extends Framework
      * Returns commands to clear cache on this framework
      * @return array
      */
-    public function clearCache() : array
+    public function clearCache()
     {
         return [
             [self::MAGERUN, 'cache:clean'],
@@ -27,7 +27,7 @@ class Magento2 extends Framework
      * Returns commands to run updates on this framework
      * @return array
      */
-    public function update() : array
+    public function update()
     {
         return [
             [self::MAGERUN, 'setup:upgrade']
