@@ -1,5 +1,4 @@
 {
-  "algorithm": "OPENSSL",
   "chmod": "0755",
   "directories": [
     "src"
@@ -18,5 +17,6 @@
   "git-version": "package_version",
   "main": "src/cdev.php",
   "output": "cdev.phar",
-  "stub": true
+  "stub": true,
+  "key": "private.key"
 }
