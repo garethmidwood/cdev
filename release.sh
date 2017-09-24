@@ -16,6 +16,7 @@ TAG=$1
 #
 git checkout master
 git tag ${TAG}
+box key:create
 box build
 
 #
