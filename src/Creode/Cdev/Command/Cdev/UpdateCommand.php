@@ -1,12 +1,12 @@
 <?php
 
 /**
- * Humbug
+ * cdev
  *
- * @category   Humbug
- * @package    Humbug
- * @copyright  Copyright (c) 2015 Pádraic Brady (http://blog.astrumfutura.com)
- * @license    https://github.com/padraic/humbug/blob/master/LICENSE New BSD License
+ * @category   cdev
+ * @package    cdev
+ * @copyright  Copyright (c) 2017 Creode (http://www.creode.co.uk)
+ * @license    https://github.com/garethmidwood/cdev/blob/master/LICENSE
  */
 
 namespace Creode\Cdev\Command\Cdev;
@@ -181,7 +181,7 @@ class UpdateCommand extends Command
             }
         
             if ($result) {
-                $this->output->writeln('<fg=green>Humbug has been updated.</fg=green>');
+                $this->output->writeln('<fg=green>cdev has been updated.</fg=green>');
                 $this->output->writeln(sprintf(
                     '<fg=green>Current version is:</fg=green> <options=bold>%s</options=bold>.',
                     $newVersion
@@ -191,7 +191,7 @@ class UpdateCommand extends Command
                     $oldVersion
                 ));
             } else {
-                $this->output->writeln('<fg=green>Humbug is currently up to date.</fg=green>');
+                $this->output->writeln('<fg=green>cdev is currently up to date.</fg=green>');
                 $this->output->writeln(sprintf(
                     '<fg=green>Current version is:</fg=green> <options=bold>%s</options=bold>.',
                     $oldVersion
@@ -210,7 +210,7 @@ class UpdateCommand extends Command
         try {
             $result = $updater->rollback();
             if ($result) {
-                $this->output->writeln('<fg=green>Humbug has been rolled back to prior version.</fg=green>');
+                $this->output->writeln('<fg=green>cdev has been rolled back to prior version.</fg=green>');
             } else {
                 $this->output->writeln('<fg=red>Rollback failed for reasons unknown.</fg=red>');
             }
@@ -282,24 +282,24 @@ class UpdateCommand extends Command
     {
         $this
             ->setName('self-update')
-            ->setDescription('Update humbug.phar to most recent stable, pre-release or development build.')
+            ->setDescription('Update cdev.phar to most recent stable, pre-release or development build.')
             ->addOption(
                 'dev',
                 'd',
                 InputOption::VALUE_NONE,
-                'Update to most recent development build of Humbug.'
+                'Update to most recent development build of cdev.'
             )
             ->addOption(
                 'non-dev',
                 'N',
                 InputOption::VALUE_NONE,
-                'Update to most recent non-development (alpha/beta/stable) build of Humbug tagged on Github.'
+                'Update to most recent non-development (alpha/beta/stable) build of cdev tagged on Github.'
             )
             ->addOption(
                 'pre',
                 'p',
                 InputOption::VALUE_NONE,
-                'Update to most recent pre-release version of Humbug (alpha/beta/rc) tagged on Github.'
+                'Update to most recent pre-release version of cdev (alpha/beta/rc) tagged on Github.'
             )
             ->addOption(
                 'stable',
@@ -311,7 +311,7 @@ class UpdateCommand extends Command
                 'rollback',
                 'r',
                 InputOption::VALUE_NONE,
-                'Rollback to previous version of Humbug if available on filesystem.'
+                'Rollback to previous version of cdev if available on filesystem.'
             )
             ->addOption(
                 'check',
