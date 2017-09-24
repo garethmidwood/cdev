@@ -68,7 +68,6 @@ function progress {
   REMAINING_CHARS=`eval printf "%0.s." $(seq 0 $REMAINING_CHAR_COUNT)`
 
   echo -ne "- ${ICON_INCOMPLETE} ${BAR_COLOUR_COMPLETE}installing ${BAR_COLOUR_COMPLETE}${COMPLETE_CHARS:1}${BAR_COLOUR_REMAINING}${REMAINING_CHARS:1} ${TEXT_COLOUR}(${COMPLETE}%)${NO_COLOUR}\r"
-  sleep 0.2
 }
 
 
