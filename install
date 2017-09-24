@@ -1,67 +1,141 @@
 #!/bin/bash
 
+INSTALL_DIR=~/.cdev
+LOGFILE='install.log'
+
+ICON_INCOMPLETE_COLOUR=`tput setaf 1`
+ICON_COMPLETE_COLOUR=`tput setaf 2`
+TEXT_COLOUR=`tput setaf 2`
+BAR_COLOUR_COMPLETE=`tput setaf 6`
+BAR_COLOUR_REMAINING=`tput setaf 3`
+ERROR_COLOUR=`tput setaf 1`
+NO_COLOUR=`tput sgr0`
+
+ICON_INCOMPLETE="${BAR_COLOUR_REMAINING}\xc2\xa2${NO_COLOUR}"
+ICON_COMPLETE="${ICON_COMPLETE_COLOUR}\xcf\xbe${NO_COLOUR}"
+ICON_ERROR="${ERROR_COLOUR}\xcf\xbf${NO_COLOUR}"
+
 RELEASE='https://garethmidwood.github.io/cdev/downloads/cdev.phar'
 RELEASE_KEY='https://garethmidwood.github.io/cdev/downloads/cdev.phar.pubkey'
 
 TMP_RELEASE_FILE=$(mktemp)
 TMP_RELEASE_KEY_FILE=$(mktemp)
 
-mkdir -p ~/.cdev
-TARGET_RELEASE_PATH=~/.cdev/cdev.phar
-TARGET_RELEASE_KEY_PATH=~/.cdev/cdev.phar.pubkey
+TARGET_RELEASE_PATH="${INSTALL_DIR}/cdev.phar"
+TARGET_RELEASE_KEY_PATH="${INSTALL_DIR}/cdev.phar.pubkey"
 
 ALIAS='/usr/local/bin/cdev'
 
 
 
-echo 'Downloading latest cdev release key to' $TMP_RELEASE_KEY_FILE
 
-if curl -o $TMP_RELEASE_KEY_FILE $RELEASE_KEY ; then
+function err {
+  log "FATAL ERROR: ${1}"
+  completeLogEntry
 
-  echo 'Copying to' $TARGET_RELEASE_KEY_PATH
+  echo -ne "- ${ERROR_COLOUR}${1}${NO_COLOUR}\r"
+  echo -ne "\n"
+  echo -ne "- ${ICON_ERROR} cdev installation failed"
+  echo -ne "\n"
+  exit 1
+} 
+
+function log {
+  echo $1 >> ${INSTALL_DIR}/${LOGFILE}
+}
+
+function initLogEntry {
+  log "============================================="
+  log "Installation started at `date`"
+  log "============================================="
+}
+
+function completeLogEntry {
+  log "fin"
+  log ""
+  log ""
+}
+
+function progress {
+  TOTAL=100
+  COMPLETE=$1
+  REMAINING=$(($TOTAL-$1))
+
+  COMPLETE_CHAR_COUNT=$(($COMPLETE/5))
+  REMAINING_CHAR_COUNT=$(($REMAINING/5))
+
+  COMPLETE_CHARS=`eval printf "%0.sϾ" $(seq 0 $COMPLETE_CHAR_COUNT)`
+  REMAINING_CHARS=`eval printf "%0.s." $(seq 0 $REMAINING_CHAR_COUNT)`
+
+  echo -ne "- ${ICON_INCOMPLETE} ${BAR_COLOUR_COMPLETE}installing ${BAR_COLOUR_COMPLETE}${COMPLETE_CHARS:1}${BAR_COLOUR_REMAINING}${REMAINING_CHARS:1} ${TEXT_COLOUR}(${COMPLETE}%)${NO_COLOUR}\r"
+  sleep 0.2
+}
+
+
+
+
+initLogEntry
+
+mkdir -p ${INSTALL_DIR}
+
+progress 10
+
+
+log "Downloading latest cdev release key to $TMP_RELEASE_KEY_FILE"
+
+if curl -sSo $TMP_RELEASE_KEY_FILE $RELEASE_KEY ; then
+  progress 40
+
+  log "Copying to $TARGET_RELEASE_KEY_PATH"
   if cp $TMP_RELEASE_KEY_FILE $TARGET_RELEASE_KEY_PATH ; then
-    echo 'cdev key was successfully installed.'
+    progress 50
+    log "cdev key was successfully installed."
   else
-    echo 'Error when copying cdev release to' $TARGET_RELEASE_KEY_PATH
-    exit 1
+    err "Error when copying cdev release to ${TARGET_RELEASE_KEY_PATH}"
   fi
 
 else
-  echo 'Error when downloading cdev release from' $RELEASE_KEY
-  exit 1
+  err "Error when downloading cdev release from ${RELEASE_KEY}"
 fi
 
 
 
-echo 'Downloading latest cdev release to' $TMP_RELEASE_FILE
+log "Downloading latest cdev release to $TMP_RELEASE_FILE"
 
-if curl -o $TMP_RELEASE_FILE $RELEASE ; then
+if curl -sSo $TMP_RELEASE_FILE $RELEASE ; then
+  progress 70
 
-  echo 'Copying to' $TARGET_RELEASE_PATH
+  log "Copying to $TARGET_RELEASE_PATH"
   if cp $TMP_RELEASE_FILE $TARGET_RELEASE_PATH ; then
+    progress 80
 
-    echo 'Making executable'
+    log "Making executable"
     if chmod +x $TARGET_RELEASE_PATH ; then
-      echo 'cdev.phar successfully installed.'
+      progress 90
+      log "cdev.phar successfully installed."
     else
-      echo 'Error when granting execute permissions on' $TARGET_RELEASE_PATH
-      exit 1
+      err "Error when granting execute permissions on ${TARGET_RELEASE_PATH}"
     fi
 
   else
-    echo 'Error when copying cdev release to' $TARGET_RELEASE_PATH
-    exit 1
+    err "Error when copying cdev release to ${TARGET_RELEASE_PATH}"
   fi
 
 else
-  echo 'Error when downloading cdev release from' $RELEASE
-  exit 1
+  err "Error when downloading cdev release from ${RELEASE}"
 fi
 
-
-echo 'Creating alias'
+log "Creating alias"
+rm $ALIAS
 ln -s $TARGET_RELEASE_PATH $ALIAS 
 
-echo 'cdev was successfully installed. Run `cdev` for usage'
+progress 100
+
+echo -ne "- ${ICON_COMPLETE} cdev was successfully installed. Run ${TEXT_COLOUR}cdev${NO_COLOUR} for usage"
+echo -ne "\n"
+
+log "Installation completed successfully"
+
+completeLogEntry
 
 exit 0
