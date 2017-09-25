@@ -210,10 +210,14 @@ class GlobalConfigureCommand extends ConfigurationCommand
         foreach($this->_config['config']['boilerplates'][$framework::NAME]['boilerplates'] as $index => $repo) {
             $removeRepo = false;
 
+            $repoName = is_string($repo)
+                ? $repo . ' [master]'
+                :  $repo['repo'] . ' [' . $repo['branch'] . ']';
+
             $this->askYesNoQuestion(
-                'Remove ' . $repo,
+                'Remove ' . $repoName,
                 $removeRepo
-            );     
+            );
 
             if ($removeRepo) {
                 unset(
@@ -236,14 +240,20 @@ class GlobalConfigureCommand extends ConfigurationCommand
             return;
         }
 
-        $repo = null;
+        $repo = $branch = null;
 
         $this->askQuestion(
             'Repo address',
             $repo
         );
 
-        $this->_config['config']['boilerplates'][$framework::NAME]['boilerplates'][] = $repo;
+        $this->askQuestion(
+            'Repo branch',
+            $branch,
+            'master'
+        );
+
+        $this->_config['config']['boilerplates'][$framework::NAME]['boilerplates'][] = ['repo' => $repo, 'branch' => $branch];
 
         // offer to add another
         $this->_addBoilerplates($framework);

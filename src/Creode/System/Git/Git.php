@@ -7,12 +7,14 @@ class Git extends Command
 {
     const COMMAND = 'git';
 
-    public function clone($path, $repoUrl, $dir = null)
+    public function clone($path, $repoUrl, $branch = 'master', $dir = null)
     {
         $this->runExternalCommand(
             self::COMMAND,
             [
                 'clone',
+                '--branch',
+                $branch,
                 $repoUrl,
                 $dir
             ],

@@ -128,6 +128,8 @@ class ConfigureCommand extends ConfigurationCommand
 
         $this->askQuestions();
 
+        $this->addConfigExclusions(['boilerplates']);
+
         $this->saveConfig($path . '/' . Config::CONFIG_DIR, Config::CONFIG_FILE);
         $this->saveServicesXml($path);
 
