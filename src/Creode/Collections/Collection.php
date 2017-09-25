@@ -6,7 +6,7 @@ abstract class Collection
 {
     protected $items = array();
 
-    public function getItems() : array
+    public function getItems()
     {
         return $this->items;
     }

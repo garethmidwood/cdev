@@ -495,7 +495,7 @@ GITIGNORE;
      */
     private function configureEnvironment(OutputInterface $output)
     {
-        $cmdNamespace = $this->_chosenEnvironmentClass::COMMAND_NAMESPACE;
+        $cmdNamespace = constant("{$this->_chosenEnvironmentClass}::COMMAND_NAMESPACE");
 
         // TODO: This command name should be enforced by the environment class
         // will probably need a new abstract class to enable that

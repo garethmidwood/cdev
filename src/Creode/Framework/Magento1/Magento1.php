@@ -15,7 +15,7 @@ class Magento1 extends Framework
      * Returns commands to clear cache on this framework
      * @return array
      */
-    public function clearCache() : array
+    public function clearCache()
     {
         return [
             [self::MAGERUN, 'cache:clean'],
@@ -27,7 +27,7 @@ class Magento1 extends Framework
      * Returns commands to run updates on this framework
      * @return array
      */
-    public function update() : array
+    public function update()
     {
         return [
             [self::MAGERUN, 'sys:setup:run']
@@ -38,7 +38,7 @@ class Magento1 extends Framework
      * Returns an array of tables that can have their data cleansed on dev environments
      * @return array
      */
-    public function getDBTableCleanseList() : array
+    public function getDBTableCleanseList()
     {
         return [
             'adminnotification_inbox',

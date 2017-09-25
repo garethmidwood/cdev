@@ -13,7 +13,7 @@ class WordPress extends Framework
      * Returns commands to clear cache on this framework
      * @return array
      */
-    public function clearCache() : array
+    public function clearCache()
     {
         return [];
     }
@@ -22,7 +22,7 @@ class WordPress extends Framework
      * Returns commands to run updates on this framework
      * @return array
      */
-    public function update() : array
+    public function update()
     {
         return [];
     }

@@ -166,7 +166,7 @@ class CreateSiteCommand extends ConfigurationCommand
          *  Clone repository
          * 
          */
-        $this->_git->clone($path, $chosenBoilerplate['repo'], $chosenBoilerplate['branch'], $dirName);
+        $this->_git->cloneRepo($path, $chosenBoilerplate['repo'], $chosenBoilerplate['branch'], $dirName);
 
         /**
          * 
