@@ -49,16 +49,18 @@ class SetupEnvCommand extends ConfigurationCommand
 
     private $_containers = [
         'MySQL' => [
+            'defaultActive' => true,
             'node' => 'mysql',
-            'command' => \Creode\Environment\Docker\Command\Container\Mysql::COMMAND_NAME,
-            'config' => \Creode\Environment\Docker\Command\Container\Mysql::CONFIG_DIR . '/' .
-                \Creode\Environment\Docker\Command\Container\Mysql::CONFIG_FILE
+            'command' => Container\Mysql::COMMAND_NAME,
+            'config' => Container\Mysql::CONFIG_DIR . '/' .
+                Container\Mysql::CONFIG_FILE
         ],
         'PHP' => [
+            'defaultActive' => true,
             'node' => 'php',
-            'command' => \Creode\Environment\Docker\Command\Container\Php::COMMAND_NAME,
-            'config' => \Creode\Environment\Docker\Command\Container\Php::CONFIG_DIR . '/' .
-                \Creode\Environment\Docker\Command\Container\Php::CONFIG_FILE,
+            'command' => Container\Php::COMMAND_NAME,
+            'config' => Container\Php::CONFIG_DIR . '/' .
+                Container\Php::CONFIG_FILE,
             'links' => [
                 'mysql',
                 'mailcatcher',
@@ -88,22 +90,25 @@ class SetupEnvCommand extends ConfigurationCommand
             ]
         ],
         'Mailcatcher' => [
+            'defaultActive' => true,
             'node' => 'mailcatcher',
-            'command' => \Creode\Environment\Docker\Command\Container\Mailcatcher::COMMAND_NAME,
-            'config' => \Creode\Environment\Docker\Command\Container\Mailcatcher::CONFIG_DIR . '/' .
-                \Creode\Environment\Docker\Command\Container\Mailcatcher::CONFIG_FILE
+            'command' => Container\Mailcatcher::COMMAND_NAME,
+            'config' => Container\Mailcatcher::CONFIG_DIR . '/' .
+                Container\Mailcatcher::CONFIG_FILE
         ],
         'Redis' => [
+            'defaultActive' => false,
             'node' => 'redis',
-            'command' => \Creode\Environment\Docker\Command\Container\Redis::COMMAND_NAME,
-            'config' => \Creode\Environment\Docker\Command\Container\Redis::CONFIG_DIR . '/' .
-                \Creode\Environment\Docker\Command\Container\Redis::CONFIG_FILE
+            'command' => Container\Redis::COMMAND_NAME,
+            'config' => Container\Redis::CONFIG_DIR . '/' .
+                Container\Redis::CONFIG_FILE
         ],
         'Drush' => [
+            'defaultActive' => false,
             'node' => 'drush',
-            'command' => \Creode\Environment\Docker\Command\Container\Drush::COMMAND_NAME,
-            'config' => \Creode\Environment\Docker\Command\Container\Drush::CONFIG_DIR . '/' .
-                \Creode\Environment\Docker\Command\Container\Drush::CONFIG_FILE,
+            'command' => Container\Drush::COMMAND_NAME,
+            'config' => Container\Drush::CONFIG_DIR . '/' .
+                Container\Drush::CONFIG_FILE,
             'depends' => [
                 'php',
                 'mysql'
@@ -360,7 +365,8 @@ class SetupEnvCommand extends ConfigurationCommand
 
             $useContainer = $this->containerRequired(
                 $label,
-                $this->_config['config']['docker']['compose']['services'][$node]['active']
+                $this->_config['config']['docker']['compose']['services'][$node]['active'],
+                $container['defaultActive']
             );
 
             if ($useContainer) {
@@ -398,16 +404,19 @@ class SetupEnvCommand extends ConfigurationCommand
      * Asks whether a container is required and saves results
      * @param string $label 
      * @param string|array &$config 
+     * @param boolean $defaultActive
      * @return boolean
      */
-    private function containerRequired($label, &$config) 
+    private function containerRequired($label, &$config, $defaultActive) 
     {
         $helper = $this->getHelper('question');
 
-        $optionsLabel = $config ? 'Y/n' : 'y/N';
+        $required = ((is_null($config) && $defaultActive) || $config);
+
+        $optionsLabel = $required ? 'Y/n' : 'y/N';
         $question = new ConfirmationQuestion(
-            '<question>' . $label . '? ' . $optionsLabel . '</question> : [Current: <info>' . ($config ? 'Yes' : 'No') . '</info>]',
-            $config,
+            '<question>' . $label . '? ' . $optionsLabel . '</question> : [Current: <info>' . ($required ? 'Yes' : 'No') . '</info>]',
+            $required,
             '/^(y|j)/i'
         );
         $config = $helper->ask($this->_input, $this->_output, $question);
