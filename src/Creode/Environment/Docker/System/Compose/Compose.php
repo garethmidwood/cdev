@@ -137,6 +137,28 @@ class Compose extends Command
     }
 
     /**
+     * Shows status of environment
+     * @param string $path 
+     * @return string
+     */
+    public function ps($path)
+    {
+        $this->requiresConfig();
+        
+        $this->runExternalCommand(
+            self::COMMAND,
+            [
+                '-f',
+                Config::CONFIG_DIR . self::FILE,
+                '-p',
+                $this->_networkName,
+                'ps'
+            ],
+            $path
+        );
+    }
+
+    /**
      * Connects to database
      * @param string $path 
      * @param string $database Database to connect to

@@ -19,6 +19,11 @@ class Sync extends Command
         $this->_configExists = file_exists(Config::CONFIG_DIR . self::FILE);
     }
     
+    /**
+     * Starts syncing 
+     * @param string $path 
+     * @return string
+     */
     public function start($path)
     {
         $this->requiresConfig();
@@ -36,6 +41,11 @@ class Sync extends Command
         return self::COMMAND . ' start completed';
     }
 
+    /**
+     * Stops syncing 
+     * @param string $path 
+     * @return string
+     */
     public function stop($path)
     {
         $this->requiresConfig();
@@ -53,6 +63,11 @@ class Sync extends Command
         return self::COMMAND . ' stop completed';
     }
 
+    /**
+     * Cleans syncs
+     * @param string $path 
+     * @return string
+     */
     public function clean($path)
     {
         $this->requiresConfig();
@@ -70,6 +85,11 @@ class Sync extends Command
         return self::COMMAND . ' clean completed';
     }
 
+    /**
+     * Triggers a sync
+     * @param string $path 
+     * @return string
+     */
     public function sync($path)
     {
         $this->requiresConfig();
@@ -85,6 +105,28 @@ class Sync extends Command
         );
 
         return self::COMMAND . ' sync completed';
+    }
+
+    /**
+     * Lists syncpoints for this project
+     * @param string $path 
+     * @return string
+     */
+    public function list($path)
+    {
+        $this->requiresConfig();
+
+        $this->run(
+            self::COMMAND, 
+            [
+                'list',
+                '-c',
+                Config::CONFIG_DIR . self::FILE
+            ],
+            $path
+        );
+
+        return self::COMMAND . ' list completed';
     }
 
     /**

@@ -74,6 +74,9 @@
                 <argument type="service" id="cdev.env_start_command" />
             </call>
             <call method="add">
+                <argument type="service" id="cdev.env_status_command" />
+            </call>
+            <call method="add">
                 <argument type="service" id="cdev.env_stop_command" />
             </call>
             <call method="add">
@@ -134,6 +137,10 @@
         </service>
 
         <service id="cdev.env_start_command" class="Creode\Cdev\Command\Env\StartEnvCommand">
+            <argument type="service" id="cdev.environment.type" />
+        </service>
+
+        <service id="cdev.env_status_command" class="Creode\Cdev\Command\Env\StatusEnvCommand">
             <argument type="service" id="cdev.environment.type" />
         </service>
 

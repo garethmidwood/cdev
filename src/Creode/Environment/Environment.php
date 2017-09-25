@@ -17,6 +17,8 @@ abstract class Environment extends Logger
     
     abstract public function nuke();
 
+    abstract public function status();
+
     abstract public function cleanup();
 
     abstract public function ssh();
