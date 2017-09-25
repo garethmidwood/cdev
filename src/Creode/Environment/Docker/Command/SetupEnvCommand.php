@@ -509,12 +509,14 @@ class SetupEnvCommand extends ConfigurationCommand
 
             $links = $this->getContainerLinks($values['node']);
             if ($links) {
-                $config['links'] = $this->getContainerLinks($values['node']);
+                $config['links'] = $links;
+            } else {
+                unset($config['links']);
             }
 
             $activeServices[$values['node']] = $config;
         }
-
+        
         $configArray['version'] = '2';
         $configArray['services'] = $activeServices;
         
