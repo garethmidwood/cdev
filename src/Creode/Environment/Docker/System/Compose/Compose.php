@@ -56,7 +56,7 @@ class Compose extends Command
             array_push($params, '--build');
         }
 
-        $this->run(self::COMMAND, $params, $path);
+        $this->runExternalCommand(self::COMMAND, $params, $path);
 
         return self::COMMAND . ' up completed';
     }
@@ -109,6 +109,37 @@ class Compose extends Command
 
         return self::COMMAND . ' rm completed';
     } 
+
+    /**
+     * Pulls latest images
+     * @param string $path
+     * @param string $serviceName
+     * @return string
+     */
+    public function pullImages($path, $serviceName = null)
+    {
+        $this->requiresConfig();
+
+        $params = [
+            '-f',
+            Config::CONFIG_DIR . self::FILE,
+            '-p',
+            $this->_networkName,
+            'pull'
+        ];
+
+        if (isset($serviceName)) {
+            array_push($params, $serviceName);
+        }
+
+        $this->run(
+            self::COMMAND,
+            $params,
+            $path
+        );
+
+        return self::COMMAND . ' pull completed';
+    }
 
     /**
      * Connects to running environment
