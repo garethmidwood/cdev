@@ -17,7 +17,7 @@ TAG=$1
 git checkout master
 git push
 git tag ${TAG}
-box key:create
+#box key:create
 box build
 
 #
@@ -27,7 +27,7 @@ git checkout gh-pages
 git pull
 
 mv cdev.phar downloads/cdev.phar
-mv cdev.phar.pubkey downloads/cdev.phar.pubkey
+cp cdev.phar.pubkey downloads/cdev.phar.pubkey
 shasum downloads/cdev.phar > downloads/cdev.version
 
 git add downloads/cdev.phar

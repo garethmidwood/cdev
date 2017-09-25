@@ -12,11 +12,11 @@ TARGET_RELEASE_KEY_PATH="${INSTALL_DIR}/cdev-local.phar.pubkey"
 
 ALIAS='/usr/local/bin/cdev-local'
 
-box key:create
+#box key:create
 box build
 
 mv cdev.phar $TARGET_RELEASE_PATH
-mv cdev.phar.pubkey $TARGET_RELEASE_KEY_PATH
+cp cdev.phar.pubkey $TARGET_RELEASE_KEY_PATH
 
 rm $ALIAS
 ln -s $TARGET_RELEASE_PATH $ALIAS
