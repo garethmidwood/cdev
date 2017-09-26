@@ -30,7 +30,7 @@ cdev self-update
 
 Requirements
 ------------
-PHP 7+
+PHP 5.6 or higher
 
 
 
