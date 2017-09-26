@@ -94,10 +94,10 @@ class UpdateCommand extends Command
          * If current build is stable, only update to more recent stable
          * versions if available. User may specify otherwise using options.
          */
-        if ($parser->isStable($this->version)) {
-            $this->updateToStableBuild();
-            return;
-        }
+        // if ($parser->isStable($this->version)) {
+        //     $this->updateToStableBuild();
+        //     return;
+        // }
 
         /**
          * By default, update to most recent remote version regardless
