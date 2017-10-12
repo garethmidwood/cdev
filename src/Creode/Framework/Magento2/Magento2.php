@@ -18,8 +18,8 @@ class Magento2 extends Framework
     public function clearCache()
     {
         return [
-            [self::MAGERUN, 'cache:clean'],
-            [self::MAGERUN, 'cache:flush']
+            ['php', self::MAGERUN, 'cache:clean'],
+            ['php', self::MAGERUN, 'cache:flush']
         ];
     }
 
@@ -30,7 +30,7 @@ class Magento2 extends Framework
     public function update()
     {
         return [
-            [self::MAGERUN, 'setup:upgrade']
+            ['php', self::MAGERUN, 'setup:upgrade']
         ];
     }
 }
