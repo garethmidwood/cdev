@@ -218,6 +218,9 @@
         <service id="environment.framework.wordpress"
             class="Creode\Framework\WordPress\WordPress">
         </service>
+        <service id="environment.framework.custom"
+            class="Creode\Framework\Custom\Custom">
+        </service>
 
 
         <!-- Entities -->
