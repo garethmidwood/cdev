@@ -104,12 +104,16 @@ class Docker extends Environment
 
         $path = $this->_input->getOption('path');
         $build = $this->_input->getOption('build');
+        $update = $this->_input->getOption('update');
+        
 
         if ($this->_usingDockerSync) {
             $this->_sync->start($path);
         }
 
-        $this->_compose->pullImages($path);
+        if ($update) {
+            $this->_compose->pullImages($path);
+        }
 
         $this->_compose->up($path, $build);
     }
