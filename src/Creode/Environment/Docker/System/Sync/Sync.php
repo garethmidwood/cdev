@@ -112,7 +112,7 @@ class Sync extends Command
      * @param string $path 
      * @return string
      */
-    public function list($path)
+    public function listSyncPoints($path)
     {
         $this->requiresConfig();
 

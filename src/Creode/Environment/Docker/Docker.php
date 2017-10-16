@@ -152,7 +152,7 @@ class Docker extends Environment
         $this->_compose->ps($path);
  
         if ($this->_usingDockerSync) {
-            $this->_sync->list($path);
+            $this->_sync->listSyncPoints($path);
         }
     }
 
