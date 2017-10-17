@@ -29,6 +29,13 @@ class StartEnvCommand extends EnvCommand
             InputOption::VALUE_NONE,
             'Rebuilds the environment'
         );
+
+        $this->addOption(
+            'update',
+            'u',
+            InputOption::VALUE_NONE,
+            'Updates the environment layer'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
