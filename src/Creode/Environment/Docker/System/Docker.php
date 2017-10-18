@@ -9,16 +9,16 @@ class Docker extends Command
     
     public function cleanup($path)
     {
-        $this->runCommand(self::COMMAND, ['container', 'prune', '--force'], $path);
-        $this->runCommand(self::COMMAND, ['image', 'prune', '--force'], $path);
-        $this->runCommand(self::COMMAND, ['volume', 'prune', '--force'], $path);
+        $this->run(self::COMMAND, ['container', 'prune', '--force'], $path);
+        $this->run(self::COMMAND, ['image', 'prune', '--force'], $path);
+        $this->run(self::COMMAND, ['volume', 'prune', '--force'], $path);
 
         return 'Clean up complete.';
     }
 
     public function pull($path, $image)
     {
-        $this->runCommand(
+        $this->run(
             self::COMMAND,
             ['pull', $image],
             $path
