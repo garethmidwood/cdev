@@ -189,6 +189,7 @@ class ConfigureCommand extends ConfigurationCommand
                     $this->changeSrcDir($originalSrc, $this->_config['config']['dir']['src']);
                 }
             }
+            $this->createScriptsDir();
         }
 
         /**
@@ -332,6 +333,34 @@ class ConfigureCommand extends ConfigurationCommand
                 $this->moveFilesToSrc($newSrc, $moveRepo);
             }
         }
+    }
+
+    /**
+     * Creates a scripts directory for running shell scripts on startup
+     * @return [type] [description]
+     */
+    private function createScriptsDir() {
+        $this->_output->writeln('===== Creating scripts directory');
+
+        $src = "scripts";
+
+        $path = $this->_input->getOption('path');
+
+        $srcPath = $path . '/scripts';
+
+        if ($this->_fs->exists($srcPath))
+        {
+            $this->_output->writeln("<comment>$src directory already exists. Continuing with existing dir</comment>");
+            return false;
+        }
+            
+        $this->_output->writeln("<comment>Creating $src directory</comment>");
+        
+        $this->_fs->mkdir($srcPath, 0740);
+
+        $this->_output->writeln("<comment>$src directory created</comment>");
+
+        return true;
     }
 
     /**

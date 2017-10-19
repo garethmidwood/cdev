@@ -87,6 +87,18 @@ cd project/dir
 cdev env:db
 ```
 
+Running Scripts on Startup
+--------------------------
+You can run a series of shell scripts on the server in alphanumerical order each time an environment has started up. Place your scripts inside the cdev root directory under "scripts/".
+
+You can run the scripts manually via cdev env:scripts
+
+```
+# Example script to add a command to the crontab (scripts/0_cron.sh)
+command="php /var/www/html/artisan schedule:run >> /dev/null 2>&1"
+job="* * * * * $command"
+cat <(fgrep -i -v "$command" <(crontab -l)) <(echo "$job") | crontab -
+```
 
 Contributing to cdev
 --------------------
