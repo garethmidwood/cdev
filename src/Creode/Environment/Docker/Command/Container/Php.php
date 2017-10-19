@@ -19,7 +19,8 @@ class Php extends Container
             'VIRTUAL_HOST' => '.project.docker'
         ],
         'volumes' => [
-            ['../src:/var/www/html']
+            ['../src:/var/www/html'],
+            ['../scripts:/var/.cdev/scripts']
         ]
     ];
 
@@ -88,10 +89,16 @@ class Php extends Container
         $this->_config['links'] = []; 
 
         if ($volumeName) {
-            $this->_config['volumes'] = [$volumeName . ':/var/www/html:nocopy'];
+            $this->_config['volumes'] = [
+                $volumeName . ':/var/www/html:nocopy',
+            ];
         } else {
-            $this->_config['volumes'] = ['../' . $src . ':/var/www/html'];
+            $this->_config['volumes'] = [
+                '../' . $src . ':/var/www/html'
+            ];
         }
+        //add in scripts volume
+        $this->_config['volumes'][] = '../scripts:/var/.cdev/scripts';
         
     }
 }

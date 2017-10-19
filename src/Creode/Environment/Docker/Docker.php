@@ -116,6 +116,7 @@ class Docker extends Environment
         }
 
         $this->_compose->up($path, $build);
+        $this->scripts();
     }
 
     public function stop()
@@ -128,6 +129,31 @@ class Docker extends Environment
  
         if ($this->_usingDockerSync) {
             $this->_sync->stop($path);
+        }
+    }
+
+    /**
+     * Runs shell scripts contained within "scripts" on the environment
+     * @return [type] [description]
+     */
+    public function scripts() {
+        //get a list of all the script files inside the /scripts directory
+        $this->logTitle('Running shell scripts...');
+
+        $scripts = array();
+        $dir = new \DirectoryIterator("scripts");
+        foreach ($dir as $fileinfo) {
+            if (!$fileinfo->isDot()) {
+                $scripts[] = $fileinfo->getFilename();
+            }
+        }
+        if(count($scripts) <= 0){
+            return;
+        }
+        //loop through & run the shell scripts
+        asort($scripts);
+        foreach($scripts as $script) {
+            $this->runCommand(["sh","/var/.cdev/scripts/".$script],true);
         }
     }
 
