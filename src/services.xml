@@ -65,6 +65,9 @@
                 <argument type="service" id="cdev.site_startup_command" />
             </call>
             <call method="add">
+                <argument type="service" id="cdev.env_scripts_command" />
+            </call>
+            <call method="add">
                 <argument type="service" id="cdev.env_nuke_command" />
             </call>
             <call method="add">
@@ -119,6 +122,10 @@
         </service>
 
         <service id="cdev.env_cleanup_command" class="Creode\Cdev\Command\Env\CleanupEnvCommand">
+            <argument type="service" id="cdev.environment.type" />
+        </service>
+
+        <service id="cdev.env_scripts_command" class="Creode\Cdev\Command\Env\RunScriptsEnvCommand">
             <argument type="service" id="cdev.environment.type" />
         </service>
 

@@ -25,6 +25,8 @@ abstract class Environment extends Logger
 
     abstract public function dbConnect();
 
+    abstract public function scripts();
+
     abstract public function runCommand(array $command = array(), $elevatePermissions = false);
 
     public function startUp() {
