@@ -12,6 +12,7 @@ class FrameworkCollection extends Collection
         $this->addItem('\Creode\Framework\Drupal7\Drupal7');
         $this->addItem('\Creode\Framework\Drupal8\Drupal8');
         $this->addItem('\Creode\Framework\WordPress\WordPress');
+        $this->addItem('\Creode\Framework\Laravel\Laravel');
         $this->addItem('\Creode\Framework\Custom\Custom');
     }
 }

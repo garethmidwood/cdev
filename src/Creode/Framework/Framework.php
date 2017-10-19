@@ -8,19 +8,32 @@ abstract class Framework
      * Returns commands to clear cache on this framework
      * @return array
      */
-    abstract public function clearCache();
+    public function clearCache() {
+        return [];
+    }
 
     /**
      * Returns commands to run updates on this framework
      * @return array
      */
-    abstract public function update();
+    public function update() {
+        return [];
+    }
 
     /**
      * Returns an array of tables that can have their data cleansed on dev environments
      * @return array
      */
     public function getDBTableCleanseList()
+    {
+        return [];
+    }
+
+    /**
+     * returns commands to run start up functions on this framework
+     * @return [type] [description]
+     */
+    public function startUp()
     {
         return [];
     }
