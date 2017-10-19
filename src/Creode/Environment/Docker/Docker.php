@@ -116,7 +116,6 @@ class Docker extends Environment
         }
 
         $this->_compose->up($path, $build);
-        $this->_framework->startUp();
         $this->scripts();
     }
 
