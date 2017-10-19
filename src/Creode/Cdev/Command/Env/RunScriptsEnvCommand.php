@@ -12,7 +12,7 @@ class RunScriptsEnvCommand extends EnvCommand
     protected function configure()
     {
         $this->setName('env:scripts');
-        $this->setDescription('Itterates through all shell scripts found in /scripts');
+        $this->setDescription('Iterates through all shell scripts found in /scripts');
 
         $this->addOption(
             'path',
