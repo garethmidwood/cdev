@@ -16,7 +16,7 @@ class Manager
     CONST MODULE_FILE = 'cdev.module.yml';
     CONST PLUGIN_DIR = DIRECTORY_SEPARATOR . '.cdev' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR;
 
-    static private function getPluginDir()
+    static public function getPluginDir()
     {
         return getenv("HOME") . self::PLUGIN_DIR;
     }
