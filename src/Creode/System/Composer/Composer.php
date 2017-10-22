@@ -66,21 +66,21 @@ class Composer extends Command
     /**
      * Adds a package
      * @param string $path 
-     * @param string $package 
+     * @param string|array $package 
      * @return string
      */
     public function require($path, $package)
     {
+        $package = is_array($package) ? $package : [$package];
+        $params = array_merge(['require'], $package);
+
         $this->runExternalCommand(
             $this->_composer,
-            [
-                'require',
-                $package
-            ],
+            $params,
             $path
         );
 
-        return 'composer require ' . $package . ' completed';
+        return 'composer require ' . implode(' ', $package) . ' completed';
     }
 
     /**

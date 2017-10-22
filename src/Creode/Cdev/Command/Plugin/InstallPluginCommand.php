@@ -44,6 +44,8 @@ class InstallPluginCommand extends ConfigurationCommand
             'Path to run commands on. Defaults to the directory the command is run from',
             getcwd()
         );
+
+        $this->addArgument('packages', InputArgument::IS_ARRAY, 'The packages to install');
     }
 
     /**
@@ -71,21 +73,30 @@ class InstallPluginCommand extends ConfigurationCommand
         $helper = $this->getHelper('question');
         $path = $this->_input->getOption('path');
 
-        $this->askQuestion(
-            'Plugin package name (e.g. cdev/framework-drupal7)',
-            $this->_package
-        );
+        $packages = $this->_input->getArgument('packages');
+
+        if (count($packages) > 0) {
+            $this->installPlugin(implode(' ', $packages));
+        } else {
+            $this->askQuestion(
+                'Plugin package name (e.g. cdev/framework-drupal7)',
+                $this->_package
+            );
+        }
     }
 
     /**
      * Installs the specified plugin
+     * @param string|null $package 
      * @return type
      */
-    private function installPlugin()
+    private function installPlugin($package = null)
     {
+        $packageToInstall = isset($package) ? $package : $this->_package;
+
         $path = \Creode\Cdev\Plugin\Manager::getPluginDir();
 
-        $this->_composer->require($path, $this->_package);
+        $this->_composer->require($path, $packageToInstall);
     }
 
 }
