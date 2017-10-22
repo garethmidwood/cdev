@@ -163,9 +163,6 @@
 
         <!-- Frameworks -->
 
-        <service id="environment.framework.magento1"
-            class="Creode\Framework\Magento1\Magento1">
-        </service>
         <service id="environment.framework.magento2"
             class="Creode\Framework\Magento2\Magento2">
         </service>
