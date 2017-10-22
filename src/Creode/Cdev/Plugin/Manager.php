@@ -2,6 +2,8 @@
 
 namespace Creode\Cdev\Plugin;
 
+use Creode\Collections\FrameworkCollection;
+use Creode\Collections\EnvironmentCollection;
 use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -11,7 +13,7 @@ use Symfony\Component\Yaml\Yaml;
 class Manager
 {
     CONST SERVICES_FILE = 'cdev.services.xml';
-    CONST COMMANDS_FILE = 'cdev.commands.yml';
+    CONST MODULE_FILE = 'cdev.module.yml';
     CONST PLUGIN_DIR = DIRECTORY_SEPARATOR . '.cdev' . DIRECTORY_SEPARATOR . 'plugins' . DIRECTORY_SEPARATOR;
 
     static private function getPluginDir()
@@ -29,7 +31,7 @@ class Manager
 
         if (!is_dir($cdevPlugins)) {
             if (!mkdir($cdevPlugins, 0700, true)) {
-                die('ERROR: Could not create plugin dir ' . $cdevPlugins);
+                die('ERROR: Could not create plugin dir ' . $cdevPlugins . PHP_EOL);
             }
         }
 
@@ -67,7 +69,7 @@ class Manager
         Application $application
     ) {
         $finder = new Finder();
-        $finder->files()->name(self::COMMANDS_FILE)->in(self::getPluginDir());
+        $finder->files()->name(self::MODULE_FILE)->in(self::getPluginDir());
 
         foreach ($finder as $file) {
             $contents = Yaml::parse(file_get_contents($file->getRealPath()));
@@ -80,6 +82,66 @@ class Manager
                 foreach($contents['commands'] as $commandId) {
                     $command = $container->get($commandId);
                     $application->add($command);
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds the plugin frameworks to the collection
+     * @param FrameworkCollection $frameworkCollection 
+     * @return void
+     */
+    static public function registerFrameworks(
+        FrameworkCollection $frameworkCollection
+    ) {
+        $finder = new Finder();
+        $finder->files()->name(self::MODULE_FILE)->in(self::getPluginDir());
+
+        foreach ($finder as $file) {
+            $contents = Yaml::parse(file_get_contents($file->getRealPath()));
+            
+            if (is_array($contents) && 
+                isset($contents['frameworks']) &&
+                is_array($contents['frameworks']) &&
+                count($contents['frameworks']) > 0
+            ) {
+                foreach($contents['frameworks'] as $frameworkClass) {
+                    if (!class_exists($frameworkClass)) {
+                        die('Could not find plugin framework class ' . $frameworkClass . PHP_EOL);
+                    }
+
+                    $frameworkCollection->addItem($frameworkClass);
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds the plugin environments to the collection
+     * @param EnvironmentCollection $environmentCollection 
+     * @return void
+     */
+    static public function registerEnvironments(
+        EnvironmentCollection $environmentCollection
+    ) {
+        $finder = new Finder();
+        $finder->files()->name(self::MODULE_FILE)->in(self::getPluginDir());
+
+        foreach ($finder as $file) {
+            $contents = Yaml::parse(file_get_contents($file->getRealPath()));
+            
+            if (is_array($contents) && 
+                isset($contents['environments']) &&
+                is_array($contents['environments']) &&
+                count($contents['environments']) > 0
+            ) {
+                foreach($contents['environments'] as $environmentClass) {
+                    if (!class_exists($environmentClass)) {
+                        die('Could not find plugin environment class ' . $environmentClass . PHP_EOL);
+                    }
+
+                    $environmentCollection->addItem($environmentClass);
                 }
             }
         }

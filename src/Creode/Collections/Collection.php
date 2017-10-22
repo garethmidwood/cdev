@@ -11,7 +11,7 @@ abstract class Collection
         return $this->items;
     }
 
-    protected function addItem($item)
+    public function addItem($item)
     {
         $this->items[] = $item;
     }
