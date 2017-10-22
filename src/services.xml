@@ -8,7 +8,7 @@
         <!-- Defaults - override in app config -->
 
         <service id="cdev.environment.type" alias="environment.type.docker"/>
-        <service id="cdev.environment.framework" alias="environment.framework.drupal7"/>
+        <service id="cdev.environment.framework" alias="environment.framework.custom"/>
 
         <!-- App creation and adding command -->
 
@@ -31,6 +31,9 @@
             <call method="add">
                 <argument type="service" id="cdev.db_cleanse_command" />
             </call>
+
+
+
             <call method="add">
                 <argument type="service" id="cdev.docker_container_mysql" />
             </call>
@@ -49,6 +52,9 @@
             <call method="add">
                 <argument type="service" id="cdev.docker_setup" />
             </call>
+
+
+
             <call method="add">
                 <argument type="service" id="cdev.env_cleanup_command" />
             </call>
@@ -208,9 +214,6 @@
         </service>
         <service id="environment.framework.magento2"
             class="Creode\Framework\Magento2\Magento2">
-        </service>
-        <service id="environment.framework.drupal7"
-            class="Creode\Framework\Drupal7\Drupal7">
         </service>
         <service id="environment.framework.drupal8"
             class="Creode\Framework\Drupal8\Drupal8">
