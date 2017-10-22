@@ -31,30 +31,6 @@
             <call method="add">
                 <argument type="service" id="cdev.db_cleanse_command" />
             </call>
-
-
-
-            <call method="add">
-                <argument type="service" id="cdev.docker_container_mysql" />
-            </call>
-            <call method="add">
-                <argument type="service" id="cdev.docker_container_php" />
-            </call>
-            <call method="add">
-                <argument type="service" id="cdev.docker_container_mailcatcher" />
-            </call>
-            <call method="add">
-                <argument type="service" id="cdev.docker_container_redis" />
-            </call>
-            <call method="add">
-                <argument type="service" id="cdev.docker_container_drush" />
-            </call>
-            <call method="add">
-                <argument type="service" id="cdev.docker_setup" />
-            </call>
-
-
-
             <call method="add">
                 <argument type="service" id="cdev.env_cleanup_command" />
             </call>
@@ -168,43 +144,7 @@
             <argument type="service" id="cdev.system_git" />
             <argument type="service" id="cdev.collections.framework" />
         </service>
-
-        <service id="cdev.docker_setup" class="Creode\Environment\Docker\Command\SetupEnvCommand">
-            <argument type="service" id="environment.type.docker" />
-            <argument type="service" id="cdev.system_composer" />
-            <argument type="service" id="symfony.filesystem" />
-        </service>
-
-        <service id="cdev.docker_container_mysql" class="Creode\Environment\Docker\Command\Container\Mysql">
-            <argument type="service" id="symfony.filesystem" />
-        </service>
-
-        <service id="cdev.docker_container_php"
-            class="Creode\Environment\Docker\Command\Container\Php">
-        </service>
-
-        <service id="cdev.docker_container_mailcatcher"
-            class="Creode\Environment\Docker\Command\Container\Mailcatcher">
-        </service>
-
-        <service id="cdev.docker_container_redis"
-            class="Creode\Environment\Docker\Command\Container\Redis">
-        </service>
-
-        <service id="cdev.docker_container_drush"
-            class="Creode\Environment\Docker\Command\Container\Drush">
-        </service>
         
-
-        <!-- Environments -->
-
-        <service id="environment.type.docker" class="Creode\Environment\Docker\Docker">
-            <argument type="service" id="cdev.system_docker" />
-            <argument type="service" id="cdev.system_docker_compose" />
-            <argument type="service" id="cdev.system_docker_sync" />
-            <argument type="service" id="cdev.environment.framework" />
-            <argument type="service" id="cdev.config" />
-        </service>
 
 
         <!-- Frameworks -->
@@ -243,18 +183,6 @@
 
         <service id="cdev.system_composer"
             class="Creode\System\Composer\Composer">
-        </service>
-
-        <service id="cdev.system_docker"
-            class="Creode\Environment\Docker\System\Docker">
-        </service>
-
-        <service id="cdev.system_docker_compose"
-            class="Creode\Environment\Docker\System\Compose\Compose">
-        </service>
-
-        <service id="cdev.system_docker_sync"
-            class="Creode\Environment\Docker\System\Sync\Sync">
         </service>
 
         <service id="cdev.system_git"
