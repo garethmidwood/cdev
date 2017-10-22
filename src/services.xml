@@ -163,9 +163,6 @@
 
         <!-- Frameworks -->
 
-        <service id="environment.framework.magento2"
-            class="Creode\Framework\Magento2\Magento2">
-        </service>
         <service id="environment.framework.wordpress"
             class="Creode\Framework\WordPress\WordPress">
         </service>
