@@ -7,7 +7,7 @@
 
         <!-- Defaults - override in app config -->
 
-        <service id="cdev.environment.type" alias="environment.type.docker"/>
+        <service id="cdev.environment.type" alias="environment.type.custom"/>
         <service id="cdev.environment.framework" alias="environment.framework.custom"/>
 
         <!-- App creation and adding command -->
@@ -161,11 +161,9 @@
         
 
 
+
         <!-- Frameworks -->
 
-        <service id="environment.framework.wordpress"
-            class="Creode\Framework\WordPress\WordPress">
-        </service>
         <service id="environment.framework.custom"
             class="Creode\Framework\Custom\Custom">
         </service>
