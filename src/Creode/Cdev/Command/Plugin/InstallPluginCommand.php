@@ -76,7 +76,7 @@ class InstallPluginCommand extends ConfigurationCommand
         $packages = $this->_input->getArgument('packages');
 
         if (count($packages) > 0) {
-            $this->installPlugin(implode(' ', $packages));
+            $this->_package = implode(' ', $packages);
         } else {
             $this->askQuestion(
                 'Plugin package name (e.g. cdev/framework-drupal7)',
