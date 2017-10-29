@@ -7,7 +7,7 @@
 
         <!-- Defaults - override in app config -->
 
-        <service id="cdev.environment.type" alias="environment.type.custom"/>
+        <service id="cdev.environment.type" alias="environment.type.default"/>
         <service id="cdev.environment.framework" alias="environment.framework.custom"/>
 
         <!-- App creation and adding command -->
@@ -160,6 +160,14 @@
         </service>
         
 
+
+
+        <!-- Environments -->
+
+        <service id="environment.environment.default" class="Creode\Environment\Default\Default">
+            <argument type="service" id="cdev.environment.framework" />
+            <argument type="service" id="cdev.config" />
+        </service>
 
 
         <!-- Frameworks -->
