@@ -1,6 +1,6 @@
 <?php
 
-namespace Cdev\Environment\Default;
+namespace Creode\Environment\Example;
 
 use Creode\Cdev\Config;
 use Creode\Environment\Environment;
@@ -9,17 +9,16 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Yaml\Yaml;
 
 
-
-class Default extends Environment
+class Example extends Environment
 {
-    const NAME = 'default';
-    const LABEL = 'Default';
-    const COMMAND_NAMESPACE = 'default';
+    const NAME = 'example';
+    const LABEL = 'Example';
+    const COMMAND_NAMESPACE = 'example';
     
     /**
      * @var Framework
      */
-    private $_framework;
+    protected $_framework;
 
     /**
      * @var Config
