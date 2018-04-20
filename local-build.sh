@@ -18,5 +18,5 @@ box build
 mv cdev.phar $TARGET_RELEASE_PATH
 cp cdev.phar.pubkey $TARGET_RELEASE_KEY_PATH
 
-rm $ALIAS
-ln -s $TARGET_RELEASE_PATH $ALIAS
+sudo rm $ALIAS
+sudo ln -s $TARGET_RELEASE_PATH $ALIAS
