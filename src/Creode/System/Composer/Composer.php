@@ -105,6 +105,26 @@ class Composer extends Command
     }
 
     /**
+     * Updates a package
+     * @param string $path 
+     * @param string $package 
+     * @return string
+     */
+    public function update($path, $package)
+    {
+        $this->runExternalCommand(
+            $this->_composer,
+            [
+                'update',
+                $package
+            ],
+            $path
+        );
+
+        return 'composer update ' . $package . ' completed';
+    }
+
+    /**
      * Removes a package
      * @param string $path 
      * @param string $package 
@@ -122,6 +142,24 @@ class Composer extends Command
         );
 
         return 'composer remove ' . $package . ' completed';
+    }
+
+    /**
+     * Lists info about the packages
+     * @param string $path
+     * @return string
+     */
+    public function info($path)
+    {
+        $this->runExternalCommand(
+            $this->_composer,
+            [
+                'info'
+            ],
+            $path
+        );
+
+        return 'composer list completed';
     }
 
 }

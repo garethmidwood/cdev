@@ -35,7 +35,13 @@
                 <argument type="service" id="cdev.cdev_plugin_search_command" />
             </call>
             <call method="add">
+                <argument type="service" id="cdev.cdev_plugin_update_command" />
+            </call>
+            <call method="add">
                 <argument type="service" id="cdev.cdev_plugin_remove_command" />
+            </call>
+            <call method="add">
+                <argument type="service" id="cdev.cdev_plugin_list_command" />
             </call>
             <call method="add">
                 <argument type="service" id="cdev.db_cleanse_command" />
@@ -109,6 +115,14 @@
         </service>
 
         <service id="cdev.cdev_plugin_remove_command" class="Creode\Cdev\Command\Plugin\RemovePluginCommand">
+            <argument type="service" id="cdev.system_composer" />
+        </service>
+
+        <service id="cdev.cdev_plugin_update_command" class="Creode\Cdev\Command\Plugin\UpdatePluginCommand">
+            <argument type="service" id="cdev.system_composer" />
+        </service>
+
+        <service id="cdev.cdev_plugin_list_command" class="Creode\Cdev\Command\Plugin\ListPluginCommand">
             <argument type="service" id="cdev.system_composer" />
         </service>
 
