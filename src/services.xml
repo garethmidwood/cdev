@@ -9,6 +9,7 @@
 
         <service id="cdev.environment.type" alias="environment.type.example"/>
         <service id="cdev.environment.framework" alias="environment.framework.custom"/>
+        <service id="cdev.storage" alias="storage.s3"/>
 
         <!-- App creation and adding command -->
 
@@ -59,6 +60,12 @@
                 <argument type="service" id="cdev.site_create_command" />
             </call>
             <call method="add">
+                <argument type="service" id="cdev.storage_s3_setup" />
+            </call>
+            <call method="add">
+                <argument type="service" id="cdev.storage_server_setup" />
+            </call>
+            <call method="add">
                 <argument type="service" id="cdev.env_nuke_command" />
             </call>
             <call method="add">
@@ -87,7 +94,7 @@
 
         <service id="cdev.backup_pull_command" class="Creode\Cdev\Command\Backup\PullCommand">
             <argument type="service" id="cdev.config" />
-            <argument type="service" id="cdev.system_ssh" />
+            <argument type="service" id="cdev.storage" />
         </service>
 
         <service id="cdev.cdev_configure_command" class="Creode\Cdev\Command\Cdev\ConfigureCommand">
@@ -96,6 +103,7 @@
             <argument type="service" id="cdev.system_git" />
             <argument type="service" id="cdev.collections.environment" />
             <argument type="service" id="cdev.collections.framework" />
+            <argument type="service" id="cdev.collections.storage" />
         </service>
 
         <service id="cdev.cdev_global_configure_command" class="Creode\Cdev\Command\Cdev\GlobalConfigureCommand">
@@ -179,6 +187,14 @@
             <argument type="service" id="cdev.system_git" />
             <argument type="service" id="cdev.collections.framework" />
         </service>
+
+        <service id="cdev.storage_s3_setup"
+            class="Creode\Storage\S3\Command\SetupStorageCommand">
+        </service>
+
+        <service id="cdev.storage_server_setup"
+            class="Creode\Storage\Server\Command\SetupStorageCommand">
+        </service>
         
 
 
@@ -195,6 +211,18 @@
 
         <service id="environment.framework.custom"
             class="Creode\Framework\Custom\Custom">
+        </service>
+
+
+        <!-- Storage -->
+
+        <service id="storage.server" class="Creode\Storage\Server\Server">
+            <argument type="service" id="cdev.system_ssh" />
+            <argument type="service" id="cdev.config" />
+        </service>
+
+        <service id="storage.s3" class="Creode\Storage\S3\S3">
+            <argument type="service" id="cdev.config" />
         </service>
 
 
@@ -221,14 +249,6 @@
             class="Creode\System\Git\Git">
         </service>
 
-        <service id="cdev.collections.environment"
-            class="Creode\Collections\EnvironmentCollection">
-        </service>
-
-        <service id="cdev.collections.framework"
-            class="Creode\Collections\FrameworkCollection">
-        </service>
-
         <service id="cdev.system_iconv" class="Creode\System\Iconv\Iconv">
             <argument type="service" id="symfony.filesystem" />
         </service>
@@ -239,6 +259,20 @@
 
         <service id="cdev.system_ssh" class="Creode\System\Ssh\Ssh">
             <argument type="service" id="cdev.config" />
+        </service>
+
+
+        <!-- Collections -->
+        <service id="cdev.collections.environment"
+            class="Creode\Collections\EnvironmentCollection">
+        </service>
+
+        <service id="cdev.collections.framework"
+            class="Creode\Collections\FrameworkCollection">
+        </service>
+
+        <service id="cdev.collections.storage"
+            class="Creode\Collections\StorageCollection">
         </service>
 
 

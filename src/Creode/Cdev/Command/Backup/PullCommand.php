@@ -2,7 +2,7 @@
 namespace Creode\Cdev\Command\Backup;
 
 use Creode\Cdev\Config;
-use Creode\System\Ssh\Ssh;
+use Creode\Storage\Storage;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -19,21 +19,21 @@ class PullCommand extends Command
     private $_config;
 
     /**
-     * @var Ssh
+     * @var Storage
      */
-    private $_ssh;
+    private $_storageLocation;
 
     /**
      * @param Config $config 
-     * @param Ssh $ssh 
+     * @param Storage $storageLocation 
      * @return null
      */
     public function __construct(
         Config $config,
-        Ssh $ssh
+        Storage $storageLocation
     ) {
         $this->_config = $config;
-        $this->_ssh = $ssh;
+        $this->_storageLocation = $storageLocation;
 
         parent::__construct();
     }
@@ -98,7 +98,7 @@ class PullCommand extends Command
         }
 
         foreach ($transfers as $transfer) {
-            $this->_ssh->download(
+            $this->_storageLocation->download(
                 $path,
                 'backups',
                 $transfer['source'],

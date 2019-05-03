@@ -122,3 +122,17 @@ which cdev-local
 # should output /usr/local/bin/cdev-local
 ```
 
+### Creating a new collection
+Some configuration options require the user to choose which class they want to use (e.g. environment, framework, storage).
+If you want to create a new collection you must do a few things:
+
+- Create collection class in `Creode\Collections` namespace
+ - If your collection is bundled with options already then you need to add them with `addItem()` (see framework collection for an example)
+- Create a register function (e.g. `registerStorage()`) in the plugin manager
+- Add a folder in the `Creode` director, this folder will be the name of your namespace and must be capitalized.
+- Add your option classes in their own folder within your new namespace.
+- If your classes have their own configuration then create a `Command` directory within the option dir, add a setup command in here
+- Update `Cdev\ConfigureCommand`, add a search and a replacement value in `saveServicesXml` for your new config option
+ - Add the same search value into `templates/services.env.xml`. This template will be used when a configuration is saved
+
+

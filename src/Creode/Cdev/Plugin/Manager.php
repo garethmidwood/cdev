@@ -4,6 +4,7 @@ namespace Creode\Cdev\Plugin;
 
 use Creode\Collections\FrameworkCollection;
 use Creode\Collections\EnvironmentCollection;
+use Creode\Collections\StorageCollection;
 use Symfony\Component\Console\Application;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
@@ -142,6 +143,36 @@ class Manager
                     }
 
                     $environmentCollection->addItem($environmentClass);
+                }
+            }
+        }
+    }
+
+    /**
+     * Adds the plugin storage locations to the collection
+     * @param StorageCollection $storageCollection 
+     * @return void
+     */
+    static public function registerStorage(
+        StorageCollection $storageCollection
+    ) {
+        $finder = new Finder();
+        $finder->files()->name(self::MODULE_FILE)->in(self::getPluginDir());
+
+        foreach ($finder as $file) {
+            $contents = Yaml::parse(file_get_contents($file->getRealPath()));
+            
+            if (is_array($contents) && 
+                isset($contents['storage']) &&
+                is_array($contents['storage']) &&
+                count($contents['storage']) > 0
+            ) {
+                foreach($contents['storage'] as $storageClass) {
+                    if (!class_exists($storageClass)) {
+                        die('Could not find plugin storage class ' . $storageClass . PHP_EOL);
+                    }
+
+                    $storageCollection->addItem($storageClass);
                 }
             }
         }

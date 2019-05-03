@@ -5,6 +5,7 @@ use Creode\Cdev\Command\ConfigurationCommand;
 use Creode\Cdev\Config;
 use Creode\Collections\EnvironmentCollection;
 use Creode\Collections\FrameworkCollection;
+use Creode\Collections\StorageCollection;
 use Creode\Environment;
 use Creode\Framework;
 use Creode\System\Git\Git;
@@ -47,6 +48,11 @@ class ConfigureCommand extends ConfigurationCommand
     private $_chosenFrameworkClass;
 
     /**
+     * @var string
+     */
+    private $_chosenBackupLocationClass;
+
+    /**
      * @var array
      */
     private $_environments;
@@ -55,6 +61,11 @@ class ConfigureCommand extends ConfigurationCommand
      * @var array
      */
     private $_frameworks;
+
+    /**
+     * @var array
+     */
+    private $_storageLocations;    
 
     /**
      * @var Filesystem
@@ -84,13 +95,15 @@ class ConfigureCommand extends ConfigurationCommand
         Finder $finder,
         Git $git,
         EnvironmentCollection $environmentCollection,
-        FrameworkCollection $frameworkCollection
+        FrameworkCollection $frameworkCollection,
+        StorageCollection $storageCollection
     ) {
         $this->_fs = $fs;
         $this->_finder = $finder;
         $this->_git = $git;
         $this->_environments = $environmentCollection->getItems();
         $this->_frameworks = $frameworkCollection->getItems();
+        $this->_storageLocations = $storageCollection->getItems();
 
         parent::__construct();
     }
@@ -134,6 +147,7 @@ class ConfigureCommand extends ConfigurationCommand
         $this->saveServicesXml($path);
 
         $this->configureEnvironment($output);
+        $this->configureBackupLocation($output);
     }
 
     /**
@@ -243,40 +257,23 @@ class ConfigureCommand extends ConfigurationCommand
          * BACKUPS
          * 
          */
-        $this->askQuestion(
-            'Backups: Host',
-            $this->_config['config']['backups']['host']
-        );
+        $backupLocations = [];
+        $backupLocationsMap = [];
+        foreach ($this->_storageLocations as $storageLocation) {
+            $backupLocations[$storageLocation::NAME] = $storageLocation::LABEL;
+            $backupLocationsMap[$storageLocation::NAME] = $storageLocation;
+        }
+        
+        $currentBackupLocation = count($backupLocations) == 1 ? $backupLocations[key($backupLocations)] : $this->_config['config']['backups']['location'];
 
-        $this->askQuestion(
-            'Backups: Port',
-            $this->_config['config']['backups']['port']
+        $question = new ChoiceQuestion(
+            '<question>Backup Location:</question> [Current: <info>' . $currentBackupLocation . '</info>]',
+            $backupLocations,
+            $currentBackupLocation
         );
-
-        $this->askQuestion(
-            'Backups: User',
-            $this->_config['config']['backups']['user']
-        );
-
-        $this->askQuestion(
-            'Backups: DB Directory',
-            $this->_config['config']['backups']['db-dir']
-        );
-
-        $this->askQuestion(
-            'Backups: DB file name',
-            $this->_config['config']['backups']['db-file']
-        );
-
-        $this->askQuestion(
-            'Backups: Media Directory',
-            $this->_config['config']['backups']['media-dir']
-        );
-
-        $this->askQuestion(
-            'Backups: Media file name',
-            $this->_config['config']['backups']['media-file']
-        );
+        $question->setErrorMessage('Backup location %s is invalid.');
+        $this->_config['config']['backups']['location'] = $helper->ask($this->_input, $this->_output, $question);
+        $this->_chosenBackupLocationClass = $backupLocationsMap[$this->_config['config']['backups']['location']];
     }
 
 
@@ -299,12 +296,14 @@ class ConfigureCommand extends ConfigurationCommand
         
         $searches = [
             '{{env_type}}',
-            '{{env_framework}}'
+            '{{env_framework}}',
+            '{{storage_location}}'
         ];
 
         $replacements = [
             $this->_config['config']['environment']['type'],
-            $this->_config['config']['environment']['framework']
+            $this->_config['config']['environment']['framework'],
+            $this->_config['config']['backups']['location']
         ];
 
         $servicesContent = str_replace($searches, $replacements, $servicesContent);
@@ -498,6 +497,30 @@ GITIGNORE;
         $cmdNamespace = constant("{$this->_chosenEnvironmentClass}::COMMAND_NAMESPACE");
 
         // TODO: This command name should be enforced by the environment class
+        // will probably need a new abstract class to enable that
+        $cmd = $cmdNamespace . ':setup';
+
+        $command = $this->getApplication()->find($cmd);
+
+        $arguments = array(
+            'command' => $cmd
+        );
+
+        $cmdInput = new ArrayInput($arguments);
+
+        $command->run($cmdInput, $output);
+    }
+
+    /**
+     * Runs the setup for the selected environment
+     * @param OutputInterface $output 
+     * @return null
+     */
+    private function configureBackupLocation(OutputInterface $output)
+    {
+        $cmdNamespace = constant("{$this->_chosenBackupLocationClass}::COMMAND_NAMESPACE");
+
+        // TODO: This command name should be enforced by the backup location class
         // will probably need a new abstract class to enable that
         $cmd = $cmdNamespace . ':setup';
 
