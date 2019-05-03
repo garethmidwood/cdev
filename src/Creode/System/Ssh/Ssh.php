@@ -8,36 +8,29 @@ use Psr\Log\LoggerInterface;
 
 class Ssh extends Command
 {
-    const CONFIG_GROUP = 'backups';
     const COMMAND_DOWNLOAD = 'scp';
     const COMMAND_CONNECT = 'ssh';
 
     /**
-     * @var Config
-     */
-    private $_config;
-
-    /**
-     * @param Config $config 
-     * @return null
-     */
-    public function __construct(
-        Config $config
-    ) {
-        $this->_config = $config;
-    }
-
-    /**
      * Downloads a file from the host
      * @param string $path Working directory
-     * @param string $configNode The name of the server details node in the config yml file
+     * @param string $user The SSH username
+     * @param string $host The SSH host
+     * @param string $port The SSH port
      * @param string $srcPath The file to download
      * @param string $targetPath Where to store the downloaded file
      * @param OutputInterface $output
-     * @return string
+     * @return void
      */
-    public function download($path, $configNode, $srcPath, $targetPath, OutputInterface $output)
-    {
+    public function download(
+        $path,
+        $user,
+        $host,
+        $port,
+        $srcPath,
+        $targetPath,
+        OutputInterface $output
+    ) {
         $downloadDir = dirname($targetPath);
 
         if (!file_exists($downloadDir)) {
@@ -45,28 +38,38 @@ class Ssh extends Command
             mkdir($downloadDir);
         }
 
-        $conf = $this->_config->get($configNode);
-
         $this->runExternalCommand(
             self::COMMAND_DOWNLOAD,
             [
-                '-P' . $conf['port'],
-                $conf['user'] . '@' . $conf['host'] . ':' . $srcPath,
+                '-P' . $port,
+                (strlen($user) > 0 ? $user . '@' : '') . $host . ':' . $srcPath,
                 $targetPath
             ],
             $path
         );
     }
 
-    private function connect($path, $configNode, OutputInterface $output)
-    {
-        $conf = $this->_config->get($configNode);
-
+    /**
+     * Opens an SSH connection
+     * @param string $path Working directory
+     * @param string $user The SSH username
+     * @param string $host The SSH host
+     * @param string $port The SSH port
+     * @param OutputInterface $output 
+     * @return void
+     */
+    private function connect(
+        $path, 
+        $user,
+        $host,
+        $port,
+        OutputInterface $output
+    ) {
         $this->runExternalCommand(
             self::COMMAND_CONNECT,
             [
-                '-p' . $conf['port'],
-                $conf['user'] . '@' . $conf['host']
+                '-p' . $port,
+                (strlen($user) > 0 ? $user . '@' : '') . $host
             ],
             $path
         );

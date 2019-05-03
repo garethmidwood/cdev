@@ -64,7 +64,7 @@ class PullCommand extends Command
     {
         $answers = $this->askQuestions($input, $output);
 
-        $backupServer = $this->_config->get('backups');
+        $backupServer = $this->_config->get('storage');
         $path = $input->getOption('path');
 
         $cwd = $path . '/';
@@ -74,25 +74,25 @@ class PullCommand extends Command
         switch($answers['backupType']) {
             case 'all':
                 $transfers[] = [
-                    'target' => $cwd . Files::MEDIA_FILE,
-                    'source' => $backupServer['media-dir'] . $backupServer['media-file']
+                    'target' => $cwd . Files::MEDIA_DIR,
+                    'source' => $backupServer['media-dir']
                 ];
                 $transfers[] = [
-                    'target' => $cwd . Files::DB_FILE,
-                    'source' => $backupServer['db-dir'] . $backupServer['db-file']
+                    'target' => $cwd . Files::DB_DIR,
+                    'source' => $backupServer['db-dir']
                 ];
                 break;
             case 'media':
                 $transfers[] = [
-                    'target' => $cwd . Files::MEDIA_FILE,
-                    'source' => $backupServer['media-dir'] . $backupServer['media-file']
+                    'target' => $cwd . Files::MEDIA_DIR,
+                    'source' => $backupServer['media-dir']
                 ];
                 break;
             case 'database':
             default:
                 $transfers[] = [
-                    'target' => $cwd . Files::DB_FILE,
-                    'source' => $backupServer['db-dir'] . $backupServer['db-file']
+                    'target' => $cwd . Files::DB_DIR,
+                    'source' => $backupServer['db-dir']
                 ];
                 break;
         }
@@ -100,7 +100,7 @@ class PullCommand extends Command
         foreach ($transfers as $transfer) {
             $this->_storageLocation->download(
                 $path,
-                'backups',
+                'storage',
                 $transfer['source'],
                 $transfer['target'],
                 $output

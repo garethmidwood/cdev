@@ -4,6 +4,7 @@ namespace Creode\Storage\S3;
 
 use Creode\Cdev\Config;
 use Creode\Storage\Storage;
+use Creode\System\Aws\S3\S3 as AwsS3;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class S3 extends Storage
@@ -18,13 +19,21 @@ class S3 extends Storage
     private $_config;
 
     /**
+     * @var AwsS3
+     */
+    private $_s3;
+
+    /**
      * Constructor
+     * @param AwsS3 $s3
      * @param Config $config 
      * @return void
      */
     public function __construct(
+        AwsS3 $s3,
         Config $config
     ) {
+        $this->_s3 = $s3;
         $this->_config = $config;
     }
 
@@ -45,6 +54,14 @@ class S3 extends Storage
         $downloadLocation,
         OutputInterface $output
     ) {
-        echo 'downloading from S3...' . PHP_EOL;
+        $conf = $this->_config->get($configNodeName);
+
+        return $this->_s3->download(
+            $runPath,
+            $conf['bucket'],
+            $source,
+            $downloadLocation,
+            $output
+        );
     }
 }

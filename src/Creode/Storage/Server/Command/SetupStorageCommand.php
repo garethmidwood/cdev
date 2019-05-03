@@ -14,7 +14,7 @@ class SetupStorageCommand extends ConfigurationCommand
     protected $_config = [
         'config' => [
             'storage' => [
-                'user' => null,
+                'user' => '',
                 'host' => null,
                 'port' => null,
                 'db-dir' => 'databases',

@@ -54,6 +54,16 @@ class Server extends Storage
         $downloadLocation,
         OutputInterface $output
     ) {
-        echo 'downloading from server...' . PHP_EOL;
+        $conf = $this->_config->get($configNodeName);
+
+        return $this->_ssh->download(
+            $runPath,
+            $conf['user'],
+            $conf['host'],
+            $conf['port'],
+            $source,
+            $downloadLocation,
+            $output
+        );
     }
 }
