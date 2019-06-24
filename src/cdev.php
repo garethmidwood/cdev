@@ -9,6 +9,7 @@
 use Creode\Cdev\Config;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Exception\ServiceNotFoundException;
 use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\Finder\Finder;
 
@@ -32,8 +33,16 @@ if (file_exists($localServiceConfig)) {
     $loader->load($localServiceConfig);
 }
 
-// Create application so we can register additional commands in plugins
-$application = $container->get('symfony.application');
+
+try {
+    // Create application so we can register additional commands in plugins
+    $application = $container->get('symfony.application');
+} catch (ServiceNotFoundException $e) {
+    echo "FATAL ERROR: One of the services could not be found, do you need to install a plugin for it? Try `cdev plugin:search`" . PHP_EOL;
+    echo $e->getMessage();
+    echo PHP_EOL;
+    exit;
+}
 
 // register commands from plugins
 \Creode\Cdev\Plugin\Manager::registerCommands($container, $application);
