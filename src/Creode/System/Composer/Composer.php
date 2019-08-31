@@ -18,6 +18,16 @@ class Composer extends Command
     }
 
     /**
+     * Returns true if the given path is already initialised for composer
+     * @param string $path 
+     * @return boolean
+     */
+    public function isInitialised($path)
+    {
+        return file_exists($path . DIRECTORY_SEPARATOR . 'composer.json');
+    }
+
+    /**
      * initiliases new repo
      * @param string $path 
      * @param string $packageName 

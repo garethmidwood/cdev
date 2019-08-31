@@ -96,6 +96,13 @@ class InstallPluginCommand extends ConfigurationCommand
 
         $path = \Creode\Cdev\Plugin\Manager::getPluginDir();
 
+        if (!$this->_composer->isInitialised($path)) {
+            echo 'not initialised' . PHP_EOL;
+            $this->_composer->init($path, 'cdev-plugins');
+        } else {
+            echo 'it is initialised' . PHP_EOL;
+        }
+
         $this->_composer->require($path, $packageToInstall);
     }
 
