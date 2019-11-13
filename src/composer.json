@@ -8,12 +8,6 @@
             "email": "gareth.midwood@creode.co.uk"
         }
     ],
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https://packagist.creode.co.uk"
-        }
-    ],
     "minimum-stability": "dev",
     "require": {
         "symfony/console": "^3.3",

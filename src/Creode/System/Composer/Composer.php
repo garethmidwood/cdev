@@ -125,6 +125,28 @@ class Composer extends Command
     }
 
     /**
+     * Wrapper around composers options.
+     *
+     * @param string $path
+     * @param array $options
+     * @return string
+     *    String representation of the command which was ran.
+     */
+    public function config($path, $options = [])
+    {
+        $config = ['config'];
+        $merged_config = array_merge($config, $options);
+
+        $this->runExternalCommand(
+            $this->_composer,
+            $merged_config,
+            $path
+        );
+
+        return 'composer ' . implode(" ", $merged_config);
+    }
+
+    /**
      * Removes a package
      * @param string $path 
      * @param string $package 
