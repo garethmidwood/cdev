@@ -3,7 +3,6 @@ namespace Creode\Cdev\Command\Plugin;
 
 use Creode\Cdev\Command\ConfigurationCommand;
 use Creode\System\Composer\Composer;
-use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputInterface;
@@ -102,5 +101,4 @@ class InstallPluginCommand extends ConfigurationCommand
 
         $this->_composer->require($path, $packageToInstall);
     }
-
 }

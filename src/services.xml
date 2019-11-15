@@ -39,6 +39,9 @@
                 <argument type="service" id="cdev.cdev_plugin_update_command" />
             </call>
             <call method="add">
+                <argument type="service" id="cdev.cdev_plugin_add_repository_command" />
+            </call>
+            <call method="add">
                 <argument type="service" id="cdev.cdev_plugin_remove_command" />
             </call>
             <call method="add">
@@ -131,6 +134,10 @@
         </service>
 
         <service id="cdev.cdev_plugin_list_command" class="Creode\Cdev\Command\Plugin\ListPluginCommand">
+            <argument type="service" id="cdev.system_composer" />
+        </service>
+
+        <service id="cdev.cdev_plugin_add_repository_command" class="Creode\Cdev\Command\Plugin\AddRepositoryCommand">
             <argument type="service" id="cdev.system_composer" />
         </service>
 
