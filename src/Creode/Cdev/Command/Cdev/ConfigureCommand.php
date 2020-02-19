@@ -33,6 +33,9 @@ class ConfigureCommand extends ConfigurationCommand
             'environment' => array(
                 'type' => null,
                 'framework' => null
+            ),
+            'backups' => array(
+                'location' => null
             )
         )
     );
